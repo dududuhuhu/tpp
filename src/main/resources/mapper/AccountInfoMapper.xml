@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AccountInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AccountInfo">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="name" column="name" />
+            <result property="fullName" column="full_name" />
+            <result property="sid" column="sid" />
+            <result property="sidType" column="sid_type" />
+            <result property="status" column="status" />
+            <result property="disabled" column="disabled" />
+            <result property="lockout" column="lockout" />
+            <result property="passwordChangeable" column="password_changeable" />
+            <result property="passwordExpires" column="password_expires" />
+            <result property="passwordRequired" column="password_required" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+            <result property="isHarmful" column="is_harmful" />
+            <result property="harmfulKey" column="harmful_key" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,name,full_name,sid,sid_type,
+        status,disabled,lockout,password_changeable,password_expires,
+        password_required,created_at,updated_at,is_harmful,harmful_key
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from account_info
+        where  id = #{id} 
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        select
+        <include refid="Base_Column_List" />
+        from account_info order by id
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from account_info
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AccountInfo" useGeneratedKeys="true">
+        insert into account_info
+        ( id,mac,name,full_name,sid,sid_type,
+        status,disabled,lockout,password_changeable,password_expires,
+        password_required,created_at,updated_at,is_harmful,harmful_key)
+        values (#{id},#{mac},#{name},#{fullName},#{sid},#{sidType},
+        #{status},#{disabled},#{lockout},#{passwordChangeable},#{passwordExpires},
+        #{passwordRequired},#{createdAt},#{updatedAt},#{isHarmful},#{harmfulKey})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AccountInfo" useGeneratedKeys="true">
+        insert into account_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="name != null">name,</if>
+                <if test="fullName != null">full_name,</if>
+                <if test="sid != null">sid,</if>
+                <if test="sidType != null">sid_type,</if>
+                <if test="status != null">status,</if>
+                <if test="disabled != null">disabled,</if>
+                <if test="lockout != null">lockout,</if>
+                <if test="passwordChangeable != null">password_changeable,</if>
+                <if test="passwordExpires != null">password_expires,</if>
+                <if test="passwordRequired != null">password_required,</if>
+                <if test="createdAt != null">created_at,</if>
+                <if test="updatedAt != null">updated_at,</if>
+                <if test="isHarmful != null">is_harmful,</if>
+                <if test="harmfulKey != null">harmful_key,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="name != null">#{name},</if>
+                <if test="fullName != null">#{fullName},</if>
+                <if test="sid != null">#{sid},</if>
+                <if test="sidType != null">#{sidType},</if>
+                <if test="status != null">#{status},</if>
+                <if test="disabled != null">#{disabled},</if>
+                <if test="lockout != null">#{lockout},</if>
+                <if test="passwordChangeable != null">#{passwordChangeable},</if>
+                <if test="passwordExpires != null">#{passwordExpires},</if>
+                <if test="passwordRequired != null">#{passwordRequired},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+                <if test="updatedAt != null">#{updatedAt},</if>
+                <if test="isHarmful != null">#{isHarmful},</if>
+                <if test="harmfulKey != null">#{harmfulKey},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        update account_info
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="name != null">
+                    name = #{name},
+                </if>
+                <if test="fullName != null">
+                    full_name = #{fullName},
+                </if>
+                <if test="sid != null">
+                    sid = #{sid},
+                </if>
+                <if test="sidType != null">
+                    sid_type = #{sidType},
+                </if>
+                <if test="status != null">
+                    status = #{status},
+                </if>
+                <if test="disabled != null">
+                    disabled = #{disabled},
+                </if>
+                <if test="lockout != null">
+                    lockout = #{lockout},
+                </if>
+                <if test="passwordChangeable != null">
+                    password_changeable = #{passwordChangeable},
+                </if>
+                <if test="passwordExpires != null">
+                    password_expires = #{passwordExpires},
+                </if>
+                <if test="passwordRequired != null">
+                    password_required = #{passwordRequired},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+                <if test="updatedAt != null">
+                    updated_at = #{updatedAt},
+                </if>
+                <if test="isHarmful != null">
+                    is_harmful = #{isHarmful},
+                </if>
+                <if test="harmfulKey != null">
+                    harmful_key = #{harmfulKey},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        update account_info
+        set 
+            mac =  #{mac},
+            name =  #{name},
+            full_name =  #{fullName},
+            sid =  #{sid},
+            sid_type =  #{sidType},
+            status =  #{status},
+            disabled =  #{disabled},
+            lockout =  #{lockout},
+            password_changeable =  #{passwordChangeable},
+            password_expires =  #{passwordExpires},
+            password_required =  #{passwordRequired},
+            created_at =  #{createdAt},
+            updated_at =  #{updatedAt},
+            is_harmful =  #{isHarmful},
+            harmful_key =  #{harmfulKey}
+        where   id = #{id} 
+    </update>
+</mapper>

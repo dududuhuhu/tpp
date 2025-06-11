@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>资产详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <style>
+        .st {
+            width: 270px!important;
+        }
+        .layui-form-label {
+            width: 120px!important;
+        }
+        .xinghao {
+            color: red!important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-container" style="width: 100%;">
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <h3>资产详情</h3>
+                </div>
+                <div class="layui-card-body">
+                    <div class="layui-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">账号</li>
+                            <li>服务</li>
+                            <li>进程</li>
+                            <li>应用</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <div id="accountInfoContent">
+                                    <p>加载中...</p>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div id="serviceInfoContent">
+                                    <p>加载中...</p>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div id="processInfoContent">
+                                    <p>加载中...</p>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div id="appInfoContent">
+                                    <p>加载中...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    // 日期格式转换函数
+    function formatDate(str) {
+        if (str != null) {
+            var now = new Date(str);
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+        }
+        return "";
+    }
+</script>
+<script type="text/javascript">
+    layui.config({
+        base: '/layui/layuiAdmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['element', 'jquery'], function () {
+        var $ = layui.$
+            , element = layui.element
+            , table = layui.table;
+        // 初始化选项卡
+        element.init();
+
+        function loadAssetsInfo(url, selector, hostMac) {
+
+
+            // 根据 URL 动态调整表格列配置
+            let cols = [];
+            if (url.includes('/host/accountInfo')) {
+                cols = [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', title: 'ID', width: 55},
+                        {field: 'mac', title: 'MAC地址', width: 150},
+                        {field: 'name', title: '主机名', width: 150},
+                        {field: 'fullName', title: '全名', width: 200},
+                        {field: 'sid', title: 'SID', width: 180},
+                        {field: 'sidType', title: 'SID类型', width: 100},
+                        {
+                            field: 'status', title: '状态', width: 100
+                        },
+                        {
+                            field: 'disabled', title: '禁用', width: 80, templet: function(d) {
+                                return d.disabled === 1 ? '是' : '否';
+                            }
+                        },
+                        {
+                            field: 'lockout', title: '锁定', width: 80, templet: function(d) {
+                                return d.lockout === 1 ? '是' : '否';
+                            }
+                        },
+                        {
+                            field: 'passwordChangeable', title: '可改密码', width: 100, templet: function(d) {
+                                return d.passwordChangeable === 1 ? '是' : '否';
+                            }
+                        },
+                        {
+                            field: 'passwordExpires', title: '密码过期', width: 100, templet: function(d) {
+                                return d.passwordExpires === 1 ? '是' : '否';
+                            }
+                        },
+                        {
+                            field: 'passwordRequired', title: '密码必填', width: 100, templet: function(d) {
+                                return d.passwordRequired === 1 ? '是' : '否';
+                            }
+                        },
+                        {
+                            field: 'createdAt', title: '创建时间', width: 160, templet: function(d) {
+                                return formatDate(d.createdAt);
+                            }
+                        },
+                        {
+                            field: 'updatedAt', title: '更新时间', width: 160, templet: function(d) {
+                                return d.updatedAt ? formatDate(d.updatedAt) : formatDate(d.createdAt);
+                            }
+                        },
+                        {
+                            field: 'isHarmful',
+                            title: '是否有害',
+                            width: 150,
+                            templet: function(d) {
+                                if (d.isHarmful === 1) {
+                                    return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
+                                } else {
+                                    return "<button class='layui-btn layui-btn-normal layui-btn-xs'>否</button>";
+                                }
+                            }
+                        },
+                        {field: 'harmfulKey', title: '有害位置', width: 180},
+                    ]
+                ];
+            } else if (url.includes('/host/serviceInfo')) {
+                cols = [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', title: 'ID', width: 55},
+                        {field: 'mac', title: 'MAC地址', width: 150},
+                        {field: 'serviceName', title: '服务名称', width: 120},
+                        {field: 'status', title: '状态', width: 120},
+                        {field: 'startTime', title: '启动时间', width: 120, templet: function (d) {
+                                return formatDate(d.startTime);
+                            }}
+                    ]
+                ];
+            } else if (url.includes('/host/processInfo')) {
+                cols = [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', title: 'ID', width: 55},
+                        {field: 'mac', title: 'MAC地址', width: 150},
+                        {field: 'pid',title:'进程ID',width: 80},
+                        {field: 'ppid',title:'子进程ID',width: 80},
+                        {field: 'name',title:'进程名字',width: 80},
+                        {field: 'cmd',title:'命令行',width: 80},
+                        {field: 'priority', title: '优先权', width: 120},
+                        {field: 'description', title: '描述', width: 120},
+                        {field: 'collectTime', title: '探测时间', width: 120, templet: function (d) {
+                                return formatDate(d.collectTime);
+                            }}
+                    ]
+                ];
+            } else if (url.includes('/host/appInfo')) {
+                cols = [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', title: 'ID', width: 55},
+                        {field: 'mac', title: 'MAC地址', width: 150},
+                        {field: 'displayName', title: '应用名字', width: 120},
+                        {field: 'installLocation', title: '安装地址', width: 130},
+                        {field: 'uninstallString', title: '卸载地址', width: 120},
+                        {field: 'collectTime', title: '探测时间', width: 120, templet: function (d) {
+                                return formatDate(d.collectTime);
+                            }}
+                    ]
+                ];
+            }
+
+            // 清除“加载中...”的提示信息
+            $(selector).empty();
+            var data={
+                macAddress:hostMac,
+            };
+            console.log("data:",data);
+
+            // 使用 Layui 的 table.render 方法渲染表格
+            table.render({
+                elem: selector, // 表格容器的 DOM 元素选择器
+                url: url, // 数据接口 URL
+                method: 'POST', // 请求方法
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
+                },
+                contentType: 'application/json', // 明确指定发送的内容类型为JSON
+                data: JSON.stringify(data), // 将请求体数据序列化为JSON字符串
+                where:data,
+                dataType: 'json', // 期望从服务器接收 JSON 格式的响应
+                cols: cols, // 动态列配置
+                page: {
+                    curr: 1, // 设定初始在第 1 页
+                    limit: 5, // 设定初始每页显示 5 条
+                    limits: [5, 10, 15, 20] // 可选的每页显示条数
+                }
+            });
+        }
+
+// 从 URL 参数中获取主机 MAC 地址
+        var hostMac = new URLSearchParams(window.location.search).get('mac');
+        console.log("hostMac:", hostMac);
+
+
+// 加载不同类型的资产信息
+        loadAssetsInfo('/host/accountInfo', '#accountInfoContent', hostMac);
+        loadAssetsInfo('/host/serviceInfo', '#serviceInfoContent', hostMac);
+        loadAssetsInfo('/host/processInfo', '#processInfoContent', hostMac);
+        loadAssetsInfo('/host/appInfo', '#appInfoContent', hostMac);
+    });
+</script>
+</body>
+</html>

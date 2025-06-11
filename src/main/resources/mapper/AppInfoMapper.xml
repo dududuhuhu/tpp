@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AppInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AppInfo">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="displayName" column="display_name" />
+            <result property="installLocation" column="install_location" />
+            <result property="uninstallString" column="uninstall_string" />
+            <result property="collectTime" column="collect_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,display_name,install_location,uninstall_string,collect_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from app_info
+        where  id = #{id} 
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.AppInfo">
+        select
+        <include refid="Base_Column_List" />
+        from app_info
+        where mac = #{mac}
+        order by id
+    </select>
+    <select id="selectByMacAndDisplayName" resultType="com.tpp.threat_perception_platform.pojo.AppInfo">
+        select
+        <include refid="Base_Column_List" />
+        from app_info
+        where  mac = #{mac} and display_name = #{displayName}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from app_info
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo" useGeneratedKeys="true">
+        insert into app_info
+        ( id,mac,display_name,install_location,uninstall_string,collect_time)
+        values (#{id},#{mac},#{displayName},#{installLocation},#{uninstallString},#{collectTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo" useGeneratedKeys="true">
+        insert into app_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="displayName != null">display_name,</if>
+                <if test="installLocation != null">install_location,</if>
+                <if test="uninstallString != null">uninstall_string,</if>
+                <if test="collectTime != null">collect_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="displayName != null">#{displayName},</if>
+                <if test="installLocation != null">#{installLocation},</if>
+                <if test="uninstallString != null">#{uninstallString},</if>
+                <if test="collectTime != null">#{collectTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo">
+        update app_info
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="displayName != null">
+                    display_name = #{displayName},
+                </if>
+                <if test="installLocation != null">
+                    install_location = #{installLocation},
+                </if>
+                <if test="uninstallString != null">
+                    uninstall_string = #{uninstallString},
+                </if>
+                <if test="collectTime != null">
+                    collect_time = #{collectTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo">
+        update app_info
+        set 
+            mac =  #{mac},
+            display_name =  #{displayName},
+            install_location =  #{installLocation},
+            uninstall_string =  #{uninstallString},
+            collect_time =  #{collectTime}
+        where   id = #{id} 
+    </update>
+</mapper>
