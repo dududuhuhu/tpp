@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Service管理</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+</head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-card-body">
+        <!-- 表格 -->
+        <table id="assets-service-manage" lay-filter="assets-service-manage"></table>
+    </div>
+</div>
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.config({
+        base: '/layui/layuiAdmin/'
+    }).extend({
+        index: 'lib/index'
+    }).use(['layer', 'table', 'form'], function(){
+        var $ = layui.$, form = layui.form, layer = layui.layer, table = layui.table;
+        var hostId = layui.data('sharedData').hostId;
+        console.log(hostId);
+        var data = {
+          id: hostId,
+          page: 1,
+          limit: 5,
+        };
+        console.log(data);
+        // data = JSON.stringify(data);
+        table.render({
+            elem:"#assets-service-manage",
+            method: 'post',
+            url:'/host/assets/service/list',
+            headers:{
+                'Authorization': localStorage.getItem('token'),
+            },
+            contentType: 'application/json',
+            width:'auto',
+            cellMinWidth:80,
+            title:'service',
+            where: data,
+            cols:[
+                [
+                    {type:'checkbox', fixed: 'left'},
+                    {field:'id', title:'ID', width:80},
+                    {field:'hostId', tile:'主机ID', width:80},
+                    {field:'name', title:'服务名', width:120},
+                    {field:'port', title:'端口', width:80},
+                    {field:'protocol', title:'协议', width:80},
+                    {field:'state', title:'状态', width:80},
+                    {field:'version', title:'版本', width:80},
+                    {field:'extrainfo', title:'额外信息', width:80},
+                ]
+            ],
+            page:{curr: 1, limit: 5},
+            limits:[5,10,15,20,25],
+        })
+    });
+</script>
+</body>
+
+</html>

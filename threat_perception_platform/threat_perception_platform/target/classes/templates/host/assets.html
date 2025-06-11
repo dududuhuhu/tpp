@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资产探测</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+    <style>
+        .st{
+            width: 270px!important;
+        }
+        .layui-form-label{
+            width: 120px!important;
+        }
+        .xinghao{
+            color: red!important;
+        }
+    </style>
+</head>
+<body>
+
+<!--表单-->
+<div class="layui-form" lay-filter="assets-form" id="assets-form" style="padding: 20px 0 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">MAC地址<span class="xinghao">*</span></label>
+        <div class="layui-input-inline st">
+            <input type="text" name="macAddress" readonly lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <input type="checkbox" name="account" value="1" title="账号探测" lay-filter="assets-filter">
+        <input type="checkbox" name="service" value="1" title="服务探测" lay-filter="assets-filter">
+        <input type="checkbox" name="process" value="1" title="进程探测" lay-filter="assets-filter">
+        <input type="checkbox" name="app" value="1" title="应用探测" lay-filter="assets-filter">
+    </div>
+</div>
+
+<script src="/layui/layui.js"></script>
+</body>
+</html>

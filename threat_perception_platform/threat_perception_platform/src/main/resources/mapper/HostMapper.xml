@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.HostMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.Host">
+            <id property="id" column="id" />
+            <result property="hostName" column="host_name" />
+            <result property="ipAddress" column="ip_address" />
+            <result property="macAddress" column="mac_address" />
+            <result property="osType" column="os_type" />
+            <result property="osName" column="os_name" />
+            <result property="osVersion" column="os_version" />
+            <result property="osBit" column="os_bit" />
+            <result property="cpuType" column="cpu_type" />
+            <result property="ram" column="ram" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,host_name,ip_address,mac_address,os_type,os_name,
+        os_version,os_bit,cpu_type,ram,create_time,
+        update_time
+    </sql>
+
+    <sql id="Base_Column_List2">
+        id, host_name, ip_address, mac_address, os_type, os_name,
+        os_version, os_bit, cpu_type, ram, create_time
+    </sql>
+
+    <sql id="heartbeat_timeout">
+        60
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from host
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from host
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Host" useGeneratedKeys="true">
+        insert into host
+        ( id,host_name,ip_address,mac_address,os_type,os_name,
+        os_version,os_bit,cpu_type,ram,create_time,
+        update_time)
+        values (#{id},#{hostName},#{ipAddress},#{macAddress},#{osType},#{osName},
+        #{osVersion},#{osBit},#{cpuType},#{ram},#{createTime},
+        #{updateTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Host" useGeneratedKeys="true">
+        insert into host
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="hostName != null">host_name,</if>
+                <if test="ipAddress != null">ip_address,</if>
+                <if test="macAddress != null">mac_address,</if>
+                <if test="osType != null">os_type,</if>
+                <if test="osName != null">os_name,</if>
+                <if test="osVersion != null">os_version,</if>
+                <if test="osBit != null">os_bit,</if>
+                <if test="cpuType != null">cpu_type,</if>
+                <if test="ram != null">ram,</if>
+                <if test="createTime != null">create_time,</if>
+                <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="hostName != null">#{hostName},</if>
+                <if test="ipAddress != null">#{ipAddress},</if>
+                <if test="macAddress != null">#{macAddress},</if>
+                <if test="osType != null">#{osType},</if>
+                <if test="osName != null">#{osName},</if>
+                <if test="osVersion != null">#{osVersion},</if>
+                <if test="osBit != null">#{osBit},</if>
+                <if test="cpuType != null">#{cpuType},</if>
+                <if test="ram != null">#{ram},</if>
+                <if test="createTime != null">#{createTime},</if>
+                <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.Host">
+        update host
+        <set>
+                <if test="hostName != null">
+                    host_name = #{hostName},
+                </if>
+                <if test="ipAddress != null">
+                    ip_address = #{ipAddress},
+                </if>
+                <if test="macAddress != null">
+                    mac_address = #{macAddress},
+                </if>
+                <if test="osType != null">
+                    os_type = #{osType},
+                </if>
+                <if test="osName != null">
+                    os_name = #{osName},
+                </if>
+                <if test="osVersion != null">
+                    os_version = #{osVersion},
+                </if>
+                <if test="osBit != null">
+                    os_bit = #{osBit},
+                </if>
+                <if test="cpuType != null">
+                    cpu_type = #{cpuType},
+                </if>
+                <if test="ram != null">
+                    ram = #{ram},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.Host">
+        update host
+        set 
+            host_name =  #{hostName},
+            ip_address =  #{ipAddress},
+            mac_address =  #{macAddress},
+            os_type =  #{osType},
+            os_name =  #{osName},
+            os_version =  #{osVersion},
+            os_bit =  #{osBit},
+            cpu_type =  #{cpuType},
+            ram =  #{ram},
+            create_time =  #{createTime},
+            update_time =  #{updateTime}
+        where   id = #{id} 
+    </update>
+    <update id="updateStatus">
+        update host
+        set
+            update_time = #{currentTime}
+        where mac_address = #{macAddress};
+    </update>
+    <insert id="updateOrInsertByMacAddress">
+        INSERT INTO host (host_name, ip_address, mac_address, os_type, os_name, os_version, os_bit, cpu_type, ram, create_time, update_time)
+        VALUES (#{host.hostName}, #{host.ipAddress}, #{host.macAddress}, #{host.osType}, #{host.osName}, #{host.osVersion}, #{host.osBit}, #{host.cpuType}, #{host.ram}, #{currentTime}, #{currentTime})
+            ON DUPLICATE KEY UPDATE
+                                 host_name = #{host.hostName},
+                                 ip_address = #{host.ipAddress},
+                                 os_type = #{host.osType},
+                                 os_name = #{host.osName},
+                                 os_version = #{host.osVersion},
+                                 os_bit = #{host.osBit},
+                                 cpu_type = #{host.cpuType},
+                                 ram = #{host.ram},
+                                 update_time = #{currentTime}
+    </insert>
+
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.HostView">
+        select
+        <include refid="Base_Column_List2" />
+            ,case
+                when timestampdiff(second, update_time, now()) &lt;= <include refid="heartbeat_timeout" /> then 1 else 0
+                end as status
+        from host
+        <where>
+            <if test="param.keywords != null and param.keywords != ''">
+                and host_name like concat('%', #{param.keywords}, '%')
+            </if>
+            <if test="param.id != 0 and param.id != null">
+                and id = #{param.id}
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="selectByMacAddress" resultType="com.tpp.threat_perception_platform.pojo.Host">
+        select
+            <include refid="Base_Column_List" />
+        from host
+        where mac_address = #{macAddress};
+    </select>
+</mapper>
