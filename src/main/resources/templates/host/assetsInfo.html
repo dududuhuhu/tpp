@@ -26,7 +26,7 @@
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-header">
-                    <h3>08:8E:90:C7:79:13</h3>
+                    <h3>资产详情</h3>
                 </div>
                 <div class="layui-card-body">
                     <div class="layui-tab">
@@ -166,14 +166,14 @@
                 cols = [
                     [
                         {type:'checkbox', fixed: 'left'},
-                        // {field:'id', title:'ID', width:50},
-                        // {field:'hostId', tile:'主机ID', width:80},
+                        {field:'id', title:'ID', width:80},
+                        {field:'hostId', tile:'主机ID', width:80},
                         {field:'name', title:'服务名', width:120},
                         {field:'port', title:'端口', width:80},
                         {field:'protocol', title:'协议', width:80},
                         {field:'state', title:'状态', width:80},
                         {field:'version', title:'版本', width:80},
-                        {field:'extrainfo', title:'额外信息', width:100},
+                        {field:'extrainfo', title:'额外信息', width:80},
                     ]
                 ];
             } else if (url.includes('/host/processInfo')) {
