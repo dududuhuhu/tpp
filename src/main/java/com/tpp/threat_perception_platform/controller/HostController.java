@@ -4,10 +4,7 @@ import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
-import com.tpp.threat_perception_platform.service.AccountInfoService;
-import com.tpp.threat_perception_platform.service.AppInfoService;
-import com.tpp.threat_perception_platform.service.HostService;
-import com.tpp.threat_perception_platform.service.ProcessInfoService;
+import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +21,8 @@ public class HostController {
     private ProcessInfoService processInfoService;
     @Autowired
     private AccountInfoService accountInfoService;
+    @Autowired
+    private ServiceInfoService serviceInfoService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -60,11 +59,12 @@ public class HostController {
         return result;
     }
 //
-//    // 获取服务信息
-//    @PostMapping("/host/serviceInfo")
-//    public ResponseResult serviceInfo(@RequestBody AssetsParam param) {
-//        return hostService.getAServiceInfo(param);
-//    }
+    // 获取服务信息
+    @PostMapping("/host/serviceInfo")
+    public ResponseResult serviceInfo(@RequestBody MyParam param) {
+        System.out.println(param);
+        return serviceInfoService.retrieveAssetsService(param);
+    }
 //
     // 获取进程信息
     @PostMapping("/host/processInfo")

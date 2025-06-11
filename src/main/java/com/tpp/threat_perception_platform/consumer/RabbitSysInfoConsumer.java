@@ -1,16 +1,12 @@
 package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.rabbitmq.client.Channel;
 
-import com.tpp.threat_perception_platform.pojo.AccountInfo;
-import com.tpp.threat_perception_platform.pojo.AppInfo;
-import com.tpp.threat_perception_platform.pojo.Host;
-import com.tpp.threat_perception_platform.pojo.ProcessInfo;
+import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
-import com.tpp.threat_perception_platform.service.AccountInfoService;
-import com.tpp.threat_perception_platform.service.HostService;
-import com.tpp.threat_perception_platform.service.AppInfoService;
-import com.tpp.threat_perception_platform.service.ProcessInfoService;
+import com.tpp.threat_perception_platform.service.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +31,9 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private AccountInfoService accountInfoService;
+
+    @Autowired
+    private ServiceInfoService serviceInfoService;
 
     @RabbitListener(queues = "sysinfo_queue")
     public void receive(String message, @Headers Map<String,Object> headers,
@@ -211,4 +210,30 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+    @RabbitListener(queues="service_queue")
+    public void receiveService(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received message: " + message);
+        try {
+            JSONObject jsonObject = JSON.parseObject(message);
+            List<ServiceInfo> services = JSON.parseArray(jsonObject.getString("service"), ServiceInfo.class);
+            String macAddress = jsonObject.getString("macAddress");
+            System.out.println("macAddress: " + macAddress);
+            System.out.println("services: " + services);
+            serviceInfoService.saveService(macAddress, services);
+        }
+        catch (JSONException e) {
+            System.err.println("JSONException: " + e.getMessage());
+
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            // ACK
+            channel.basicAck(deliveryTag, false);
+        }
+        // catch (Exception e) {
+        //     System.err.println("Exception: " + e.getMessage());
+        // }
+        finally{
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
 }
