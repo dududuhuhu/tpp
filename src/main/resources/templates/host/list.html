@@ -260,18 +260,23 @@
 
                 });
             }else if(obj.event === 'assetsInfo'){
-                var hostMacAddress = data.macAddress; // 获取当前主机的MAC地址
-                // 使用layer.open打开一个新的弹出层
                 layer.open({
-                    type: 2, // iframe层
-                    skin: 'layui-layer-molv',
-                    area: ['800px', '600px'], // 弹出层大小
-                    title: '资产详情', // 弹出层标题
-                    content: '/page/host/assetsInfo?mac=' + encodeURIComponent(hostMacAddress), // iframe加载的页面
-                    maxmin: true, // 允许最大化和最小化
-                    btn: ['关闭'], // 弹出层按钮
+                    type: 2,
+                    title: '资产详情',
+                    area: ['800px', '600px'],
+                    content: '/page/host/assetsInfo', // 页面2地址
+                    maxmin: true,
+                    btn: ['关闭'],
                     yes: function(index, layero){
-                        layer.close(index); // 关闭弹出层
+                        layer.close(index);
+                    },
+                    success: function(layero, index){
+                        // 获取iframe窗口对象
+                        var iframeWin = layero.find('iframe')[0].contentWindow;
+                        // 延迟发送，保证页面2监听就绪
+                        setTimeout(() => {
+                            iframeWin.postMessage(data, '*');
+                        }, 200);
                     }
                 });
             }
