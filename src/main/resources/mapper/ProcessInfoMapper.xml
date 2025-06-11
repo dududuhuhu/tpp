@@ -33,7 +33,8 @@
     <select id="selectByMacAndPid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
         SELECT *
         FROM process_info
-        WHERE mac = #{mac}
+        WHERE mac = #{param.macAddress}
+          AND collect_time = (SELECT MAX(collect_time) FROM process_info WHERE mac=#{param.macAddress})
           AND pid = #{pid}
     </select>
 

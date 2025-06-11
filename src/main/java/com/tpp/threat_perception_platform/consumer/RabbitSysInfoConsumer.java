@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.rabbitmq.client.Channel;
@@ -210,30 +211,40 @@ public class RabbitSysInfoConsumer {
         }
     }
 
-    @RabbitListener(queues="service_queue")
+    @RabbitListener(queues = "service_queue")
     public void receiveService(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received message: " + message);
+
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG); // 提前获取 deliveryTag
+        boolean isAcked = false;
+
         try {
-            JSONObject jsonObject = JSON.parseObject(message);
-            List<ServiceInfo> services = JSON.parseArray(jsonObject.getString("service"), ServiceInfo.class);
-            String macAddress = jsonObject.getString("macAddress");
+            // 解析 JSON 数组
+            JSONArray jsonArray = JSON.parseArray(message);
+            if (jsonArray.isEmpty()) {
+                throw new JSONException("Received empty JSON array");
+            }
+
+            // 提取 macAddress 和 services
+            String macAddress = jsonArray.getJSONObject(0).getString("mac"); // 假设每个 JSON 对象都有 "mac" 字段
+            List<ServiceInfo> services = jsonArray.toJavaList(ServiceInfo.class);
+
             System.out.println("macAddress: " + macAddress);
             System.out.println("services: " + services);
-            serviceInfoService.saveService(macAddress, services);
-        }
-        catch (JSONException e) {
-            System.err.println("JSONException: " + e.getMessage());
 
-            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-            // ACK
-            channel.basicAck(deliveryTag, false);
-        }
-        // catch (Exception e) {
-        //     System.err.println("Exception: " + e.getMessage());
-        // }
-        finally{
-            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-            channel.basicAck(deliveryTag, false);
+            serviceInfoService.saveService(macAddress, services);
+            isAcked = true; // 标记消息已成功处理
+        } catch (JSONException e) {
+            System.err.println("JSONException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Exception: " + e.getMessage());
+        } finally {
+            if (!isAcked) {
+                System.out.println("Message processing failed. Rejecting message with delivery tag: " + deliveryTag);
+                channel.basicNack(deliveryTag, false, true); // 拒绝消息并重新入队
+            } else {
+                channel.basicAck(deliveryTag, false); // 确认消息
+            }
         }
     }
 }

@@ -28,6 +28,7 @@
         <include refid="Base_Column_List" />
         from app_info
         where mac = #{mac}
+        AND collect_time = (SELECT MAX(collect_time) FROM app_info WHERE mac=#{mac})
         order by id
     </select>
     <select id="selectByMacAndDisplayName" resultType="com.tpp.threat_perception_platform.pojo.AppInfo">

@@ -38,7 +38,10 @@
     <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
         select
         <include refid="Base_Column_List" />
-        from account_info order by id
+        from account_info
+        WHERE mac = #{param.macAddress}
+        AND updated_at = (SELECT MAX(updated_at) FROM account_info WHERE mac=#{param.macAddress})
+        order by id
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

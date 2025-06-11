@@ -42,11 +42,12 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
 
     @Override
     public ResponseResult retrieveAssetsService(MyParam param) {
-        if (param.getId() == null) return new ResponseResult<>(400, "Invalid param");
+        String mac= param.getMacAddress();
+        Integer id = hostMapper.selectByMacAddress(mac).getId();
         PageHelper.startPage(param.getPage(), param.getLimit());
 
-        List<com.tpp.threat_perception_platform.pojo.ServiceInfo> serviceList = serviceInfoMapper.selectByHostId(Long.valueOf(param.getId()));
-        if (!serviceList.isEmpty()) serviceInfoMapper.deleteByHostId(Long.valueOf(param.getId()));
+        List<com.tpp.threat_perception_platform.pojo.ServiceInfo> serviceList = serviceInfoMapper.selectByHostId(Long.valueOf(id));
+        if (!serviceList.isEmpty()) serviceInfoMapper.deleteByHostId(Long.valueOf(id));
         return new ResponseResult<>(0, serviceList);
     }
 }
