@@ -2,7 +2,7 @@ import json
 
 import pika
 
-import work.AssetsDetect
+from work.AssetsDetect import AssetsDetect
 
 
 class RabbitMQ:
@@ -59,16 +59,13 @@ class RabbitMQ:
         """
         # JSON字符串转换成字典
         data = json.loads(message)
-        print("mq:",data)
+        print(data)
         # 判断类型
         if data['type']=='assets':
             # 资产探测
             assets_detect = AssetsDetect(self,data)
             assets_detect.start()
             pass
-
-
-
 
     def consume_queue(self,queue_name):
         """
