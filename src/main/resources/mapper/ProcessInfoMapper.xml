@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.ProcessInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="pid" column="pid" />
+            <result property="ppid" column="ppid" />
+            <result property="name" column="name" />
+            <result property="cmd" column="cmd" />
+            <result property="priority" column="priority" />
+            <result property="description" column="description" />
+            <result property="collectTime" column="collect_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,pid,ppid,name,cmd,
+        priority,description,collect_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from process_info
+        where  id = #{id} 
+    </select>
+    <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+        SELECT * FROM process_info WHERE mac = #{mac} ORDER BY collect_time DESC
+    </select>
+    <select id="selectByMacAndPid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+        SELECT *
+        FROM process_info
+        WHERE mac = #{mac}
+          AND collect_time = (SELECT MAX(collect_time) FROM process_info WHERE mac=#{mac})
+          AND pid = #{pid}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from process_info
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo" useGeneratedKeys="true">
+        insert into process_info
+        ( id,mac,pid,ppid,name,cmd,
+        priority,description,collect_time)
+        values (#{id},#{mac},#{pid},#{ppid},#{name},#{cmd},
+        #{priority},#{description},#{collectTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo" useGeneratedKeys="true">
+        insert into process_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="pid != null">pid,</if>
+                <if test="ppid != null">ppid,</if>
+                <if test="name != null">name,</if>
+                <if test="cmd != null">cmd,</if>
+                <if test="priority != null">priority,</if>
+                <if test="description != null">description,</if>
+                <if test="collectTime != null">collect_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="pid != null">#{pid},</if>
+                <if test="ppid != null">#{ppid},</if>
+                <if test="name != null">#{name},</if>
+                <if test="cmd != null">#{cmd},</if>
+                <if test="priority != null">#{priority},</if>
+                <if test="description != null">#{description},</if>
+                <if test="collectTime != null">#{collectTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+        update process_info
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="pid != null">
+                    pid = #{pid},
+                </if>
+                <if test="ppid != null">
+                    ppid = #{ppid},
+                </if>
+                <if test="name != null">
+                    name = #{name},
+                </if>
+                <if test="cmd != null">
+                    cmd = #{cmd},
+                </if>
+                <if test="priority != null">
+                    priority = #{priority},
+                </if>
+                <if test="description != null">
+                    description = #{description},
+                </if>
+                <if test="collectTime != null">
+                    collect_time = #{collectTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+        update process_info
+        set 
+            mac =  #{mac},
+            pid =  #{pid},
+            ppid =  #{ppid},
+            name =  #{name},
+            cmd =  #{cmd},
+            priority =  #{priority},
+            description =  #{description},
+            collect_time =  #{collectTime}
+        where   id = #{id} 
+    </update>
+</mapper>

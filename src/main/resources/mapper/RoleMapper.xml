@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.RoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.Role">
+            <id property="id" column="id" />
+            <result property="roleName" column="role_name" />
+            <result property="roleDes" column="role_des" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,role_name,role_des
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from role
+        where  id = #{id} 
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.Role">
+        select
+        <include refid="Base_Column_List" />
+        from role
+        <where>
+            <if test="param.keywords != null and param.keywords != ''">
+                and role_name like concat('%',#{param.keywords},'%')
+            </if>
+            <if test="param.id != 0 and param.id != null">
+                and id=#{param.id}
+            </if>
+
+        </where>
+        order by id
+    </select>
+    <select id="selectByRoleName" resultType="com.tpp.threat_perception_platform.pojo.Role">
+        select
+        <include refid="Base_Column_List" />
+        from role
+        where role_name = #{roleName,jdbcType=VARCHAR} limit 1
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from role
+        where  id = #{id} 
+    </delete>
+    <delete id="deleteRole">
+        delete from role
+        where  id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Role" useGeneratedKeys="true">
+        insert into role
+        ( id,role_name,role_des)
+        values (#{id},#{roleName},#{roleDes})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Role" useGeneratedKeys="true">
+        insert into role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="roleName != null">role_name,</if>
+                <if test="roleDes != null">role_des,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="roleName != null">#{roleName},</if>
+                <if test="roleDes != null">#{roleDes},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.Role">
+        update role
+        <set>
+                <if test="roleName != null">
+                    role_name = #{roleName},
+                </if>
+                <if test="roleDes != null">
+                    role_des = #{roleDes},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.Role">
+        update role
+        set 
+            role_name =  #{roleName},
+            role_des =  #{roleDes}
+        where   id = #{id} 
+    </update>
+</mapper>
