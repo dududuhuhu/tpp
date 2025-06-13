@@ -4,18 +4,18 @@
 
 ​	改成自己的mq设置
 
-HOST = '192.168.192.128'
+`HOST = '192.168.192.128'
 PORT = 4568
 USERNAME = 'admin'
 PASSWORD = '20250606'
 VHOST = 'my_vhost'
-
+`
 
 - agent\mq\RabbitMQ.py
 
 ​	改成自己的设置
 
- def __init__(self):
+ `def __init__(self):
         self.__host = '192.168.192.128'
         # self.__host = '10.100.1.136'
         self.__port = '4568'
@@ -26,8 +26,18 @@ VHOST = 'my_vhost'
         self.__connection = ''
         self.__channel = ''
         # 初始化连接
-        self.__get_connection()
+        self.__get_connection()`
 
+- agent\work\ApplicationRiskDetect.py
+数据库改成自己的配置
+
+`self.db_config = {
+'host': 'localhost',
+'port': 3306,
+'user': 'root',
+'password': 'shuhan',
+'database': 'threat_perception'
+}`
 ### 运行
 
 直接运行agent\main.py
