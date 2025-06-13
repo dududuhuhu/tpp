@@ -26,5 +26,9 @@ PUBLISHER_ROUTING = {
     'password_queue':'password',
     'systemRisk_queue':'systemRisk',
     'vulnerability_queue':'vulnerability',
+    'account_queue':'account',
+    'service_queue':'service',
+    'process_queue':'process',
+    'app_queue':'app',
 }
 

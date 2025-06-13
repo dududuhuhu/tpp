@@ -6,6 +6,7 @@ from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.PasswordDetect import SMBWeakPasswordScanner
 from work.SystemRiskDetect import SystemRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
+from work.assetsDetect import *
 from threading import Thread
 
 def wrapper(routing_key, detector, publisher, need_publish):
@@ -29,6 +30,24 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
             detector = SystemRiskDetect(body)
         elif data['type'] == 'vulnerability':
             detector = VulnerabilityDetect(body)
+        elif data['type'] == 'assets':
+            if data['account'] == 1:
+                detector = AcountDetector(body)
+                t = Thread(target=wrapper, args=('account', detector, publisher, True))
+                t.start()
+            if data['service'] == 1:
+                detector = ServiceDetector(body)
+                t = Thread(target=wrapper, args=('service', detector, publisher, True))
+                t.start()
+            if data['process'] == 1:
+                detector = ProcessDetector(body)
+                t = Thread(target=wrapper, args=('process', detector, publisher, True))
+                t.start()
+            if data['app'] == 1:
+                detector = AppDetector(body)
+                t = Thread(target=wrapper, args=('app', detector, publisher, True))
+                t.start()
+            detector = None
         else:
             print(f"Unknown message type: {data['type']}")
         if detector:
