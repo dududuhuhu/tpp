@@ -38,7 +38,7 @@ class SMBWeakPasswordScanner:
         """
         users = self.list_local_users()
         results = []
-
+        print("开始弱口令探测...................!")
         print("[*] 开始进行 SMB 弱口令扫描...")
 
         for user in users:
@@ -68,5 +68,6 @@ class SMBWeakPasswordScanner:
 
             results.append(user_result)
         data=json.dumps(results)
+        print("探测弱口令结束！")
         return data
 

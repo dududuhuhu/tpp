@@ -10,7 +10,7 @@ def test_callback(consumer:Consumer, channel, basic_deliver, properties, body):
     
 
 def main():
-    url = get_amqp_url('172.17.0.2', 5672, 'admin', 'hello123456', 'my_vhost')
+    url = get_amqp_url('192.168.192.128', 4568, 'admin', '20250606', 'my_vhost')
     consumer:Consumer = Consumer(exchange='sysinfo_exchange', amqp_url=url)
     test_cb = functools.partial(test_callback, consumer)
     routing = [

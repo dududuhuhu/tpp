@@ -6,7 +6,7 @@ from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.PasswordDetect import SMBWeakPasswordScanner
 from work.SystemRiskDetect import SystemRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
-from work.assetsDetect import *
+from work.AssetsDetect import *
 from threading import Thread
 
 def wrapper(routing_key, detector, publisher, need_publish):
@@ -21,30 +21,30 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
         detector = None
         routing_key = data['type']
         if data['type'] == 'hotfix':
-            detector = HotfixDetector(body)
+            detector = HotfixDetector(data)
         elif data['type'] == 'applicationRisk':
-            detector = ApplicationRiskDetect(body)
+            detector = ApplicationRiskDetect(data)
         elif data['type'] == 'password':
-            detector = SMBWeakPasswordScanner(body)
+            detector = SMBWeakPasswordScanner(data)
         elif data['type'] == 'systemRisk':
-            detector = SystemRiskDetect(body)
+            detector = SystemRiskDetect(data)
         elif data['type'] == 'vulnerability':
-            detector = VulnerabilityDetect(body)
+            detector = VulnerabilityDetect(data)
         elif data['type'] == 'assets':
             if data['account'] == 1:
-                detector = AcountDetector(body)
+                detector = AcountDetector(data)
                 t = Thread(target=wrapper, args=('account', detector, publisher, True))
                 t.start()
             if data['service'] == 1:
-                detector = ServiceDetector(body)
+                detector = ServiceDetector(data)
                 t = Thread(target=wrapper, args=('service', detector, publisher, True))
                 t.start()
             if data['process'] == 1:
-                detector = ProcessDetector(body)
+                detector = ProcessDetector(data)
                 t = Thread(target=wrapper, args=('process', detector, publisher, True))
                 t.start()
             if data['app'] == 1:
-                detector = AppDetector(body)
+                detector = AppDetector(data)
                 t = Thread(target=wrapper, args=('app', detector, publisher, True))
                 t.start()
             detector = None

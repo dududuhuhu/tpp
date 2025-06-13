@@ -33,6 +33,7 @@ class ApplicationRiskDetect:
         执行应用风险探测
         :return: 探测结果（JSON字符串）
         """
+        print("开始应用风险探测...................!")
         target_hosts = [self.ip]
         flag = 0
         scanner = None
@@ -75,4 +76,5 @@ class ApplicationRiskDetect:
                 scanner.close_database()
 
         result = {'result': 'success' if flag == 1 else 'fail'}
+        print("探测应用风险结束！")
         return json.dumps(result, ensure_ascii=False)

@@ -2,10 +2,10 @@ from mq.consumer import Consumer
 import uuid
 from service.consumerService import agent_mac_queue_callback
 all = ['HOST', 'PORT', 'USERNAME', 'PASSWORD', 'VHOST', 'consumer_routing', 'publisher_routing']
-HOST = '172.17.0.2'
-PORT = 5672
+HOST = '192.168.192.128'
+PORT = 4568
 USERNAME = 'admin'
-PASSWORD = 'hello123456'
+PASSWORD = '20250606'
 VHOST = 'my_vhost'
 
 MAC = ':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))

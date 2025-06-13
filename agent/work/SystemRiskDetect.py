@@ -61,6 +61,7 @@ class SystemRiskDetect:
 
     # 运行的函数
     def detect(self):
+        print("开始系统风险探测...................!")
         result_report = []
         for rule in self.rules:
             try:
@@ -69,9 +70,13 @@ class SystemRiskDetect:
                 safe, info = False, f"检查异常: {e}"
 
             result_report.append({
+                "rule_id": rule["id"],
                 "rule_name": rule["name"],
+                "description": rule["description"],
                 "status": info,
-                "result": safe
+                "is_safe": safe
             })
-        data=json.dumps(result_report)
+        data=json.dumps(result_report, ensure_ascii=False)
+        print(data)
+        print("探测系统风险结束！")
         return data
