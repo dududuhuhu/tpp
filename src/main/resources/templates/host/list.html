@@ -38,18 +38,19 @@
         color: #fff !important;
     }
 
-    /* 默认图标状态 */
-    .layui-dropdown-menu li .layui-menu-body-title i {
-        font-size: 16px !important;
-        margin-right: 10px !important;
-        color: #16baaa !important;
-        transition: color 0.25s ease, transform 0.3s ease; /* 添加 transform 过渡 */
+    /* 默认图标样式 */
+    .dropdown-item-icon i {
+        font-size: 16px;
+        margin-right: 10px;
+        color: #16baaa;
+        transition: transform 0.3s ease, color 0.3s ease;
+        display: inline-block; /* 必须加，才支持 transform */
     }
 
-    /* hover 时图标旋转 */
-    .layui-dropdown-menu li .layui-menu-body-title:hover i {
-        color: #fff !important;
-        transform: rotate(180deg); /* 图标旋转 */
+    /* 当父元素 hover 时触发旋转 */
+    .layui-dropdown-menu li:hover .dropdown-item-icon i {
+        transform: rotate(180deg);
+        color: #fff;
     }
 
 
@@ -336,11 +337,11 @@
                     elem: this,
                     show: true, // 外部事件触发即显示
                     data: [
-                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>安全补丁</span>', id: 'hotfix' },
-                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>漏洞检测</span>', id: 'vulnerability' },
-                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>弱密码</span>', id: 'weakPassword' },
-                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>应用风险</span>', id: 'appRisk' },
-                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>系统风险</span>', id: 'systemRisk' }
+                        {title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-engine"></i>安全补丁</span>', id: 'hotfix'},
+                        {title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-vercode"></i>漏洞检测</span>', id: 'vulnerability'},
+                        {title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-password"></i>弱密码</span>', id: 'weakPassword'},
+                        {title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-app"></i>应用风险</span>', id: 'appRisk'},
+                        {title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-util"></i>系统风险</span>', id: 'systemRisk'}
                     ],
                     click: function(itemData, othis) {
                         console.log(itemData.id); // ✅ 现在你必须用 itemData.id，而不是 data.id
