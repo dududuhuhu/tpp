@@ -6,6 +6,55 @@
     <link rel="stylesheet" href="/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
 </head>
+<style>
+    /* dropdown 容器样式 */
+    .layui-dropdown-menu {
+        background-color: #fff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+        min-width: 170px !important;
+        padding: 6px 0 !important;
+        font-size: 14px !important;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+        overflow: hidden !important;
+        border: 1px solid #f0f0f0 !important;
+        z-index: 9999 !important;
+    }
+
+    /* 每个菜单项的内容 */
+    .layui-dropdown-menu li .layui-menu-body-title {
+        display: flex !important;
+        align-items: center !important;
+        padding: 0px 20px !important;
+        cursor: pointer !important;
+        color: #333 !important;
+        font-weight: 500 !important;
+        transition: all 0.25s ease !important;
+    }
+
+    /* hover 效果 */
+    .layui-dropdown-menu li .layui-menu-body-title:hover {
+        background-color: #16baaa !important;
+        color: #fff !important;
+    }
+
+    /* 默认图标状态 */
+    .layui-dropdown-menu li .layui-menu-body-title i {
+        font-size: 16px !important;
+        margin-right: 10px !important;
+        color: #16baaa !important;
+        transition: color 0.25s ease, transform 0.3s ease; /* 添加 transform 过渡 */
+    }
+
+    /* hover 时图标旋转 */
+    .layui-dropdown-menu li .layui-menu-body-title:hover i {
+        color: #fff !important;
+        transform: rotate(180deg); /* 图标旋转 */
+    }
+
+
+
+</style>
 <body>
 
 <div class="layui-fluid">
@@ -45,7 +94,8 @@
 
             <script type="text/html" id="table-useradmin-webuser">
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="assets"><i class="layui-icon layui-icon-edit"></i>资产探测</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="assetsInfo"><i class="layui-icon layui-icon-edit"></i>资产详情</a>
+                <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="assetsInfo"><i class="layui-icon layui-icon-edit"></i>资产详情</a>
+                <a class="layui-btn layui-btn-xs" lay-event="more">风险发现<i class="layui-icon layui-icon-down"></i></a>
                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
             </script>
 
@@ -90,6 +140,7 @@
         var $ = layui.$
             ,form = layui.form
             ,layer = layui.layer
+            ,dropdown = layui.dropdown
             ,table = layui.table;
 
         //加载table
@@ -170,7 +221,7 @@
                     return d.updateTime==null? formatDate(d.createTime):formatDate(d.updateTime);
                 }}
 
-                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser',width:265}
+                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser',width:352}
             ]]
             ,page: {
                 curr: 1 //设定初始在第 5 页
@@ -264,7 +315,7 @@
                     type: 2,
                     title: '资产详情',
                     area: ['800px', '600px'],
-                    content: '/page/host/assetsInfo', // 页面2地址
+                    content: '/page/host/assetsInfo',
                     maxmin: true,
                     btn: ['关闭'],
                     yes: function(index, layero){
@@ -279,7 +330,86 @@
                         }, 200);
                     }
                 });
+            }else if(obj.event === 'more'){
+                // 更多下拉菜单
+                dropdown.render({
+                    elem: this,
+                    show: true, // 外部事件触发即显示
+                    data: [
+                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>安全补丁</span>', id: 'hotfix' },
+                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>漏洞检测</span>', id: 'vulnerability' },
+                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>弱密码</span>', id: 'weakPassword' },
+                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>应用风险</span>', id: 'appRisk' },
+                        { title: '<span class="dropdown-item-icon"><i class="layui-icon layui-icon-set"></i>系统风险</span>', id: 'systemRisk' }
+                    ],
+                    click: function(itemData, othis) {
+                        console.log(itemData.id); // ✅ 现在你必须用 itemData.id，而不是 data.id
+
+                        let configMap = {
+                            hotfix: { title: '安全补丁', url: '/page/host/hotfix' },
+                            vulnerability: { title: '漏洞检测', url: '/page/host/vulnerability' },
+                            weakPassword: { title: '弱密码', url: '/page/host/weakPassword' },
+                            appRisk: { title: '应用风险', url: '/page/host/appRisk' },
+                            systemRisk: { title: '系统风险', url: '/page/host/systemRisk' }
+                        };
+
+                        let config = configMap[itemData.id]; // ✅ 这里也要改成 itemData.id
+                        if (!config) return;
+
+
+                        layer.open({
+                            type: 2,
+                            title: config.title,
+                            skin: 'layui-layer-molv',
+                            content: config.url,
+                            maxmin: true,
+                            area: ['480px', '310px'],
+                            btn: ['确定', '取消'],
+                            success: function (layero, index) {
+                                var contentWindow = layero.find('iframe')[0].contentWindow;
+                                setTimeout(function () {
+                                    contentWindow.layui.form.val('layuiadmin-form-useradmin', {
+                                        hostName: data.hostName,
+                                        macAddress: data.macAddress
+                                    });
+                                }, 100); // 延迟 100ms 等待 layui 加载完成
+                            },
+                            yes: function (index, layero) {
+                                var iframeWindow = window['layui-layer-iframe' + index],
+                                    submitID = 'LAY-user-front-submit',
+                                    submit = layero.find('iframe').contents().find('#' + submitID);
+
+                                iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                                    var field = data.field;
+                                    console.log("data:",data);
+
+                                    $.ajax({
+                                        url: "/host/" + itemData.id + "Discovery", // 例如：/host/hotfixDiscovery
+                                        type: "post",
+                                        headers: {
+                                            'Authorization': localStorage.getItem('token')
+                                        },
+                                        data: JSON.stringify(field),
+                                        contentType: "application/json;charset=utf-8",
+                                        dataType: "json",
+                                        success: function (res) {
+                                            if (res.code == 0) {
+                                                layer.msg(res.msg);
+                                                table.reload('LAY-user-manage');
+                                                layer.close(index);
+                                            } else {
+                                                layer.msg(res.msg, { icon: 5 });
+                                            }
+                                        }
+                                    });
+                                });
+                                submit.trigger('click');
+                            }
+                        });
+                    }
+                });
             }
+
         });
 
 

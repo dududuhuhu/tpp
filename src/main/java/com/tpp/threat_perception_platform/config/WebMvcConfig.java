@@ -28,11 +28,25 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 主机相关页面
         registry.addViewController("/page/host/list").setViewName("host/list");
         registry.addViewController("/page/host/assets").setViewName("host/assets");
+        registry.addViewController("/page/host/hotfix").setViewName("host/hotfix");
+        registry.addViewController("/page/host/vulnerability").setViewName("host/vulnerability");
+        registry.addViewController("/page/host/weakPassword").setViewName("host/weakPassword");
+        registry.addViewController("/page/host/appRisk").setViewName("host/appRisk");
+        registry.addViewController("/page/host/systemRisk").setViewName("host/systemRisk");
+
+
+
         registry.addViewController("/page/host/assetsInfo").setViewName("host/assetsInfo");
         registry.addViewController("/page/host/accountInfo").setViewName("host/accountInfo");
         registry.addViewController("/page/host/appInfo").setViewName("host/appInfo");
         registry.addViewController("/page/host/processInfo").setViewName("host/processInfo");
         registry.addViewController("/page/host/serviceInfo").setViewName("host/serviceInfo");
+
         registry.addViewController("/page/host/assetsDiscovery").setViewName("host/assetsDiscovery");
+        registry.addViewController("/page/host/hotfixDiscovery").setViewName("host/hotfixDiscovery");
+        registry.addViewController("/page/host/vulnerabilityDiscovery").setViewName("host/vulnerabilityDiscovery");
+        registry.addViewController("/page/host/weakPasswordDiscovery").setViewName("host/weakPasswordDiscovery");
+        registry.addViewController("/page/host/appRiskDiscovery").setViewName("host/appRiskDiscovery");
+        registry.addViewController("/page/host/systemRiskDiscovery").setViewName("host/systemRiskDiscovery");
     }
 }
