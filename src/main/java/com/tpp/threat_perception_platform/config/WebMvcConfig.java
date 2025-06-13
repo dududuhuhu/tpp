@@ -50,3 +50,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/host/systemRiskDiscovery").setViewName("host/systemRiskDiscovery");
     }
 }
+
