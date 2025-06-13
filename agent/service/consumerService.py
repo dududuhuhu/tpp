@@ -1,28 +1,39 @@
 import json
 from mq.consumer import Consumer
 from mq.publisher import Publisher
-# from RiskDiscovery.hotfix import Hotfix
-# from RiskDiscovery.ApplicationRisk import ApplicationRisk
-# from RiskDiscovery.password import Password
-# from RiskDiscovery.SystemRisk import SystemRisk
-# from RiskDiscovery.vulnerability import Vulnerability
+from work.HotfixDetect import HotfixDetector
+from work.ApplicationRiskDetect import ApplicationRiskDetect
+from work.PasswordDetect import SMBWeakPasswordScanner
+from work.SystemRiskDetect import SystemRiskDetect
+from work.VulnerabilityDetect import VulnerabilityDetect
+from threading import Thread
+
+def wrapper(routing_key, detector, publisher, need_publish):
+    if need_publish:
+        publisher.publish_message(routing_key=routing_key, message=detector.detect())
 
 def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
     try:
+        print(body.decode('utf-8'))
         data = json.loads(body.decode('utf-8'))
         print(f"Received message: {data}")
+        detector = None
+        routing_key = data['type']
         if data['type'] == 'hotfix':
-            pass
+            detector = HotfixDetector(body)
         elif data['type'] == 'applicationRisk':
-            pass
+            detector = ApplicationRiskDetect(body)
         elif data['type'] == 'password':
-            pass
+            detector = SMBWeakPasswordScanner(body)
         elif data['type'] == 'systemRisk':
-            pass
+            detector = SystemRiskDetect(body)
         elif data['type'] == 'vulnerability':
-            pass
+            detector = VulnerabilityDetect(body)
         else:
             print(f"Unknown message type: {data['type']}")
+        if detector:
+            t = Thread(target=wrapper, args=(routing_key, detector, publisher, True))
+            t.start()
 
     except json.JSONDecodeError as e:
         print(f"Failed to decode JSON: {e}")
