@@ -59,6 +59,7 @@ class Service(Thread):
         self._reconnect()
 
     def _on_connection_closed(self, connection, reason):
+        print('connection closed')
         self._channel = None
         with self._lock:
             if self._stopping:
@@ -130,10 +131,21 @@ class Service(Thread):
         # self._start_publishing()
         queue_name = userdata
         logger.info("Queue %s bound to exchange %s", queue_name, self._exchange)
+        self._queue_key_pairs[queue_name] = (self._queue_key_pairs[queue_name][0], True)
         for queue, (routing_key, bound) in self._queue_key_pairs.items():
-            if queue == queue_name:
-                self._queue_key_pairs[queue] = (routing_key, True)
-                break
+            if not bound:
+                return
+        self._app_on_bindok(frame, userdata)
+    
+    def _app_on_bindok(self, frame, userdata):
+        pass
+    
+    def is_stopped(self):
+        with self._lock:
+            return not self._channel or self._stopping
+    
+    def _app_on_start(self):
+        return
     
     def run(self):
         while True:
@@ -142,6 +154,7 @@ class Service(Thread):
                     logger.info("Service is stopping")
                     break
             if self.should_reconnect:
+                self._app_on_start()
                 self._connection = None
                 self._channel = None
                 self._connection = self._connect()
