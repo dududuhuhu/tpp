@@ -1,36 +1,21 @@
-# coding=utf-8
 import json
-import threading
+
 from impacket.examples.utils import parse_target
 from impacket.smbconnection import SMBConnection
 import subprocess
 
 
-class PasswordDetect(threading.Thread):
-    """
-    弱密码探测的线程类
-    """
-    def __init__(self,mq,data):
-        super().__init__()
-        # 平台传递的指令
-        self.__data=data
+class SMBWeakPasswordScanner:
+    def __init__(self, data):
+        self.target_ip=data['ipAddress']
+        self.weak_passwords = [
+            "123456", "123123", "admin", "password", "123", "111111", "root", "abc123"
+        ]
 
-    def run(self):
+    def list_local_users(self):
         """
-        线程运行方法
-        :return:
+        获取本地 Windows 系统中的所有用户（非空行、非标题）
         """
-        self.__detect()
-        # pass
-
-    def __detect(self):
-        """
-        探测的方法
-        :return:
-        """
-        self.__passwordDetect()
-
-    def __list_windows_users(self):
         result = subprocess.run(["net", "user"], capture_output=True, text=True, shell=True)
         output = result.stdout
         users = []
@@ -45,17 +30,13 @@ class PasswordDetect(threading.Thread):
                     break
                 users.extend(line.strip().split())
 
-        return users[:-1]
+        return users[:-1]  # 去掉命令提示尾部内容
 
-    def __smb_login(self):
+    def detect(self):
         """
-        遍历所有本地用户，尝试使用弱密码库进行 SMB 登录，返回扫描结果列表。
+        执行弱口令扫描，返回结果列表
         """
-        weak_passwords = [
-            "123456", "123123", "admin", "password", "123", "111111", "root", "abc123"
-        ]
-
-        users = self.list_windows_users()
+        users = self.list_local_users()
         results = []
 
         print("[*] 开始进行 SMB 弱口令扫描...")
@@ -67,9 +48,10 @@ class PasswordDetect(threading.Thread):
                 "password": None
             }
 
-            for pwd in weak_passwords:
-                target = f"{user}:{pwd}@127.0.0.1"
+            for pwd in self.weak_passwords:
+                target = f"{user}:{pwd}@{self.target_ip}"
                 domain, username, password, address = parse_target(target)
+
                 try:
                     smbClient = SMBConnection(address, address, sess_port=445)
                     smbClient.login(username, password, domain, '', '')
@@ -77,7 +59,7 @@ class PasswordDetect(threading.Thread):
                     user_result["weak"] = True
                     user_result["password"] = password
                     smbClient.logoff()
-                    break  # 找到一个弱口令就不继续测这个用户了
+                    break
                 except Exception:
                     continue
 
@@ -85,12 +67,6 @@ class PasswordDetect(threading.Thread):
                 print(f"[-] 用户 {user} 不存在已知弱口令")
 
             results.append(user_result)
+        data=json.dumps(results)
+        return data
 
-        return results
-
-    def __passwordDetect(self):
-        ###补丁发现
-        print("开始探测弱密码数据..............!")
-        data=self.__smb_login()
-        password_data=json.dumps(data)
-        return password_data

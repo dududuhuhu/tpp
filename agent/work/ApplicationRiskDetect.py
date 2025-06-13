@@ -1,42 +1,19 @@
 # coding=utf-8
 import json
-import threading
-import wmi
-import pythoncom
-
 from RiskDiscovery.ApplicationRisk import ApplicationRiskScanner
 
-
-class ApplicationRiskDetect(threading.Thread):
+class ApplicationRiskDetect:
     """
-    应用探测的线程类
+    应用风险探测类（非线程版本）
     """
-    def __init__(self,data):
-        super().__init__()
-        # 平台传递的指令
-        self.__data=data
 
-    def run(self):
+    def __init__(self, data):
         """
-        线程运行方法
-        :return:
+        初始化探测器
+        :param ip_address: 目标主机 IP 地址
         """
-        self.__detect()
-        # pass
-
-    def __detect(self):
-        """
-        探测的方法
-        :return:
-        """
-        self.__applicationRiskDetect()
-
-    def __applicationRiskDetect(self):
-        # 这里需要后端传进来ipAddress
-        ip=self.data['ipAddress']
-
-        # 数据库配置
-        db_config = {
+        self.ip = data['ipAddress']
+        self.db_config = {
             'host': 'localhost',
             'port': 3306,
             'user': 'root',
@@ -44,22 +21,33 @@ class ApplicationRiskDetect(threading.Thread):
             'database': 'threat_perception'
         }
 
-        # 目标主机列表
-        # 这里跟换成自己的主机ip
-        target_hosts = [ip]
-        flag=0 # 成功1，失败0
+    def detect(self) -> str:
+        """
+        外部调用接口，执行探测任务
+        :return: 探测结果（JSON字符串）
+        """
+        return self.__application_risk_detect()
+
+    def __application_risk_detect(self) -> str:
+        """
+        执行应用风险探测
+        :return: 探测结果（JSON字符串）
+        """
+        target_hosts = [self.ip]
+        flag = 0
         scanner = None
+
         try:
             # 创建扫描器实例
-            scanner = ApplicationRiskScanner(db_config)
+            scanner = ApplicationRiskScanner(self.db_config)
 
-            # 执行批量扫描
+            # 执行扫描
             results = scanner.batch_scan_targets(target_hosts)
 
-            # 生成扫描报告
+            # 生成报告
             report = scanner.generate_report(results)
 
-            # 输出报告
+            # 输出摘要
             print(f"\n=== 应用风险扫描报告 ===")
             print(f"扫描时间: {report['scan_time']}")
             print(f"总扫描次数: {report['scan_summary']['total_scans']}")
@@ -76,7 +64,8 @@ class ApplicationRiskDetect(threading.Thread):
                 print(f"\n风险类型分布:")
                 for risk_type, count in report['risk_distribution']['by_type'].items():
                     print(f"  {risk_type}: {count} 个")
-            flag=1
+
+            flag = 1
 
         except Exception as e:
             print(f"扫描过程异常: {e}")
@@ -85,13 +74,5 @@ class ApplicationRiskDetect(threading.Thread):
             if scanner:
                 scanner.close_database()
 
-        if flag==1:
-            data = {
-               'result':'success'
-            }
-        else:
-            data = {
-               'result':'fail'
-            }
-        app_data=json.dumps(data)
-        return app_data
+        result = {'result': 'success' if flag == 1 else 'fail'}
+        return json.dumps(result, ensure_ascii=False)
