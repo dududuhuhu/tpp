@@ -43,12 +43,6 @@ public class HostController {
         return hostService.editHost(host);
     }
 
-    @PostMapping("/host/assetsDiscovery")
-    public ResponseResult assetsDiscovery(@RequestBody AssetsParam param){
-        return hostService.assetsDiscovery(param);
-    }
-
-
     // 获取账号信息
     @PostMapping("/host/accountInfo")
     public ResponseResult accountInfo(@RequestBody MyParam param) {
@@ -58,14 +52,14 @@ public class HostController {
 //        System.out.println(result);
         return result;
     }
-//
+
     // 获取服务信息
     @PostMapping("/host/serviceInfo")
     public ResponseResult serviceInfo(@RequestBody MyParam param) {
         System.out.println(param);
         return serviceInfoService.retrieveAssetsService(param);
     }
-//
+
     // 获取进程信息
     @PostMapping("/host/processInfo")
     public ResponseResult processInfo(@RequestBody MyParam param) {
@@ -89,7 +83,15 @@ public class HostController {
         return appInfoService.appList(param);
     }
 
-
+    /**
+     * 资产探测
+     * @param param
+     * @return
+     */
+    @PostMapping("/host/assetsDiscovery")
+    public ResponseResult assetsDiscovery(@RequestBody AssetsParam param){
+        return hostService.assetsDiscovery(param);
+    }
 
 
 
