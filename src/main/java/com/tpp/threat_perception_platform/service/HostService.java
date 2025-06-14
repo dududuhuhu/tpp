@@ -2,6 +2,7 @@ package com.tpp.threat_perception_platform.service;
 
 
 import com.tpp.threat_perception_platform.param.AssetsParam;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
@@ -58,4 +59,5 @@ public interface HostService {
      */
     public ResponseResult assetsDiscovery(AssetsParam param);
 
+    ResponseResult hotfixDiscovery(HotfixParam param);
 }
