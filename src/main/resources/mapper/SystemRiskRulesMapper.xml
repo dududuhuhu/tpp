@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.SystemRiskRulesMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
+            <id property="id" column="id" />
+            <result property="riskName" column="risk_name" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="riskType" column="risk_type" />
+            <result property="detectionMethod" column="detection_method" />
+            <result property="rulePath" column="rule_path" />
+            <result property="rulePayload" column="rule_payload" />
+            <result property="remediationAdvice" column="remediation_advice" />
+            <result property="isActive" column="is_active" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,risk_name,risk_level,risk_type,detection_method,rule_path,
+        rule_payload,remediation_advice,is_active
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from system_risk_rules
+        where  id = #{id} 
+    </select>
+    <select id="selectAllRules" resultType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from system_risk_rules
+        where is_active=1
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from system_risk_rules
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules" useGeneratedKeys="true">
+        insert into system_risk_rules
+        ( id,risk_name,risk_level,risk_type,detection_method,rule_path,
+        rule_payload,remediation_advice,is_active)
+        values (#{id},#{riskName},#{riskLevel},#{riskType},#{detectionMethod},#{rulePath},
+        #{rulePayload},#{remediationAdvice},#{isActive})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules" useGeneratedKeys="true">
+        insert into system_risk_rules
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="riskName != null">risk_name,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="riskType != null">risk_type,</if>
+                <if test="detectionMethod != null">detection_method,</if>
+                <if test="rulePath != null">rule_path,</if>
+                <if test="rulePayload != null">rule_payload,</if>
+                <if test="remediationAdvice != null">remediation_advice,</if>
+                <if test="isActive != null">is_active,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="riskName != null">#{riskName},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="riskType != null">#{riskType},</if>
+                <if test="detectionMethod != null">#{detectionMethod},</if>
+                <if test="rulePath != null">#{rulePath},</if>
+                <if test="rulePayload != null">#{rulePayload},</if>
+                <if test="remediationAdvice != null">#{remediationAdvice},</if>
+                <if test="isActive != null">#{isActive},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
+        update system_risk_rules
+        <set>
+                <if test="riskName != null">
+                    risk_name = #{riskName},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="riskType != null">
+                    risk_type = #{riskType},
+                </if>
+                <if test="detectionMethod != null">
+                    detection_method = #{detectionMethod},
+                </if>
+                <if test="rulePath != null">
+                    rule_path = #{rulePath},
+                </if>
+                <if test="rulePayload != null">
+                    rule_payload = #{rulePayload},
+                </if>
+                <if test="remediationAdvice != null">
+                    remediation_advice = #{remediationAdvice},
+                </if>
+                <if test="isActive != null">
+                    is_active = #{isActive},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
+        update system_risk_rules
+        set 
+            risk_name =  #{riskName},
+            risk_level =  #{riskLevel},
+            risk_type =  #{riskType},
+            detection_method =  #{detectionMethod},
+            rule_path =  #{rulePath},
+            rule_payload =  #{rulePayload},
+            remediation_advice =  #{remediationAdvice},
+            is_active =  #{isActive}
+        where   id = #{id} 
+    </update>
+</mapper>
