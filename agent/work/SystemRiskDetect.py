@@ -1,82 +1,108 @@
-import datetime
 import json
+import subprocess
+import datetime
 import ntplib
 import winreg
-import subprocess
+from typing import List, Dict
+
+import requests
+
+# 风险等级映射：数字 → 文字标签
+RISK_LEVEL_MAP = {1: "低", 2: "中", 3: "高"}
+
 
 class SystemRiskDetect:
+    """
+    Windows 平台的系统风险扫描器（支持注册表、NTP、命令检测）
+    """
+
     def __init__(self,data):
-        # 规则列表定义
-        self.rules = [
-            {
-                "id": 1,
-                "name": "服务器时间校验",
-                "description": "服务器时间与NTP偏差大于5分钟",
-                "check_function": self.check_time_sync
-            },
-            {
-                "id": 3,
-                "name": "网卡混杂模式",
-                "description": "网卡处于混杂模式，可能用于嗅探网络数据",
-                "check_function": self.check_promiscuous_mode
-            }
-        ]
+        self.mac=data['macAddress']
 
-    def check_time_sync(self, threshold_minutes=5):
+    def get_application_risk_rules(self) -> List[Dict]:
+        """
+        从后端接口获取风险检测规则
+        """
         try:
-            client = ntplib.NTPClient()
-            response = client.request('pool.ntp.org')
-            ntp_time = datetime.datetime.utcfromtimestamp(response.tx_time)
-            local_time = datetime.datetime.utcnow()
-            delta = abs((ntp_time - local_time).total_seconds() / 60)
-            return delta <= threshold_minutes, f"NTP差值: {delta:.2f}分钟"
-        except Exception as e:
-            return False, f"NTP同步检查失败: {e}"
+            url = "http://localhost:8080/rule/systemRisk"
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            rules = response.json()
+            print(f"获取到 {len(rules)} 条规则")
+            return rules
+        except requests.RequestException as e:
+            print(f"[错误] 获取规则失败: {e}")
+            return []
+    def detect_system_risk(self, rule: Dict) -> Dict:
+        """
+        执行单条检测规则，并返回检测结果
+        """
+        result = {
+            "mac":self.mac,
+            "ruleId": rule["id"],
+            "riskName": rule["riskName"],
+            "riskLevel": rule["riskLevel"],
+            "riskType": rule["riskType"],
+            "isRisky": 0,  # 1=有风险，0=无风险
+            "errorMessage": "",
+            "detectionOutput": "",
+            "riskDetail": "",
+            "remediationAdvice": rule["remediationAdvice"]
+        }
 
-    def check_ip_forward(self):
         try:
-            key_path = r"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"
-            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as key:
-                value, _ = winreg.QueryValueEx(key, "IPEnableRouter")
-                return value == 0, f"IPEnableRouter={value}"
+            if rule["detectionMethod"] == "NTP":
+                # 使用 ntplib 获取 NTP 时间，并与本地时间比较
+                client = ntplib.NTPClient()
+                response = client.request('pool.ntp.org')
+                ntp_time = datetime.datetime.utcfromtimestamp(response.tx_time) + datetime.timedelta(hours=8)
+                local_time = datetime.datetime.now()
+                offset = abs((local_time - ntp_time).total_seconds())
+
+                result["detectionOutput"] = f"NTP时间: {ntp_time}, 本地时间: {local_time}"
+                result["riskDetail"] = f"NTP时间偏差：{int(offset)} 秒"
+
+                if offset > 300:
+                    result["isRisky"] = 1
+
+            elif rule["detectionMethod"] == "REG":
+                # 读取注册表键值
+                try:
+                    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, rule["registryPath"]) as key:
+                        value, _ = winreg.QueryValueEx(key, rule["valueName"])
+                        result["detectionOutput"] = f"{rule['valueName']}={value}"
+                        if str(value) == rule["riskFlag"]:
+                            result["isRisky"] = 1
+                            result["riskDetail"] = f"注册表值为 {value}"
+                except FileNotFoundError:
+                    result["errorMessage"] = "注册表路径或键不存在"
+                except PermissionError:
+                    result["errorMessage"] = "注册表访问权限不足"
+
+            elif rule["detectionMethod"] == "CMD":
+                # 执行 PowerShell 命令检查混杂模式
+                output = subprocess.check_output(rule["detectionCommand"], shell=True).decode().strip()
+                result["detectionOutput"] = output
+                if output:
+                    result["isRisky"] = 1
+                    result["riskDetail"] = f"混杂模式网卡: {output}"
+
         except Exception as e:
-            return False, f"注册表读取失败: {e}"
+            result["errorMessage"] = str(e)
 
-    def check_promiscuous_mode(self):
-        try:
-            cmd = ['powershell', '-Command',
-                   "(Get-NetAdapter | Where-Object { $_.PromiscuousMode -eq 'Enabled' }).Name"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            if result.returncode == 0:
-                interfaces = result.stdout.strip()
-                if interfaces:
-                    return False, f"混杂模式网卡: {interfaces}"
-                else:
-                    return True, "无混杂模式网卡"
-            else:
-                return False, f"PowerShell命令失败: {result.stderr}"
-        except Exception as e:
-            return False, f"检测异常: {e}"
+        return result
 
-
-    # 运行的函数
-    def detect(self):
+    def detect(self) -> List[Dict]:
+        """
+        扫描所有系统风险规则，仅返回每条检测结果（简洁版）
+        """
         print("开始系统风险探测...................!")
-        result_report = []
-        for rule in self.rules:
-            try:
-                safe, info = rule["check_function"]()
-            except Exception as e:
-                safe, info = False, f"检查异常: {e}"
+        rules = self.get_application_risk_rules()
+        results = [self.detect_system_risk(rule) for rule in rules]
 
-            result_report.append({
-                "rule_id": rule["id"],
-                "rule_name": rule["name"],
-                "description": rule["description"],
-                "status": info,
-                "is_safe": safe
-            })
-        data=json.dumps(result_report, ensure_ascii=False)
-        print(data)
+        results=json.dumps(results, ensure_ascii=False)
+        print(results)
         print("探测系统风险结束！")
-        return data
+        return results
+
+

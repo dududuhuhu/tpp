@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+            <id property="id" column="id" />
+            <result property="riskName" column="risk_name" />
+            <result property="riskDesc" column="risk_desc" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="riskType" column="risk_type" />
+            <result property="targetService" column="target_service" />
+            <result property="detectionMethod" column="detection_method" />
+            <result property="detectionPath" column="detection_path" />
+            <result property="detectionPayload" column="detection_payload" />
+            <result property="riskFlag" column="risk_flag" />
+            <result property="remediationAdvice" column="remediation_advice" />
+            <result property="status" column="status" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,risk_name,risk_desc,risk_level,risk_type,target_service,
+        detection_method,detection_path,detection_payload,risk_flag,remediation_advice,
+        status,created_at,updated_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk_rules
+        where  id = #{id} 
+    </select>
+    <select id="selectAllRules" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk_rules
+        where status = 'active'
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from application_risk_rules
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules" useGeneratedKeys="true">
+        insert into application_risk_rules
+        ( id,risk_name,risk_desc,risk_level,risk_type,target_service,
+        detection_method,detection_path,detection_payload,risk_flag,remediation_advice,
+        status,created_at,updated_at)
+        values (#{id},#{riskName},#{riskDesc},#{riskLevel},#{riskType},#{targetService},
+        #{detectionMethod},#{detectionPath},#{detectionPayload},#{riskFlag},#{remediationAdvice},
+        #{status},#{createdAt},#{updatedAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules" useGeneratedKeys="true">
+        insert into application_risk_rules
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="riskName != null">risk_name,</if>
+                <if test="riskDesc != null">risk_desc,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="riskType != null">risk_type,</if>
+                <if test="targetService != null">target_service,</if>
+                <if test="detectionMethod != null">detection_method,</if>
+                <if test="detectionPath != null">detection_path,</if>
+                <if test="detectionPayload != null">detection_payload,</if>
+                <if test="riskFlag != null">risk_flag,</if>
+                <if test="remediationAdvice != null">remediation_advice,</if>
+                <if test="status != null">status,</if>
+                <if test="createdAt != null">created_at,</if>
+                <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="riskName != null">#{riskName},</if>
+                <if test="riskDesc != null">#{riskDesc},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="riskType != null">#{riskType},</if>
+                <if test="targetService != null">#{targetService},</if>
+                <if test="detectionMethod != null">#{detectionMethod},</if>
+                <if test="detectionPath != null">#{detectionPath},</if>
+                <if test="detectionPayload != null">#{detectionPayload},</if>
+                <if test="riskFlag != null">#{riskFlag},</if>
+                <if test="remediationAdvice != null">#{remediationAdvice},</if>
+                <if test="status != null">#{status},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+                <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        update application_risk_rules
+        <set>
+                <if test="riskName != null">
+                    risk_name = #{riskName},
+                </if>
+                <if test="riskDesc != null">
+                    risk_desc = #{riskDesc},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="riskType != null">
+                    risk_type = #{riskType},
+                </if>
+                <if test="targetService != null">
+                    target_service = #{targetService},
+                </if>
+                <if test="detectionMethod != null">
+                    detection_method = #{detectionMethod},
+                </if>
+                <if test="detectionPath != null">
+                    detection_path = #{detectionPath},
+                </if>
+                <if test="detectionPayload != null">
+                    detection_payload = #{detectionPayload},
+                </if>
+                <if test="riskFlag != null">
+                    risk_flag = #{riskFlag},
+                </if>
+                <if test="remediationAdvice != null">
+                    remediation_advice = #{remediationAdvice},
+                </if>
+                <if test="status != null">
+                    status = #{status},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+                <if test="updatedAt != null">
+                    updated_at = #{updatedAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        update application_risk_rules
+        set 
+            risk_name =  #{riskName},
+            risk_desc =  #{riskDesc},
+            risk_level =  #{riskLevel},
+            risk_type =  #{riskType},
+            target_service =  #{targetService},
+            detection_method =  #{detectionMethod},
+            detection_path =  #{detectionPath},
+            detection_payload =  #{detectionPayload},
+            risk_flag =  #{riskFlag},
+            remediation_advice =  #{remediationAdvice},
+            status =  #{status},
+            created_at =  #{createdAt},
+            updated_at =  #{updatedAt}
+        where   id = #{id} 
+    </update>
+</mapper>

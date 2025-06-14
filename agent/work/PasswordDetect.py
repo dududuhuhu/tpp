@@ -1,5 +1,6 @@
 import json
 
+import requests
 from impacket.examples.utils import parse_target
 from impacket.smbconnection import SMBConnection
 import subprocess
@@ -7,10 +8,20 @@ import subprocess
 
 class SMBWeakPasswordScanner:
     def __init__(self, data):
+        self.mac=data['macAddress']
         self.target_ip=data['ipAddress']
-        self.weak_passwords = [
-            "123456", "123123", "admin", "password", "123", "111111", "root", "abc123"
-        ]
+        self.weak_passwords = self.load_from_backend("http://localhost:8080/rule/weakPassword")
+
+    def load_from_backend(self, url):
+        try:
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            data = response.json()  # 应该是一个字符串列表
+            print(f"已获得{len(data)}条弱口令")
+            return data if isinstance(data, list) else []
+        except Exception as e:
+            print(f"获取弱口令列表失败：{e}")
+            return []
 
     def list_local_users(self):
         """
@@ -43,6 +54,7 @@ class SMBWeakPasswordScanner:
 
         for user in users:
             user_result = {
+                "mac":self.mac,
                 "username": user,
                 "weak": False,
                 "password": None
