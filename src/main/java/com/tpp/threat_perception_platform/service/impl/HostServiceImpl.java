@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.param.AssetsParam;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
@@ -134,6 +135,36 @@ public class HostServiceImpl implements HostService {
         String routingKey=param.getMacAddress().replace(":","");
         rabbitService.sendMessage("agent_exchange",routingKey,json);
         return new ResponseResult(0, "资产探测任务已下发，请稍后查看！");
+    }
+
+    @Override
+    public ResponseResult hotfixDiscovery(HotfixParam param) {
+        // 验证Mac地址
+
+        if (!isOnline(param.getMacAddress())){
+            return new ResponseResult<>(1003, "主机不在线！");
+        }
+        // 初始化探测类型
+        param.setType("hotfix");
+        // 将param转换成JSON
+        String json = JSON.toJSONString(param);
+        // 组装队列的名字
+        String routingKey=param.getMacAddress().replace(":","");
+        rabbitService.sendMessage("agent_exchange",routingKey,json);
+        return new ResponseResult(0, "补丁探测任务已下发，请稍后查看！");
+    }
+
+    /**
+     * 判断主机是否在线
+     */
+    private Boolean isOnline(String macAddress) {
+        // 通过mac地址查询主机信息
+        Host dbHost = hostMapper.selectByMacAddress(macAddress);
+        // 去比较更新时间和当前时间判断主机是否在线
+        if (dbHost == null || dbHost.getUpdateTime() == null|| new Date().getTime() - dbHost.getUpdateTime().getTime()>4000) {
+            return false;
+        }
+        return true;
     }
 
 }
