@@ -18,6 +18,4 @@ public class RuleController {
     public List<ApplicationRiskRules> getAllApplicationRiskRules() {
         return ruleService.getAllApplicationRiskRules();
     }
-
-
 }
