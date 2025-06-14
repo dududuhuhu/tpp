@@ -22,7 +22,7 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
         routing_key = data['type']
         if data['type'] == 'hotfix':
             detector = HotfixDetector(data)
-        elif data['type'] == 'appRisk':
+        elif data['type'] == 'applicationRisk':
             detector = ApplicationRiskDetect(data)
         elif data['type'] == 'password':
             detector = SMBWeakPasswordScanner(data)
