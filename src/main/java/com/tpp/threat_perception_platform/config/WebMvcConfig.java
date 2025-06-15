@@ -48,6 +48,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/host/weakPasswordDiscovery").setViewName("host/weakPasswordDiscovery");
         registry.addViewController("/page/host/appRiskDiscovery").setViewName("host/appRiskDiscovery");
         registry.addViewController("/page/host/systemRiskDiscovery").setViewName("host/systemRiskDiscovery");
+
+        // 风险发现相关页面
+        registry.addViewController("/page/risk/hotfixList").setViewName("risk/hotfixList");
+        registry.addViewController("/page/risk/applicationList").setViewName("risk/applicationList");
+        registry.addViewController("/page/risk/systemList").setViewName("risk/systemList");
+        registry.addViewController("/page/risk/vulnerabilityList").setViewName("risk/vulnerabilityList");
+        registry.addViewController("/page/risk/weakpasswordList").setViewName("risk/weakpasswordList");
+
+
+
     }
 }
 
