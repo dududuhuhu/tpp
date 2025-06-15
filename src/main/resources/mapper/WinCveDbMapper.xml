@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.WinCveDbMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.WinCveDb">
+            <id property="id" column="id" />
+            <id property="dt" column="dt" />
+            <result property="cve" column="cve" />
+            <result property="score" column="score" />
+            <result property="productIdList" column="product_id_list" />
+            <result property="kbList" column="kb_list" />
+            <result property="cvrfId" column="cvrf_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,dt,cve,score,product_id_list,kb_list,
+        cvrf_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from win_cve_db
+        where  id = #{id} AND dt = #{dt} 
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        select
+        <include refid="Base_Column_List" />
+        from win_cve_db
+        order by id
+    </select>
+    <select id="findByHotfixId" resultType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        SELECT * FROM win_cve_db WHERE FIND_IN_SET(#{hotfixId}, kb_list) > 0
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from win_cve_db
+        where  id = #{id} AND dt = #{dt} 
+    </delete>
+    <insert id="insert">
+        insert into win_cve_db
+        ( id,dt,cve,score,product_id_list,kb_list,
+        cvrf_id)
+        values (#{id},#{dt},#{cve},#{score},#{productIdList},#{kbList},
+        #{cvrfId})
+    </insert>
+    <insert id="insertSelective">
+        insert into win_cve_db
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="dt != null">dt,</if>
+                <if test="cve != null">cve,</if>
+                <if test="score != null">score,</if>
+                <if test="productIdList != null">product_id_list,</if>
+                <if test="kbList != null">kb_list,</if>
+                <if test="cvrfId != null">cvrf_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="dt != null">#{dt},</if>
+                <if test="cve != null">#{cve},</if>
+                <if test="score != null">#{score},</if>
+                <if test="productIdList != null">#{productIdList},</if>
+                <if test="kbList != null">#{kbList},</if>
+                <if test="cvrfId != null">#{cvrfId},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        update win_cve_db
+        <set>
+                <if test="cve != null">
+                    cve = #{cve},
+                </if>
+                <if test="score != null">
+                    score = #{score},
+                </if>
+                <if test="productIdList != null">
+                    product_id_list = #{productIdList},
+                </if>
+                <if test="kbList != null">
+                    kb_list = #{kbList},
+                </if>
+                <if test="cvrfId != null">
+                    cvrf_id = #{cvrfId},
+                </if>
+        </set>
+        where   id = #{id} AND dt = #{dt} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        update win_cve_db
+        set 
+            cve =  #{cve},
+            score =  #{score},
+            product_id_list =  #{productIdList},
+            kb_list =  #{kbList},
+            cvrf_id =  #{cvrfId}
+        where   id = #{id} AND dt = #{dt} 
+    </update>
+</mapper>

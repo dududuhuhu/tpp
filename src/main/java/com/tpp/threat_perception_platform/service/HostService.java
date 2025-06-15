@@ -1,10 +1,8 @@
 package com.tpp.threat_perception_platform.service;
 
 
-import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.MyParam;
-import com.tpp.threat_perception_platform.param.SystemRiskParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
@@ -60,8 +58,5 @@ public interface HostService {
      */
     public ResponseResult assetsDiscovery(AssetsParam param);
 
-    public ResponseResult appRiskDiscovery(ApplicationRiskParam param);
-
-    public ResponseResult systemRiskDiscovery(SystemRiskParam param);
-
+    ResponseResult hotfixDiscovery(HotfixParam param);
 }

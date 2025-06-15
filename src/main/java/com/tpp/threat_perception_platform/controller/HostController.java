@@ -2,9 +2,12 @@ package com.tpp.threat_perception_platform.controller;
 
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.AssetsParam;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
 import com.tpp.threat_perception_platform.pojo.Host;
+import com.tpp.threat_perception_platform.pojo.WinCveDb;
+import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class HostController {
     private AccountInfoService accountInfoService;
     @Autowired
     private ServiceInfoService serviceInfoService;
+    @Autowired
+    private HotfixService hotfixService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -107,6 +112,21 @@ public class HostController {
         return hostService.systemRiskDiscovery(param);
     }
 
+    /**
+     * 补丁发现
+     */
+    @PostMapping("/host/hotfixDiscovery")
+    public ResponseResult hotfixDiscovery(@RequestBody HotfixParam param) {
+        // 下发指令
+        return hostService.hotfixDiscovery(param);
+    }
 
+    /**
+     * 危险补丁展示
+     */
+    @PostMapping("/host/dangerousHotfixShow")
+    public List<DangerousHotfix> getDangerousPatches(@RequestBody HotfixParam param) {
+        return hotfixService.getDangerousPatches(param.getMacAddress());
+    }
 
 }

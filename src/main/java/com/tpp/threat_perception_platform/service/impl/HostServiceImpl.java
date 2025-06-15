@@ -6,7 +6,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.HostMapper;
-import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
@@ -139,78 +138,34 @@ public class HostServiceImpl implements HostService {
         return new ResponseResult(0, "资产探测任务已下发，请稍后查看！");
     }
 
-
     @Override
-    public ResponseResult appRiskDiscovery(ApplicationRiskParam param) {
-        // 检查 macAddress 是否存在
-        if (param.getMacAddress() == null || param.getMacAddress().isEmpty()) {
-            return new ResponseResult<>(1004, "MAC地址不能为空！");
-        }
+    public ResponseResult hotfixDiscovery(HotfixParam param) {
+        // 验证Mac地址
 
-        // 查询主机状态，确认在线
-        Host dbHost = hostMapper.selectByMacAddress(param.getMacAddress());
-        if (dbHost == null || dbHost.getUpdateTime() == null ||
-                new Date().getTime() - dbHost.getUpdateTime().getTime() > 4000) {
+        if (!isOnline(param.getMacAddress())){
             return new ResponseResult<>(1003, "主机不在线！");
         }
-
-        // **在这里给 param 赋 ipAddress**
-        param.setIpAddress(dbHost.getIpAddress());
-
-
-        // 根据 appRisk 值决定 type
-        if (param.getAppRisk() != null && param.getAppRisk() == 1) {
-            param.setType("applicationRisk");
-        } else {
-            // 如果 appRisk 不为 1，可以自定义其他任务类型或报错
-            return new ResponseResult<>(1004, "未知的应用风险任务类型！");
-        }
-
-        // 打印最终消息参数
-        System.out.println("即将发送的任务参数: " + JSON.toJSONString(param));
-
-
-
-// 重新序列化为 JSON
+        // 初始化探测类型
+        param.setType("hotfix");
+        // 将param转换成JSON
         String json = JSON.toJSONString(param);
-        String routingKey = param.getMacAddress().replace(":", "");
-        rabbitService.sendMessage("agent_exchange", routingKey, json);
-
-        return new ResponseResult<>(0, "应用风险发现任务已下发，请稍后查看！");
+        // 组装队列的名字
+        String routingKey=param.getMacAddress().replace(":","");
+        rabbitService.sendMessage("agent_exchange",routingKey,json);
+        return new ResponseResult(0, "补丁探测任务已下发，请稍后查看！");
     }
 
-    @Override
-    public ResponseResult systemRiskDiscovery(SystemRiskParam param) {
-        // 检查 macAddress 是否存在
-        if (param.getMacAddress() == null || param.getMacAddress().isEmpty()) {
-            return new ResponseResult<>(1004, "MAC地址不能为空！");
+    /**
+     * 判断主机是否在线
+     */
+    private Boolean isOnline(String macAddress) {
+        // 通过mac地址查询主机信息
+        Host dbHost = hostMapper.selectByMacAddress(macAddress);
+        // 去比较更新时间和当前时间判断主机是否在线
+        if (dbHost == null || dbHost.getUpdateTime() == null|| new Date().getTime() - dbHost.getUpdateTime().getTime()>4000) {
+            return false;
         }
-
-        // 查询主机状态，确认在线
-        Host dbHost = hostMapper.selectByMacAddress(param.getMacAddress());
-        if (dbHost == null || dbHost.getUpdateTime() == null ||
-                new Date().getTime() - dbHost.getUpdateTime().getTime() > 4000) {
-            return new ResponseResult<>(1003, "主机不在线！");
-        }
-
-        // 根据 systemRisk 值决定 type
-        if (param.getSystemRisk() != null && param.getSystemRisk() == 1) {
-            param.setType("systemRisk");
-        } else {
-            // 如果 systemRisk 不为 1，可以自定义其他任务类型或报错
-            return new ResponseResult<>(1004, "未知的应用风险任务类型！");
-        }
-
-        // 打印最终消息参数
-        System.out.println("即将发送的任务参数: " + JSON.toJSONString(param));
-
-        // 转成 JSON 发送 RabbitMQ
-        String json = JSON.toJSONString(param);
-        String routingKey = param.getMacAddress().replace(":", "");
-        rabbitService.sendMessage("agent_exchange", routingKey, json);
-
-        return new ResponseResult<>(0, "系统风险发现任务已下发，请稍后查看！");
+        return true;
     }
-
 
 }

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.HotfixMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.Hotfix">
+        <id property="id" column="id" />
+        <result property="mac" column="mac" />
+        <result property="hotfixId" column="hotfix_id" />
+        <result property="updatedTime" column="updated_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,hotfix_id,updated_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from hotfix
+        where  id = #{id}
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.Hotfix">
+        select
+        <include refid="Base_Column_List" />
+        from hotfix
+        where mac = #{mac}
+        AND updated_time = (SELECT MAX(updated_time) FROM hotfix WHERE mac=#{mac})
+        order by id
+    </select>
+    <select id="selectByMacAndHotfixId" resultType="com.tpp.threat_perception_platform.pojo.Hotfix">
+        select
+        <include refid="Base_Column_List" />
+        from hotfix
+        where  mac = #{mac} and hotfix_id = #{hotfixId}
+    </select>
+    <select id="getHotfixIdsByMac" resultType="java.lang.String">
+        SELECT hotfix_id
+        FROM hotfix
+        WHERE mac = #{mac}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from hotfix
+        where  id = #{id}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Hotfix" useGeneratedKeys="true">
+        insert into hotfix
+            ( id,mac,hotfix_id,updated_time)
+        values (#{id},#{mac},#{hotfixId},#{updatedTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.Hotfix" useGeneratedKeys="true">
+        insert into hotfix
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="mac != null">mac,</if>
+            <if test="hotfixId != null">hotfix_id,</if>
+            <if test="updatedTime != null">updated_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="mac != null">#{mac},</if>
+            <if test="hotfixId != null">#{hotfixId},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.Hotfix">
+        update hotfix
+        <set>
+            <if test="mac != null">
+                mac = #{mac},
+            </if>
+            <if test="hotfixId != null">
+                hotfix_id = #{hotfixId},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+        </set>
+        where   id = #{id}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.Hotfix">
+        update hotfix
+        set
+            mac =  #{mac},
+            hotfix_id =  #{hotfixId},
+            updated_time =  #{updatedTime}
+        where   id = #{id}
+    </update>
+</mapper>
