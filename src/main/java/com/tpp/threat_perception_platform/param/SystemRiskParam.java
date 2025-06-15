@@ -1,5 +1,7 @@
 package com.tpp.threat_perception_platform.param;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,10 @@ public class SystemRiskParam {
     /**
      * 主机MAC地址，作为设备唯一标识
      */
+
     private String macAddress;
+
+
 
     /**
      * 主机名称，可选
@@ -65,6 +70,8 @@ public class SystemRiskParam {
      * 任务类型（如 appRisk、systemRisk 等）
      */
     private String type;
+
+
 
 
 }

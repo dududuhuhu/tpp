@@ -41,6 +41,10 @@ public class RabbitSysInfoConsumer {
     @Autowired
     private ApplicationRiskService applicationRiskService;
 
+
+    @Autowired
+    private SystemRiskService systemRiskService;
+
     @Autowired
     private HotfixService hotfixService;
 
