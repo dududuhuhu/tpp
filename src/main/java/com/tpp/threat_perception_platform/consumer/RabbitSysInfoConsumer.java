@@ -309,6 +309,56 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+    @RabbitListener(queues = "systemRisk_queue")
+    public void receiveSystemRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received SystemRisk list message: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+        boolean allSuccess = true;
+
+        try {
+            // 解析消息为参数列表
+            List<SystemRisk> paramList = JSON.parseArray(message, SystemRisk.class);
+
+            for (SystemRisk param : paramList) {
+                try {
+                    // 创建新对象并赋值检测时间
+                    SystemRisk systemRisk = new SystemRisk();
+                    BeanUtils.copyProperties(param, systemRisk);
+                    systemRisk.setUpdatedAt(new Date());
+
+                    // 保存到数据库
+                    ResponseResult result = systemRiskService.saveSystemRisk(systemRisk);
+                    System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
+                            param, result.getCode(), result.getMsg());
+
+                    if (result.getCode() != 0) {
+                        allSuccess = false;
+                        System.err.printf("Failed to save system risk info for param: %s%n", param);
+                    }
+                } catch (Exception e) {
+                    allSuccess = false;
+                    System.err.printf("Exception while saving system risk info for param %s:%n", param);
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            allSuccess = false;
+            System.err.println("Exception while processing system risk message:");
+            e.printStackTrace();
+        } finally {
+            if (allSuccess) {
+                channel.basicAck(deliveryTag, false);
+                System.out.println("All system risk messages processed successfully, ACKed.");
+            } else {
+                // 出错时决定是否重试，这里设为重试
+                channel.basicNack(deliveryTag, false, true);
+                System.err.println("Some system risk messages failed, message NACKed and requeued.");
+            }
+        }
+    }
+*/
+
+
     @RabbitListener(queues = "hotfix_queue")
     public void receiveHotfix(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received hotfix message: " + message);
