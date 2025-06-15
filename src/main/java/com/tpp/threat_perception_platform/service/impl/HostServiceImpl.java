@@ -8,18 +8,18 @@ import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.HostService;
 import com.tpp.threat_perception_platform.service.RabbitService;
+import com.tpp.threat_perception_platform.service.WeakpasswordRiskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -152,6 +152,23 @@ public class HostServiceImpl implements HostService {
         String routingKey=param.getMacAddress().replace(":","");
         rabbitService.sendMessage("agent_exchange",routingKey,json);
         return new ResponseResult(0, "补丁探测任务已下发，请稍后查看！");
+    }
+
+    @Override
+    public ResponseResult weakpasswordDiscovery(WeakpasswordParam param){
+        if (!isOnline(param.getMacAddress())){
+            return new ResponseResult<>(1003, "主机不在线！");
+        }
+
+        param.setType("password");
+        String ip = hostMapper.getIpByMac(param.getMacAddress());
+        param.setIpAddress(param.getMacAddress());
+        // 将param转换成JSON
+        String json = JSON.toJSONString(param);
+        // 组装队列的名字
+        String routingKey=param.getMacAddress().replace(":","");
+        rabbitService.sendMessage("agent_exchange",routingKey,json);
+        return new ResponseResult(0, "弱密码探测任务已下发，请稍后查看！");
     }
 
     /**

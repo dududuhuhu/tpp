@@ -3,7 +3,9 @@ package com.tpp.threat_perception_platform.controller;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.Host;
+import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
 import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
@@ -29,6 +31,8 @@ public class HostController {
     private ServiceInfoService serviceInfoService;
     @Autowired
     private HotfixService hotfixService;
+    @Autowired
+    private WeakpasswordRiskService weakpasswordRiskService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -111,9 +115,26 @@ public class HostController {
     /**
      * 危险补丁展示
      */
-    @PostMapping("/host/dangerousHotfixShow")
+    @PostMapping("/host/dangerousHotfixRisk")
     public List<DangerousHotfix> getDangerousPatches(@RequestBody HotfixParam param) {
         return hotfixService.getDangerousPatches(param.getMacAddress());
+    }
+
+    /**
+     * 弱密码发现
+     */
+    @PostMapping("/host/weakPasswordDiscovery")
+    public ResponseResult weakpasswordDiscovery(@RequestBody WeakpasswordParam param) {
+        // 下发指令
+        return hostService.weakpasswordDiscovery(param);
+    }
+
+    /**
+     * 弱密码展示
+     */
+    @PostMapping("/host/weakpasswordRisk")
+    public ResponseResult getWeakpassword(@RequestBody WeakpasswordParam param) {
+        return weakpasswordRiskService.weakpasswordList(param);
     }
 
 }
