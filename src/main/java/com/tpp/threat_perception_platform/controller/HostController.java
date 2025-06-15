@@ -1,7 +1,9 @@
 package com.tpp.threat_perception_platform.controller;
 
+import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.param.SystemRiskParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
@@ -91,6 +93,18 @@ public class HostController {
     @PostMapping("/host/assetsDiscovery")
     public ResponseResult assetsDiscovery(@RequestBody AssetsParam param){
         return hostService.assetsDiscovery(param);
+    }
+
+    @PostMapping("/host/appRiskDiscovery")
+    public ResponseResult appRiskDiscovery(@RequestBody ApplicationRiskParam param){
+        System.out.println(param);
+        return hostService.appRiskDiscovery(param);
+    }
+
+    @PostMapping("/host/systemRiskDiscovery")
+    public ResponseResult systemRiskDiscovery(@RequestBody SystemRiskParam param){
+        System.out.println(param);
+        return hostService.systemRiskDiscovery(param);
     }
 
 
