@@ -6,7 +6,7 @@ import requests
 
 if platform.platform().startswith("Windows"):
     SHELL = "powershell.exe"
-    SH_FLAG = "-File"
+    SH_FLAG = "-Command"
 elif platform.platform().startswith("Linux"):
     SHELL="sh"
     SH_FLAG = "-c"
