@@ -1,67 +1,71 @@
 # coding=utf-8
 import json
-from RiskDiscovery.ApplicationRisk import ApplicationRiskScanner
+import platform
+import subprocess
+import requests
+
+if platform.platform().startswith("Windows"):
+    SHELL = "powershell.exe"
+    SH_FLAG = "-File"
+elif platform.platform().startswith("Linux"):
+    SHELL="sh"
+    SH_FLAG = "-c"
+else:
+    raise NotImplementedError("当前平台不支持，仅支持 Windows 和 Linux")
 
 class ApplicationRiskDetect:
-    """
-    应用风险探测类（非线程版本）
-    """
     def __init__(self, data):
+        self._mac = data['macAddress']
+    
+    def _get_application_risk_rules(self) -> list[dict]:
         """
-        初始化探测器
-        :param ip_address: 目标主机 IP 地址
+        从后端接口获取风险检测规则
         """
-        self.mac=data['macAddress']
-        self.ip = data['ipAddress']
-    def detect(self) -> str:
-        """
-        外部调用接口，执行探测任务
-        :return: 探测结果（JSON字符串）
-        """
-        return self.__application_risk_detect()
-
-    def __application_risk_detect(self) -> str:
-        """
-        执行应用风险探测
-        :return: 探测结果（JSON字符串）
-        """
-        print("开始应用风险探测...................!")
-        target_hosts = [self.ip]
-        mac=self.mac
-        scanner = None
-
         try:
-            # 创建扫描器实例
-            scanner = ApplicationRiskScanner()
-            # 执行扫描
-            results = scanner.batch_scan_targets(target_hosts,mac)
-            # 生成报告
-            report = scanner.generate_report(results)
-            print(report)
-
-            # 输出摘要
-            print(f"\n=== 应用风险扫描报告 ===")
-            print(f"扫描时间: {report['scanTime']}")
-            print(f"总扫描次数: {report['scanSummary']['totalScans']}")
-            print(f"发现风险: {report['scanSummary']['risksFound']}")
-            print(f"扫描错误: {report['scanSummary']['scanErrors']}")
-            print(f"成功率: {report['scanSummary']['successRate']}")
-
-            if report['riskDistribution']['byLevel']:
-                print(f"\n风险等级分布:")
-                for level, count in report['riskDistribution']['byLevel'].items():
-                    print(f"  等级 {level}: {count} 个")
-
-            if report['riskDistribution']['byType']:
-                print(f"\n风险类型分布:")
-                for risk_type, count in report['riskDistribution']['byType'].items():
-                    print(f"  {risk_type}: {count} 个")
-
-
+            url = "http://localhost:8080/rule/applicationRisk"
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            rules = response.json()
+            print(f"获取到 {len(rules)} 条规则")
+            return rules
+        except requests.RequestException as e:
+            print(f"[错误] 获取规则失败: {e}")
+            return []
+    
+    def _detect_application_risk(self, rule:dict) -> dict | None:
+        """
+        执行单条检测规则，并返回检测结果
+        """
+        try:
+            cmd = rule['detectionPayload']
+            result = subprocess.run(
+                SHELL, SH_FLAG, cmd, capture_output=True, text=True
+            )
+            rule_id = rule['id']
+            if result.returncode != 0:
+                return {
+                    'id':rule_id,
+                    'macAddress': self.mac,
+                }
+            else:
+                return None
         except Exception as e:
-            print(f"扫描过程异常: {e}")
+            print(f"[错误] 执行规则 {rule['id']} 检测失败: {e}")
+    
+    def detect(self) -> list[dict]:
+        """
+        扫描所有系统风险规则，仅返回每条检测结果（简洁版）
+        """
+        print("开始系统风险探测...................!")
+        rules = self._get_application_risk_rules()
+        results = []
+        for rule in rules:
+            result = self._detect_application_risk(rule)
+            if result is not None:
+                results.append(result)
 
-        print("探测应用风险结束！")
-        results=json.dumps(results, indent=4, ensure_ascii=False)
-
+        results=json.dumps(results, ensure_ascii=False)
+        print(results)
+        print("探测系统风险结束！")
         return results
+
