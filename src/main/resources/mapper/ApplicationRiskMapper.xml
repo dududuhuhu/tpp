@@ -38,20 +38,18 @@
 
     <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
         SELECT * FROM application_risk
-        WHERE
-        <if test="targetHost != null and targetHost != ''">
-            AND target_host = #{targetHost}
-        </if>
-        <if test="riskLevel != null">
-            AND risk_level = #{riskLevel}
-        </if>
-        <if test="status != null and status != ''">
-            AND status = #{status}
-        </if>
+        <where>
+            <if test="targetHost != null and targetHost != ''">
+                AND target_host = #{targetHost}
+            </if>
+            <if test="riskLevel != null">
+                AND risk_level = #{riskLevel}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
         ORDER BY detection_time DESC
-        <if test="pageNum != null and pageSize != null">
-            LIMIT #{pageSize} OFFSET #{pageSize} * (#{pageNum} - 1)
-        </if>
     </select>
 
     <select id="countByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="int">

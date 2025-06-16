@@ -39,10 +39,52 @@
         from application_risk_rules
         where status = 'active'
     </select>
+    <select id="selectByRuleName" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk_rules
+        where risk_name = #{riskName} limit 1
+    </select>
+    <select id="findRulesBySearchTypeAndKeywords" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk_rules
+        <where>
+            <if test="searchType != null and searchType != '' and keywords != null and keywords != ''">
+                and (
+                <choose>
+                    <when test="searchType == 'riskType'">
+                        risk_type like concat('%',#{keywords},'%')
+                    </when>
+                    <when test="searchType == 'riskLevel'">
+                        risk_level like concat('%',#{keywords},'%')
+                    </when>
+                    <when test="searchType == 'method'">
+                        detection_method like concat('%',#{keywords},'%')
+                    </when>
+                </choose>
+                )
+            </if>
+        </where>
+        order by id
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk_rules
+        order by id
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from application_risk_rules
         where  id = #{id} 
+    </delete>
+    <delete id="delete">
+        delete from application_risk_rules
+        where  id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules" useGeneratedKeys="true">
         insert into application_risk_rules

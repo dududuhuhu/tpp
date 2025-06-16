@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>安全补丁详情</title>
+    <title>应用风险详情</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -111,9 +111,9 @@
     <div class="layui-row">
         <div class="layui-col-md12">
             <div class="layui-card">
-<!--                <div class="layui-card-header">-->
-<!--                    <span>主机信息</span>-->
-<!--                </div>-->
+                <div class="layui-card-header">
+                    <span>主机信息</span>
+                </div>
                 <div class="layui-card-body">
                     <div id="assetInfoContent" style="margin-bottom: 20px">
                         <div class="layui-row">
@@ -155,6 +155,15 @@
 
                 </div>
             </div>
+
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    应用风险探测详情
+                </div>
+                <div class="layui-card-body">
+                    <table id="patchTable" lay-filter="patchTableFilter"></table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -176,20 +185,17 @@
         return "";
     }
 </script>
-<script type="text/javascript">
+<script type="text/javascript" th:inline="none">
     layui.config({
-        base: '/layui/layuiAdmin/' //静态资源所在路径
+        base: '/layui/layuiAdmin/'
     }).extend({
-        index: 'lib/index' //主入口模块
+        index: 'lib/index'
     }).use(['element', 'jquery', 'table'], function () {
         var $ = layui.$,
             element = layui.element,
             table = layui.table;
 
-        // 注释掉原本用URL参数获取mac的代码，避免冲突
-        // var hostMac = new URLSearchParams(window.location.search).get('mac');
-
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             var data = event.data;
             console.log('收到资产数据：', data);
 
@@ -203,7 +209,6 @@
                 document.getElementById('cpuName').textContent = data.cpuName || '';
                 document.getElementById('ram').textContent = data.ram || '';
 
-                // 状态按钮显示
                 var statusHtml = '';
                 if (data.status === 1 || data.status === '1') {
                     statusHtml = '<button class="layui-btn layui-btn-normal layui-btn-xs">在线</button>';
@@ -215,10 +220,75 @@
                     statusHtml = '';
                 }
                 document.getElementById('status').innerHTML = statusHtml;
+
+                // ✅ 渲染表格
+                table.render({
+                    elem: '#patchTable',
+                    url: '/host/applicationRisk',
+                    method: 'post',
+                    contentType: 'application/json',  // ✅ 设置为 application/json
+                    headers: {
+                        'Authorization': localStorage.getItem('token')?.replace(/^Bearer\s/, '')
+                    },
+                    where: JSON.stringify({
+                        targetHost: data.ipAddress,
+                        page: 1,
+                        limit: 5
+                    }),
+                    parseData: function(res){ // ✅ 修正 Layui 对返回值的解析逻辑
+                        return {
+                            code: res.code,
+                            msg: res.msg,
+                            count: res.count,
+                            data: res.data
+                        };
+                    },
+                    cols: [[
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'ruleId', title: '规则ID', width: 75},
+                        {field: 'riskName', title: '风险名称', minWidth: 220},
+                        {
+                            field: 'riskLevel',
+                            title: '风险等级',
+                            width: 86,
+                            align: 'center', // 居中
+                            templet: function (d) {
+                                const levelMap = {
+                                    1: {text: '低', color: '#5FB878'},       // 绿色
+                                    2: {text: '中', color: '#FFB800'},       // 橙色
+                                    3: {text: '高', color: '#FF5722'},       // 红色
+                                    4: {text: '严重', color: '#FF0000'}      // 深红
+                                };
+                                const level = levelMap[d.riskLevel] || {text: '未知', color: '#909399'};
+                                return `<span class="layui-btn layui-btn-xs" style="background-color:${level.color};">${level.text}</span>`;
+                            }
+                        },
+                        {field: 'riskType', title: '风险类型', width: 90},
+                        {
+                            field: 'isRisky',
+                            title: '是否风险',
+                            width: 87,
+                            align: 'center', // 居中
+                            templet: function (d) {
+                                return d.isRisky ? '<button class="layui-btn layui-btn-danger layui-btn-xs">是</button>' : '<button class="layui-btn layui-btn-normal layui-btn-xs">否</button>';
+                            }
+                        },
+                        {
+                            field: 'detectionTime',
+                            title: '检测时间',
+                            width: 151,
+                            templet: function (d) {
+                                return d.detectionTime ? new Date(d.detectionTime).toLocaleString() : '';
+                            }
+                        },
+                        {field: 'targetUrl', title: '检测路径', minWidth: 180},
+                        {field: 'remediationAdvice', title: '修复建议', minWidth: 200},
+                    ]],
+                    page: {curr: 1, limit: 5},
+                    limits: [5, 10, 15, 20]
+                });
             }
         });
-
-
     });
 </script>
 </body>

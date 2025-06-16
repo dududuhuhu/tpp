@@ -1,9 +1,12 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.ApplicationRiskMapper;
 import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
+import com.tpp.threat_perception_platform.pojo.User;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.ApplicationRiskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,14 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
 
     @Override
     public ResponseResult appRiskList(ApplicationRiskParam param) {
+        // 设置分页参数
+        PageHelper.startPage(param.getPage(), param.getLimit());
+        // 查询所有
         List<ApplicationRisk> list = applicationRiskMapper.selectByParam(param);
-        // 假设有分页总数，或者直接用list.size()，视你Mapper实现而定
-        long count = list != null ? list.size() : 0L;
-        return new ResponseResult<>(count, list);
+        // 构架pageInfo
+        PageInfo<ApplicationRisk> pageInfo = new PageInfo<>(list);
+
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
 
     @Override

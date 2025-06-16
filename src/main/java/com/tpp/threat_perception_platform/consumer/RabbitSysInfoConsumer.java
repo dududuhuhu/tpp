@@ -360,7 +360,6 @@ public class RabbitSysInfoConsumer {
             }
         }
     }
-*/
 
 
     @RabbitListener(queues = "hotfix_queue")

@@ -7,15 +7,13 @@ import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
 import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.Host;
-import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
-import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 @RestController
 public class HostController {
@@ -34,6 +32,8 @@ public class HostController {
     private HotfixService hotfixService;
     @Autowired
     private WeakpasswordRiskService weakpasswordRiskService;
+    @Autowired
+    private ApplicationRiskService applicationRiskService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -114,6 +114,11 @@ public class HostController {
     public ResponseResult systemRiskDiscovery(@RequestBody SystemRiskParam param){
         System.out.println(param);
         return hostService.systemRiskDiscovery(param);
+    }
+
+    @PostMapping("/host/applicationRisk")
+    public ResponseResult getApplicationRiskInfo(@RequestBody ApplicationRiskParam param){
+        return applicationRiskService.appRiskList(param);
     }
 
     /**
