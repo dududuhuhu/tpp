@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.service;
 
 
+import com.tpp.threat_perception_platform.param.*;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.MyParam;
@@ -69,4 +70,6 @@ public interface HostService {
     ResponseResult hotfixDiscovery(HotfixParam param);
 
     ResponseResult weakpasswordDiscovery(WeakpasswordParam param);
+
+    ResponseResult vulnerabilityDiscovery(VulnerabilityParam param);
 }

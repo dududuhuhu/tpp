@@ -6,7 +6,10 @@ import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
 import com.tpp.threat_perception_platform.param.WeakpasswordParam;
+import com.tpp.threat_perception_platform.param.*;
 import com.tpp.threat_perception_platform.pojo.Host;
+import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
+import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 public class HostController {
@@ -32,6 +36,8 @@ public class HostController {
     private HotfixService hotfixService;
     @Autowired
     private WeakpasswordRiskService weakpasswordRiskService;
+    @Autowired
+    private VulnerabilityService vulnerabilityService;
     @Autowired
     private ApplicationRiskService applicationRiskService;
 
@@ -162,6 +168,23 @@ public class HostController {
     @PostMapping("/host/weakpasswordRisk")
     public ResponseResult getWeakpassword(@RequestBody WeakpasswordParam param) {
         return weakpasswordRiskService.weakpasswordList(param);
+    }
+
+    /**
+     * 漏洞发现
+     */
+    @PostMapping("/host/vulnerabilityDiscovery")
+    public ResponseResult vulnerabilityDiscovery(@RequestBody VulnerabilityParam param) {
+        // 下发指令
+        return hostService.vulnerabilityDiscovery(param);
+    }
+
+    /**
+     * 漏洞展示
+     */
+    @PostMapping("/host/vulnerabilityRisk")
+    public ResponseResult getVulnerability(@RequestBody VulnerabilityParam param) {
+        return vulnerabilityService.vulnerabilityRiskList(param);
     }
 
 }
