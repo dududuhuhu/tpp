@@ -189,7 +189,7 @@
             ,title: '系统风险探测数据表'
             ,cols: [[
                 {type: 'checkbox', fixed: 'left'}
-                ,{field:'macAddress', title:'MAC地址',width: 150}
+                ,{field:'mac', title:'MAC地址',width: 150}
                 ,{field:'ruleId',title:'规则ID',width:72}
                 ,{field:'riskName',title:'风险名称',width:220}
                 ,{field:'riskType',title:'风险类型',width:90}
@@ -211,11 +211,11 @@
                 }
                 ,{field: 'remediationAdvice', title: '修复建议', minWidth: 200}
                 , {
-                    field: 'detectionTime',
+                    field: 'updatedAt',
                     title: '检测时间',
                     width: 151,
                     templet: function (d) {
-                        return d.detectionTime ? new Date(d.detectionTime).toLocaleString() : '';
+                        return d.updatedAt ? new Date(d.updatedAt).toLocaleString() : '';
                     }
                 }
             ]]

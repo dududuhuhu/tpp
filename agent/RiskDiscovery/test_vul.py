@@ -9,7 +9,7 @@ def get_db_connection():
     return pymysql.connect(
         host="127.0.0.1",
         user="root",
-        password="123456xsy",
+        password="shuhan",
         database="threat_perception",
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor
@@ -23,7 +23,7 @@ def get_db_connection():
     #     'database': 'threat_perception'
     # }
 
-@app.route("/", methods=["GET"])
+@app.route("/user", methods=["GET"])
 def vulnerable_endpoint():
     user_id = request.args.get("id", "")
     try:
@@ -47,4 +47,4 @@ def vulnerable_endpoint():
         connection.close()
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080)
+    app.run(host="127.0.0.1", port=5000)
