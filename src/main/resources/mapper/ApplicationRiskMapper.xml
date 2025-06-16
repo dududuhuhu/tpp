@@ -37,19 +37,27 @@
     </select>
 
     <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
-        SELECT * FROM application_risk
+        SELECT
+        ar.rule_id,
+        ar.mac,
+        arr.risk_name,
+        arr.risk_level,
+        arr.risk_type,
+        arr.remediation_advice
+
+        FROM
+        application_risk ar
+        LEFT JOIN
+        application_risk_rules arr ON ar.rule_id = arr.id
         <where>
-            <if test="targetHost != null and targetHost != ''">
-                AND target_host = #{targetHost}
+            <if test="riskLevel != null and riskLevel != ''">
+                AND arr.risk_level = #{riskLevel}
             </if>
-            <if test="riskLevel != null">
-                AND risk_level = #{riskLevel}
-            </if>
-            <if test="status != null and status != ''">
-                AND status = #{status}
+            <if test="macAddress != null and macAddress != ''">
+                AND ar.macAddress = #{macAddress}
             </if>
         </where>
-        ORDER BY detection_time DESC
+        ORDER BY ar.id
     </select>
 
     <select id="countByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="int">

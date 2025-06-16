@@ -66,9 +66,7 @@
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
                                     <option  value="macAddress">MAC地址</option>
-                                    <option value="hostName">主机名</option>
-                                    <option value="ipAddress">IP地址</option>
-                                    <option value="osType">系统类型</option>
+                                    <option value="riskLevel">风险等级</option>
                                 </select>
                             </div>
                             <div class="layui-inline">
@@ -89,7 +87,7 @@
 
                         <!-- 表格工具栏 -->
                         <script type="text/html" id="table-useradmin-webuser">
-                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+<!--                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>-->
                         </script>
                     </div>
                 </div>
@@ -179,21 +177,47 @@
             ,table = layui.table;
 
         table.render({
-            elem: '#LAY-user-manage'
-            ,method: 'post'
-            ,url:'/host/applicationRisk'
+            elem: '#LAY-user-manage',
+            method: 'post',
+            url: '/host/applicationRisk',
+            contentType: 'application/json'
             ,headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
             }
             ,cellMinWidth: 80
             ,title: '应用风险探测数据表'
             ,cols: [[
                 {type: 'checkbox', fixed: 'left'}
-                ,{field:'id',title:'ID',width: 45}
                 ,{field:'macAddress', title:'MAC地址',width: 150}
-                ,{field:'hostName', title:'主机名字',width: 120}
-                ,{field:'ipAddress', title:'IP地址',width: 130}
-                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser', width:200}
+                ,{field:'ruleId',title:'规则ID',width:72}
+                ,{field:'riskName',title:'风险名称',width:220}
+                ,{field:'riskType',title:'风险类型',width:90}
+                ,{
+                    field: 'riskLevel',
+                    title: '风险等级',
+                    width: 86,
+                    align: 'center', // 居中
+                    templet: function (d) {
+                        const levelMap = {
+                            1: {text: '低', color: '#5FB878'},       // 绿色
+                            2: {text: '中', color: '#FFB800'},       // 橙色
+                            3: {text: '高', color: '#FF5722'},       // 红色
+                            4: {text: '严重', color: '#FF0000'}      // 深红
+                        };
+                        const level = levelMap[d.riskLevel] || {text: '未知', color: '#909399'};
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${level.color};">${level.text}</span>`;
+                    }
+                }
+                ,{field: 'remediationAdvice', title: '修复建议', minWidth: 200}
+                , {
+                    field: 'detectionTime',
+                    title: '检测时间',
+                    width: 151,
+                    templet: function (d) {
+                        return d.detectionTime ? new Date(d.detectionTime).toLocaleString() : '';
+                    }
+                }
             ]]
             ,page: { curr: 1, limit: 5 }
             ,limits:[5,10,15,20]
@@ -286,8 +310,10 @@
             table.reload('LAY-user-manage', {
                 url: '/host/applicationRisk',
                 method: "post",
+                contentType: 'application/json',
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
@@ -301,6 +327,7 @@
             //执行重载
             table.reload('LAY-rule-manage', {
                 url: '/rule/application/list',
+                contentType: 'application/json',
                 method: "post",
                 headers: {
                     'Authorization': localStorage.getItem('token')
@@ -316,6 +343,7 @@
             host_refresh: function(){
                 table.reload('LAY-user-manage', {
                     url: '/host/applicationRisk',
+                    contentType: 'application/json',
                     method: "post",
                     headers: {
                         'Authorization': localStorage.getItem('token')

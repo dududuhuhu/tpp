@@ -45,7 +45,7 @@ class ApplicationRiskDetect:
             if result.returncode != 0:
                 return {
                     'id':rule_id,
-                    'macAddress': self.mac,
+                    'macAddress': self._mac,
                 }
             else:
                 return None
