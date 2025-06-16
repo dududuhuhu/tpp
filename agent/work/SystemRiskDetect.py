@@ -98,7 +98,12 @@ class SystemRiskDetect:
         """
         print("开始系统风险探测...................!")
         rules = self.get_application_risk_rules()
-        results = [self.detect_system_risk(rule) for rule in rules]
+        results=[]
+        for rule in rules:
+            result=self.detect_system_risk(rule)
+            if result['isRisky']==1:
+                results.append(result)
+        # results = [self.detect_system_risk(rule) for rule in rules]
 
         results=json.dumps(results, ensure_ascii=False)
         print(results)

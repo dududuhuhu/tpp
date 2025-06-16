@@ -71,11 +71,12 @@ def run_system_risk_scan():
             })
             continue
         safe, info = func()
-        result_report.append({
-            "rule_name": rule["name"],
-            "status": info,
-            "result": safe,
-        })
+        if not safe:
+            result_report.append({
+                "rule_name": rule["name"],
+                "status": info,
+                "result": safe,
+            })
     print(result_report)
     return result_report
 """
