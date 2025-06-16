@@ -71,6 +71,16 @@ public class SystemRiskParam {
      */
     private String type;
 
+    /**
+     * 分页：页码
+     */
+    private Integer page;
+
+    /**
+     * 分页：每页数量
+     */
+    private Integer limit;
+
 
 
 

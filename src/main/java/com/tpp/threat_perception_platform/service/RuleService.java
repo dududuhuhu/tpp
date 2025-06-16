@@ -26,4 +26,6 @@ public interface RuleService {
     public ResponseResult applicationSave(ApplicationRiskRules applicationRiskRules);
 
     public ResponseResult applicatiionRiskRulesList(MyParam param);
+
+    public ResponseResult systemSave(SystemRiskRules systemRiskRules);
 }

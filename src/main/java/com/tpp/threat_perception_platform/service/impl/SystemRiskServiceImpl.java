@@ -1,8 +1,11 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.SystemRiskMapper;
 import com.tpp.threat_perception_platform.dao.SystemRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
+import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.SystemRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.SystemRiskService;
@@ -26,9 +29,14 @@ public class SystemRiskServiceImpl implements SystemRiskService {
 
     @Override
     public ResponseResult systemRiskList(SystemRiskParam param) {
+        // 设置分页参数
+        PageHelper.startPage(param.getPage(), param.getLimit());
+        // 查询所有
         List<SystemRisk> list = systemRiskMapper.selectByParam(param);
-        long count = list != null ? list.size() : 0L;
-        return new ResponseResult<>(count, list);
+        // 构架pageInfo
+        PageInfo<SystemRisk> pageInfo = new PageInfo<>(list);
+
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
 
     @Override

@@ -49,6 +49,11 @@ public class RuleController {
         return ruleService.applicationSave(applicationRiskRules);
     }
 
+    @PostMapping("/rule/system/save")
+    public ResponseResult systemRulesSave(@RequestBody SystemRiskRules systemRiskRules){
+        return ruleService.systemSave(systemRiskRules);
+    }
+
 
 
 

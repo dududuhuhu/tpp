@@ -136,15 +136,7 @@
 
 
 
-    <select id="selectByParam" resultType="com.tpp.threat_perception_platform.pojo.SystemRisk">
-        SELECT * FROM system_risk
-        <where>
-            <if test="mac != null">AND mac = #{mac}</if>
-            <if test="riskLevel != null">AND risk_level = #{riskLevel}</if>
-            <if test="riskType != null">AND risk_type = #{riskType}</if>
-            <!-- 可扩展更多条件 -->
-        </where>
-    </select>
+
 
     <select id="countTotalScans" resultType="int">
         SELECT COUNT(*) FROM system_risk
@@ -183,6 +175,15 @@
             <if test="mac != null">AND mac = #{mac}</if>
         </where>
         GROUP BY risk_type
+    </select>
+    <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.SystemRiskParam" resultType="com.tpp.threat_perception_platform.pojo.SystemRisk">
+        SELECT * FROM system_risk
+        <where>
+            <if test=" macAddress!= null and macAddress != ''">
+                AND mac = #{macAddress}
+            </if>
+        </where>
+        ORDER BY id
     </select>
 
 

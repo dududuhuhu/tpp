@@ -84,4 +84,17 @@ public class RuleServiceImpl implements RuleService {
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
+    @Override
+    public ResponseResult systemSave(SystemRiskRules systemRiskRules) {
+        // 先查询 是否有用户
+        SystemRiskRules db_rule = systemRiskRulesMapper.selectByRuleName(systemRiskRules.getRiskName());
+        if ( db_rule!= null){
+            return new ResponseResult<>(1003, "规则已存在！");
+        }
+        systemRiskRules.setIsActive(1);  // 1 表示激活，0 表示不激活（一般的约定）
+        // 添加
+        systemRiskRulesMapper.insertSelective(systemRiskRules);
+        return new ResponseResult<>(0, "添加成功！");
+    }
 }
