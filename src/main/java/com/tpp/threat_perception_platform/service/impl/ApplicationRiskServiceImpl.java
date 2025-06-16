@@ -43,7 +43,7 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
     public ResponseResult saveAppRisk(ApplicationRisk appRisk) {
         try {
             appRisk.setDetectionTime(appRisk.getDetectionTime() != null ? appRisk.getDetectionTime() : new Date());
-            appRisk.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
             int insertResult = applicationRiskMapper.insertSelective(appRisk);
             System.out.println("插入结果: " + insertResult);
             return new ResponseResult<>(0, "插入成功");

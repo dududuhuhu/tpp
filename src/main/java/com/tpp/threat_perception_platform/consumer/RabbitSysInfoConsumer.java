@@ -284,7 +284,7 @@ public class RabbitSysInfoConsumer {
                     ApplicationRisk appRisk = new ApplicationRisk();
                     BeanUtils.copyProperties(param, appRisk);
                     appRisk.setDetectionTime(new Date());
-
+                    appRisk.setMac(param.getMac());
                     // 保存到数据库
                     ResponseResult result = applicationRiskService.saveAppRisk(appRisk);
                     System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",

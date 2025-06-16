@@ -26,6 +26,7 @@ class ApplicationRiskDetect:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             rules = response.json()
+            print("rules:",rules)
             print(f"获取到 {len(rules)} 条规则")
             return rules
         except requests.RequestException as e:
@@ -38,14 +39,17 @@ class ApplicationRiskDetect:
         """
         try:
             cmd = rule['detectionPayload']
+            print("cmd:",cmd)
             result = subprocess.run(
-                SHELL, SH_FLAG, cmd, capture_output=True, text=True
+                [SHELL, SH_FLAG, cmd],  # 修复点：传入列表，而不是多个字符串
+                capture_output=True,
+                text=True
             )
             rule_id = rule['id']
             if result.returncode != 0:
                 return {
-                    'id':rule_id,
-                    'macAddress': self._mac,
+                    'ruleId':rule_id,
+                    'mac': self._mac,
                 }
             else:
                 return None
@@ -56,7 +60,7 @@ class ApplicationRiskDetect:
         """
         扫描所有系统风险规则，仅返回每条检测结果（简洁版）
         """
-        print("开始系统风险探测...................!")
+        print("开始应用风险探测...................!")
         rules = self._get_application_risk_rules()
         results = []
         for rule in rules:
@@ -65,7 +69,7 @@ class ApplicationRiskDetect:
                 results.append(result)
 
         results=json.dumps(results, ensure_ascii=False)
-        print(results)
-        print("探测系统风险结束！")
+        print("result:",results)
+        print("探测应用风险结束！")
         return results
 

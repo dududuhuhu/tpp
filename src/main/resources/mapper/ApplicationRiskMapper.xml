@@ -43,8 +43,8 @@
         arr.risk_name,
         arr.risk_level,
         arr.risk_type,
-        arr.remediation_advice
-
+        arr.remediation_advice,
+        ar.detection_time
         FROM
         application_risk ar
         LEFT JOIN
@@ -54,7 +54,7 @@
                 AND arr.risk_level = #{riskLevel}
             </if>
             <if test="macAddress != null and macAddress != ''">
-                AND ar.macAddress = #{macAddress}
+                AND ar.mac = #{macAddress}
             </if>
         </where>
         ORDER BY ar.id
