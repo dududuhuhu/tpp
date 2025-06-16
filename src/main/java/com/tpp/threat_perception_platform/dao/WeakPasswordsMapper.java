@@ -25,4 +25,6 @@ public interface WeakPasswordsMapper {
     int updateByPrimaryKey(WeakPasswords record);
 
     List<String> selectAllWeakPasswords();
+
+    List<WeakPasswords> findAll();
 }

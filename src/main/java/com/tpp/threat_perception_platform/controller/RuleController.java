@@ -49,8 +49,9 @@ public class RuleController {
         return ruleService.applicationSave(applicationRiskRules);
     }
 
-
-
-
+    @PostMapping("/rule/weakPassword/list")
+    public ResponseResult weakPassword(MyParam param){
+        return ruleService.weakPasswordList(param);
+    }
 
 }

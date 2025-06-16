@@ -158,6 +158,7 @@ public class HostController {
      */
     @PostMapping("/host/weakpasswordRisk")
     public ResponseResult getWeakpassword(@RequestBody WeakpasswordParam param) {
+        System.out.println(param.getMacAddress());
         return weakpasswordRiskService.weakpasswordList(param);
     }
 

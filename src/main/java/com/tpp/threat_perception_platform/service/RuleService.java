@@ -26,4 +26,6 @@ public interface RuleService {
     public ResponseResult applicationSave(ApplicationRiskRules applicationRiskRules);
 
     public ResponseResult applicatiionRiskRulesList(MyParam param);
+
+    ResponseResult weakPasswordList(MyParam param);
 }

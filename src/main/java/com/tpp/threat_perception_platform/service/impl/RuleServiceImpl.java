@@ -84,4 +84,16 @@ public class RuleServiceImpl implements RuleService {
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
+    @Override
+    public ResponseResult weakPasswordList(MyParam param) {
+        // 设置分页参数
+        PageHelper.startPage(param.getPage(), param.getLimit());
+        List<WeakPasswords> weakPasswordsList = null;
+        weakPasswordsList = weakPasswordsMapper.findAll();
+        // 构架pageInfo
+        PageInfo<WeakPasswords> pageInfo = new PageInfo<>(weakPasswordsList);
+
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    }
 }
