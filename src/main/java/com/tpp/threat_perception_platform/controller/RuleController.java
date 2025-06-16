@@ -37,7 +37,6 @@ public class RuleController {
 
 
 
-
     @PostMapping("/rule/hotfix/list")
     public ResponseResult hotfixRulesList(MyParam param){
         return ruleService.hotfixRulesList(param);
@@ -51,7 +50,13 @@ public class RuleController {
     public ResponseResult hotfixRulesSave(@RequestBody WinCveDb winCveDb){
         return ruleService.hotfixSave(winCveDb);
     }
-    
+
+
+    @PostMapping("/rule/application/list")
+    public ResponseResult applicationRiskRulesList(MyParam param){
+        return ruleService.applicatiionRiskRulesList(param);
+    }
+
     @PostMapping("/rule/application/delete")
     public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
         return ruleService.applicationDelete(ids);
@@ -59,6 +64,11 @@ public class RuleController {
     @PostMapping("/rule/application/save")
     public ResponseResult applicationRulesSave(@RequestBody ApplicationRiskRules applicationRiskRules){
         return ruleService.applicationSave(applicationRiskRules);
+    }
+
+    @PostMapping("/rule/weakPassword/list")
+    public ResponseResult weakPassword(MyParam param){
+        return ruleService.weakPasswordList(param);
     }
 
     @PostMapping("/rule/vulnerability/list")
