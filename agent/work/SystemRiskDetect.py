@@ -57,7 +57,7 @@ class SystemRiskDetect:
             if result.returncode != 0:
                 return {
                     'id':rule_id,
-                    'mac': self.mac,
+                    'macAddress': self.mac,
                 }
             else:
                 return None
