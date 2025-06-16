@@ -61,6 +61,8 @@ class SystemRiskDetect:
 
                 result["detectionOutput"] = f"NTP时间: {ntp_time}, 本地时间: {local_time}"
                 result["riskDetail"] = f"NTP时间偏差：{int(offset)} 秒"
+                print(result["detectionOutput"])
+                print(result["riskDetail"])
 
                 if offset > 300:
                     result["isRisky"] = 1
