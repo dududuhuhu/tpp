@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.SystemRiskMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.SystemRisk">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="ruleId" column="rule_id" />
+            <result property="riskName" column="risk_name" />
+            <result property="riskType" column="risk_type" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="isRisky" column="is_risky" />
+            <result property="detectionOutput" column="detection_output" />
+            <result property="riskDetail" column="risk_detail" />
+            <result property="remediationAdvice" column="remediation_advice" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,rule_id,risk_name,risk_type,risk_level,
+        is_risky,detection_output,risk_detail,remediation_advice,created_at,
+        updated_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from system_risk
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from system_risk
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRisk" useGeneratedKeys="true">
+        insert into system_risk
+        ( id,mac,rule_id,risk_name,risk_type,risk_level,
+        is_risky,detection_output,risk_detail,remediation_advice,created_at,
+        updated_at)
+        values (#{id},#{mac},#{ruleId},#{riskName},#{riskType},#{riskLevel},
+        #{isRisky},#{detectionOutput},#{riskDetail},#{remediationAdvice},#{createdAt},
+        #{updatedAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRisk" useGeneratedKeys="true">
+        insert into system_risk
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="ruleId != null">rule_id,</if>
+                <if test="riskName != null">risk_name,</if>
+                <if test="riskType != null">risk_type,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="isRisky != null">is_risky,</if>
+                <if test="detectionOutput != null">detection_output,</if>
+                <if test="riskDetail != null">risk_detail,</if>
+                <if test="remediationAdvice != null">remediation_advice,</if>
+                <if test="createdAt != null">created_at,</if>
+                <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="ruleId != null">#{ruleId},</if>
+                <if test="riskName != null">#{riskName},</if>
+                <if test="riskType != null">#{riskType},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="isRisky != null">#{isRisky},</if>
+                <if test="detectionOutput != null">#{detectionOutput},</if>
+                <if test="riskDetail != null">#{riskDetail},</if>
+                <if test="remediationAdvice != null">#{remediationAdvice},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+                <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.SystemRisk">
+        update system_risk
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="ruleId != null">
+                    rule_id = #{ruleId},
+                </if>
+                <if test="riskName != null">
+                    risk_name = #{riskName},
+                </if>
+                <if test="riskType != null">
+                    risk_type = #{riskType},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="isRisky != null">
+                    is_risky = #{isRisky},
+                </if>
+                <if test="detectionOutput != null">
+                    detection_output = #{detectionOutput},
+                </if>
+                <if test="riskDetail != null">
+                    risk_detail = #{riskDetail},
+                </if>
+                <if test="remediationAdvice != null">
+                    remediation_advice = #{remediationAdvice},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+                <if test="updatedAt != null">
+                    updated_at = #{updatedAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.SystemRisk">
+        update system_risk
+        set 
+            mac =  #{mac},
+            rule_id =  #{ruleId},
+            risk_name =  #{riskName},
+            risk_type =  #{riskType},
+            risk_level =  #{riskLevel},
+            is_risky =  #{isRisky},
+            detection_output =  #{detectionOutput},
+            risk_detail =  #{riskDetail},
+            remediation_advice =  #{remediationAdvice},
+            created_at =  #{createdAt},
+            updated_at =  #{updatedAt}
+        where   id = #{id} 
+    </update>
+
+
+
+
+
+    <select id="selectByParam" resultType="com.tpp.threat_perception_platform.pojo.SystemRisk">
+        SELECT * FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+            <if test="riskLevel != null">AND risk_level = #{riskLevel}</if>
+            <if test="riskType != null">AND risk_type = #{riskType}</if>
+            <!-- 可扩展更多条件 -->
+        </where>
+    </select>
+
+    <select id="countTotalScans" resultType="int">
+        SELECT COUNT(*) FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+        </where>
+    </select>
+
+    <select id="countFoundRisks" resultType="int">
+        SELECT COUNT(*) FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+            AND is_risky = 1
+        </where>
+    </select>
+
+    <select id="countScanErrors" resultType="int">
+        SELECT COUNT(*) FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+            AND error_message IS NOT NULL AND error_message != ''
+        </where>
+    </select>
+
+    <select id="groupCountByRiskLevel" resultType="map">
+        SELECT risk_level AS `key`, COUNT(*) AS `value` FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+        </where>
+        GROUP BY risk_level
+    </select>
+
+    <select id="groupCountByRiskType" resultType="map">
+        SELECT risk_type AS `key`, COUNT(*) AS `value` FROM system_risk
+        <where>
+            <if test="mac != null">AND mac = #{mac}</if>
+        </where>
+        GROUP BY risk_type
+    </select>
+
+
+</mapper>

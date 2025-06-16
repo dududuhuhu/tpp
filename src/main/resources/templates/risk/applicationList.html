@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主机管理</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+</head>
+<style>
+    /* 1. 让 tab 标题容器具有定位上下文 */
+    .layui-tab-title {
+        border-bottom: 2px solid #e2e2e2;
+        position: relative;
+    }
+
+    /* 2. 每个 tab 项本身也要能进行绝对定位 */
+    .layui-tab-title li {
+        position: relative;
+        padding: 0 20px; /* 可根据需要调整左右间距 */
+        font-size: 16px;
+        line-height: 42px;
+        font-weight: bold;
+    }
+
+    /* 3. 当前选中的 tab 样式 */
+    .layui-tab-title li.layui-this {
+        color: #16baaa;
+        font-weight: bold;
+    }
+
+    /* 4. 使用 ::before 添加底部绿色下划线，避免与 layui 的 ::after 冲突 */
+    .layui-tab-title li.layui-this::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0; /* 贴在底部 */
+        width: 100%;
+        height: 3px;
+        background-color: #16baaa;
+        border-radius: 2px;
+        z-index: 10;
+    }
+
+    /* 5. 清除 Layui 自带的 ::after 样式，防止出现顶部边线 */
+    .layui-tab-title li.layui-this::after {
+        display: none !important;
+    }
+</style>
+
+<body>
+
+<!-- 选项卡结构 -->
+<div class="layui-tab layui-tab-brief" lay-filter="hostTab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">应用风险详情</li>
+        <li>应用风险规则库</li>
+    </ul>
+    <div class="layui-tab-content">
+
+        <!-- 主机列表 Tab -->
+        <div class="layui-tab-item layui-show">
+            <div class="layui-fluid">
+                <div class="layui-card">
+                    <div class="layui-form layui-card-header layuiadmin-card-header-auto" style="border-radius: 0;border-top: 4px solid #d2d2d2;">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <select name="searchType" lay-filter="searchType">
+                                    <option  value="macAddress">MAC地址</option>
+                                    <option value="hostName">主机名</option>
+                                    <option value="ipAddress">IP地址</option>
+                                    <option value="osType">系统类型</option>
+                                </select>
+                            </div>
+                            <div class="layui-inline">
+                                <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysuser-front-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div style="padding-bottom: 10px;">
+                            <!-- 主机列表按钮 -->
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="batchdel">删除</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
+
+                        </div>
+                        <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
+
+                        <!-- 表格工具栏 -->
+                        <script type="text/html" id="table-useradmin-webuser">
+                            <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="applicationInfo"><i class="layui-icon layui-icon-edit"></i>应用风险详情</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 补丁信息 Tab -->
+        <div class="layui-tab-item">
+            <div class="layui-fluid">
+                <div class="layui-card">
+                    <div class="layui-form layui-card-header layuiadmin-card-header-auto" style="border-radius: 0;border-top: 4px solid #d2d2d2;">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <select name="searchType" lay-filter="searchType">
+                                    <option  value="riskType">风险类型</option>
+                                    <option value="riskLevel">风险等级</option>
+                                    <option value="method">检测方法</option>
+                                </select>
+                            </div>
+                            <div class="layui-inline">
+                                <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysrule-front-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div style="padding-bottom: 10px;">
+                            <!-- 补丁规则按钮 -->
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="add">添加</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="batchdel">删除</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="refresh">刷新</button>
+                        </div>
+                        <table id="LAY-rule-manage" lay-filter="LAY-rule-manage"></table>
+
+                        <!-- 表格工具栏 -->
+                        <script type="text/html" id="table-rule-webuser">
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                        </script>
+                    </div>
+                    <div class="layui-card-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Layui 核心 JS -->
+<script src="/layui/layui.js"></script>
+
+<!-- 工具函数：时间格式化 -->
+<script>
+    function formatDate(str) {
+        if(str != null){
+            var now = new Date(str);
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            return year + "-" + month + "-" + date +" "+hours+":"+minutes+":"+seconds;
+        }
+        return "";
+    }
+</script>
+
+<!-- 页面初始化逻辑 -->
+<script type="text/javascript" th:inline="none">
+    layui.config({
+        base: '/layui/layuiAdmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['layer','table','form','element'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,layer = layui.layer
+            ,dropdown = layui.dropdown
+            ,element=layui.element
+            ,table = layui.table;
+
+        table.render({
+            elem: '#LAY-user-manage'
+            ,method: 'post'
+            ,url:'/host/list'
+            ,headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+            ,cellMinWidth: 80
+            ,title: '主机数据表'
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id',title:'ID',width: 45}
+                ,{field:'macAddress', title:'MAC地址',width: 150}
+                ,{field:'hostName', title:'主机名字',width: 120}
+                ,{field:'ipAddress', title:'IP地址',width: 130}
+                ,{field:'status', title:'状态',width: 70, templet: function (d){
+                        return d.status == 1
+                            ? '<button class="layui-btn layui-btn-normal layui-btn-xs">上线</button>'
+                            : '<button class="layui-btn layui-btn-danger layui-btn-xs">下线</button>';
+                    }}
+                ,{field:'osType', title:'系统类型',width: 100, templet: function (d){
+                        let osType = d.osType;
+                        let buttonClass = '';
+                        switch (osType) {
+                            case 'Windows': buttonClass = 'layui-btn-normal'; break;
+                            case 'Linux': buttonClass = 'layui-btn'; break;
+                            case 'MacOS': buttonClass = 'layui-btn-gray'; break;
+                            case 'Android': buttonClass = 'layui-btn-warm'; break;
+                            case 'iOS': buttonClass = 'layui-btn-danger'; break;
+                            case 'Chrome OS': buttonClass = 'layui-btn-primary'; break;
+                            case 'Unix': buttonClass = 'layui-btn-normal'; break;
+                            case 'FreeBSD': buttonClass = 'layui-btn-primary'; break;
+                            case 'VMware ESXi': buttonClass = 'layui-btn-normal'; break;
+                            case 'Xen': buttonClass = 'layui-btn-warm'; break;
+                            default: buttonClass = 'layui-btn-black';
+                        }
+                        return `<button class="layui-btn ${buttonClass} layui-btn-xs">${osType}</button>`;
+                    }}
+                ,{field:'osName', title:'系统名字',width: 120}
+                ,{field:'osVersion', title:'系统版本',width: 120}
+                ,{field:'osBit', title:'位数',width: 100}
+                ,{field:'cpuName', title:'CPU',width: 100}
+                ,{field:'ram', title:'内存',width: 100}
+                ,{field:'createTime', title:'采集时间',width: 160, templet: d => formatDate(d.createTime)}
+                ,{field:'updateTime', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.createTime)}
+                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser', width:200}
+            ]]
+            ,page: { curr: 1, limit: 5 }
+            ,limits:[5,10,15,20]
+        });
+
+        table.render({
+            elem: '#LAY-rule-manage',
+            method: 'post',
+            url: '/rule/application/list',
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            },
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'id', title: 'ID', width: 60},
+                {field: 'riskName', title: '风险名称', width: 200},
+                {field: 'riskDesc', title: '风险描述', minWidth: 300},
+                {field: 'riskType', title: '风险类型', width: 120},
+                {field: 'riskLevel', title: '风险等级', width: 100, templet: function(d){
+                        let map = {1: '低', 2: '中', 3: '高', 4: '严重'};
+                        return map[d.riskLevel] || '未知';
+                    }},
+                {field: 'targetService', title: '目标服务', width: 120},
+                {field: 'detectionMethod', title: '检测方式', width: 100},
+                {field: 'detectionPath', title: '路径', width: 150},
+                {field: 'riskFlag', title: '判断标识', width: 150},
+                {field: 'remediationAdvice', title: '修复建议', minWidth: 300},
+                {field: 'createdAt', title: '创建时间', width: 160, templet: d => formatDate(d.createdAt)},
+                ,{fixed: 'right', title:'操作', toolbar: '#table-rule-webuser', width:80}
+            ]],
+            page: { curr: 1, limit: 5 },
+            limits: [5, 10, 15, 20]
+        });
+
+
+
+        table.on('tool(LAY-user-manage)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除吗?', function(index){
+                    $.ajax({
+                        url:"/rule/application/delete",
+                        type:"post",
+                        headers: { 'Authorization': localStorage.getItem('token') },
+                        data:{ids:[data.id]},
+                        dataType:"json",
+                        success:function (res){
+                            if(res.code == 0){
+                                layer.msg(res.msg);
+                                table.reload('LAY-user-manage');
+                                layer.close(index);
+                            }else {
+                                layer.msg(res.msg,{icon: 5});
+                            }
+                        }
+                    })
+                });
+            }
+            else if(obj.event==='applicationInfo'){
+                layer.open({
+                    type: 2,
+                    skin: 'layui-layer-molv',
+                    title: '应用风险详情',
+                    area: ['800px', '600px'],
+                    content: '/page/risk/applicationInfo',
+                    maxmin: true,
+                    btn: ['关闭'],
+                    yes: function(index, layero){
+                        layer.close(index);
+                    },
+                    success: function(layero, index){
+                        // 获取iframe窗口对象
+                        var iframeWin = layero.find('iframe')[0].contentWindow;
+                        // 延迟发送，保证页面2监听就绪
+                        setTimeout(() => {
+                            iframeWin.postMessage(data, '*');
+                        }, 200);
+                    }
+                });
+            }
+        });
+
+        table.on('tool(LAY-rule-manage)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除吗?', function(index){
+                    $.ajax({
+                        url:"/rule/application/delete",
+                        type:"post",
+                        headers: { 'Authorization': localStorage.getItem('token') },
+                        data:{ids:[data.id]},
+                        dataType:"json",
+                        success:function (res){
+                            if(res.code == 0){
+                                layer.msg(res.msg);
+                                table.reload('LAY-rule-manage');
+                                layer.close(index);
+                            }else {
+                                layer.msg(res.msg,{icon: 5});
+                            }
+                        }
+                    })
+                });
+            }
+        });
+
+        //监听搜索
+        form.on('submit(LAY-sysuser-front-search)', function(data){
+            var field = data.field;
+            console.log(field);
+            //执行重载
+            table.reload('LAY-user-manage', {
+                url: '/host/list',
+                method: "post",
+                headers: {
+                    'Authorization': localStorage.getItem('token')
+                },
+                data: JSON.stringify(field), // 发送JSON格式的数据
+                where: field
+            });
+        });
+
+        //监听搜索
+        form.on('submit(LAY-sysrule-front-search)', function(data){
+            var field = data.field;
+            console.log(field);
+            //执行重载
+            table.reload('LAY-rule-manage', {
+                url: '/rule/application/list',
+                method: "post",
+                headers: {
+                    'Authorization': localStorage.getItem('token')
+                },
+                data: JSON.stringify(field), // 发送JSON格式的数据
+                where: field
+            });
+        });
+
+
+        var active = {
+            // 主机管理相关
+            host_batchdel: function(){
+                var checkData = table.checkStatus('LAY-user-manage').data;
+                if(checkData.length == 0){
+                    return layer.msg('请选择数据');
+                }
+                layer.confirm('确定删除吗？', function (){
+                    var userIds = checkData.map(item => item.id);
+                    $.ajax({
+                        url:"/host/delete",
+                        type:"post",
+                        headers: { 'Authorization': localStorage.getItem('token') },
+                        data:{ids:userIds},
+                        dataType:"json",
+                        success:function (res){
+                            if(res.code == 0){
+                                layer.msg(res.msg);
+                                table.reload('LAY-user-manage');
+                            }else{
+                                layer.msg(res.msg,{icon: 5});
+                            }
+                        }
+                    });
+                });
+            },
+            host_refresh: function(){
+                table.reload('LAY-user-manage', {
+                    url: '/host/list',
+                    method: "post",
+                    headers: {
+                        'Authorization': localStorage.getItem('token')
+                    }
+                });
+            },
+
+            // 应用规则相关
+            rule_batchdel: function(){
+                var checkData = table.checkStatus('LAY-rule-manage').data;
+                if(checkData.length == 0){
+                    return layer.msg('请选择数据');
+                }
+                layer.confirm('确定删除吗？', function (){
+                    var userIds = checkData.map(item => item.id);
+                    $.ajax({
+                        url:"/rule/application/delete",
+                        type:"post",
+                        headers: { 'Authorization': localStorage.getItem('token') },
+                        data:{ids:userIds},
+                        dataType:"json",
+                        success:function (res){
+                            if(res.code == 0){
+                                layer.msg(res.msg);
+                                table.reload('LAY-rule-manage');
+                            }else{
+                                layer.msg(res.msg,{icon: 5});
+                            }
+                        }
+                    });
+                });
+            },
+            rule_refresh: function(){
+                table.reload('LAY-rule-manage', {
+                    url: '/rule/application/list',
+                    method: 'post',
+                    headers: {
+                        'Authorization': localStorage.getItem('token')
+                    }
+                });
+            },
+            rule_add: function(){
+                layer.open({
+                    type: 2,
+                    title: '添加规则',
+                    skin: 'layui-layer-molv',
+                    content: '/page/risk/applicationRiskRulesAdd',
+                    maxmin: true,
+                    area: ['580px', '600px'],
+                    btn: ['确定', '取消'],
+                    yes: function (index,layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index],
+                            submitID = 'LAY-user-front-submit',
+                            submit = layero.find('iframe').contents().find('#'+ submitID);
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url:"/rule/application/save",
+                                type:"post",
+                                headers: {
+                                    'Authorization': localStorage.getItem('token')
+                                },
+                                data:JSON.stringify(field),
+                                contentType: "application/json;charset=utf-8",
+                                dataType:"json",
+                                success:function (res){
+                                    if(res.code === 0){
+                                        layer.msg(res.msg);
+                                        table.reload('LAY-rule-manage');
+                                        layer.close(index);
+                                    }else{
+                                        layer.msg(res.msg,{icon: 5});
+                                    }
+                                }
+                            })
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+
+        $('.layuiadmin-btn-useradmin').on('click', function(){
+            var type = $(this).data('type');
+            var tableName = $(this).data('table'); // "user" or "rule"
+
+            // 根据模块前缀调用不同的方法
+            if (tableName === 'user') {
+                active['host_' + type] && active['host_' + type]();
+            } else if (tableName === 'rule') {
+                active['rule_' + type] && active['rule_' + type]();
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

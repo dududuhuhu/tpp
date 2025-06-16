@@ -12,6 +12,8 @@ from threading import Thread
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
         publisher.publish_message(routing_key=routing_key, message=detector.detect())
+    else:
+        detector.detect()
 
 def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
     try:

@@ -48,6 +48,31 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/host/weakPasswordDiscovery").setViewName("host/weakPasswordDiscovery");
         registry.addViewController("/page/host/appRiskDiscovery").setViewName("host/appRiskDiscovery");
         registry.addViewController("/page/host/systemRiskDiscovery").setViewName("host/systemRiskDiscovery");
+
+        // 风险发现相关页面
+        registry.addViewController("/page/risk/hotfixList").setViewName("risk/hotfixList");
+        registry.addViewController("/page/risk/applicationList").setViewName("risk/applicationList");
+        registry.addViewController("/page/risk/systemList").setViewName("risk/systemList");
+        registry.addViewController("/page/risk/vulnerabilityList").setViewName("risk/vulnerabilityList");
+        registry.addViewController("/page/risk/weakpasswordList").setViewName("risk/weakpasswordList");
+
+        registry.addViewController("/page/risk/applicationRiskRulesAdd").setViewName("risk/applicationRiskRulesAdd");
+        registry.addViewController("/page/risk/systemRiskRulesAdd").setViewName("risk/systemRiskRulesAdd");
+        registry.addViewController("/page/risk/hotfixAdd").setViewName("risk/hotfixAdd");
+        registry.addViewController("/page/risk/weakpasswordsAdd").setViewName("risk/weakpasswordsAdd");
+        registry.addViewController("/page/risk/vulnerabilityRulesAdd").setViewName("risk/vulnerabilityRulesAdd");
+
+        registry.addViewController("/page/risk/hotfixInfo").setViewName("risk/hotfixInfo");
+        registry.addViewController("/page/risk/applicationInfo").setViewName("risk/applicationInfo");
+        registry.addViewController("/page/risk/systemInfo").setViewName("risk/systemInfo");
+        registry.addViewController("/page/risk/weakpasswordsInfo").setViewName("risk/weakpasswordsInfo");
+        registry.addViewController("/page/risk/vulnerabilityInfo").setViewName("risk/vulnerabilityInfo");
+
+
+
+
+
+
     }
 }
 

@@ -1,13 +1,11 @@
 package com.tpp.threat_perception_platform.controller;
 
-import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
-import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
-import com.tpp.threat_perception_platform.pojo.VulnerabilityRules;
-import com.tpp.threat_perception_platform.pojo.WeakPasswords;
+import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.pojo.*;
+import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.RuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +35,19 @@ public class RuleController {
         return ruleService.getAllVulnerabilityRules();
     }
 
+    @PostMapping("/rule/application/list")
+    public ResponseResult applicationRiskRulesList(MyParam param){
+        return ruleService.applicatiionRiskRulesList(param);
+    }
+
+    @PostMapping("/rule/application/delete")
+    public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
+        return ruleService.applicationDelete(ids);
+    }
+    @PostMapping("/rule/application/save")
+    public ResponseResult applicationRulesSave(@RequestBody ApplicationRiskRules applicationRiskRules){
+        return ruleService.applicationSave(applicationRiskRules);
+    }
 
 
 

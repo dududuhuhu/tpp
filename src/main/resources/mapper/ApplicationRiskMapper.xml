@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.ApplicationRiskMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+            <id property="id" column="id" />
+            <result property="ruleId" column="rule_id" />
+            <result property="mac" column="mac" />
+            <result property="riskName" column="risk_name" />
+            <result property="riskType" column="risk_type" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="targetHost" column="target_host" />
+            <result property="targetUrl" column="target_url" />
+            <result property="detectionTime" column="detection_time" />
+            <result property="isRisky" column="is_risky" />
+            <result property="riskDetail" column="risk_detail" />
+            <result property="responseContent" column="response_content" />
+            <result property="errorMessage" column="error_message" />
+            <result property="remediationAdvice" column="remediation_advice" />
+            <result property="status" column="status" />
+            <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,rule_id,mac,risk_name,risk_type,risk_level,
+        target_host,target_url,detection_time,is_risky,risk_detail,
+        response_content,error_message,remediation_advice,status,created_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from application_risk
+        where  id = #{id} 
+    </select>
+
+    <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        SELECT * FROM application_risk
+        <where>
+            <if test="targetHost != null and targetHost != ''">
+                AND target_host = #{targetHost}
+            </if>
+            <if test="riskLevel != null">
+                AND risk_level = #{riskLevel}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY detection_time DESC
+    </select>
+
+    <select id="countByParam" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam" resultType="int">
+        SELECT COUNT(1) FROM application_risk
+        WHERE
+        <if test="targetHost != null and targetHost != ''">
+            AND target_host = #{targetHost}
+        </if>
+        <if test="riskLevel != null">
+            AND risk_level = #{riskLevel}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from application_risk
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRisk" useGeneratedKeys="true">
+        insert into application_risk
+        ( id,rule_id,mac,risk_name,risk_type,risk_level,
+        target_host,target_url,detection_time,is_risky,risk_detail,
+        response_content,error_message,remediation_advice,status,created_at)
+        values (#{id},#{ruleId},#{mac},#{riskName},#{riskType},#{riskLevel},
+        #{targetHost},#{targetUrl},#{detectionTime},#{isRisky},#{riskDetail},
+        #{responseContent},#{errorMessage},#{remediationAdvice},#{status},#{createdAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRisk" useGeneratedKeys="true">
+        insert into application_risk
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="ruleId != null">rule_id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="riskName != null">risk_name,</if>
+                <if test="riskType != null">risk_type,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="targetHost != null">target_host,</if>
+                <if test="targetUrl != null">target_url,</if>
+                <if test="detectionTime != null">detection_time,</if>
+                <if test="isRisky != null">is_risky,</if>
+                <if test="riskDetail != null">risk_detail,</if>
+                <if test="responseContent != null">response_content,</if>
+                <if test="errorMessage != null">error_message,</if>
+                <if test="remediationAdvice != null">remediation_advice,</if>
+                <if test="status != null">status,</if>
+                <if test="createdAt != null">created_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="ruleId != null">#{ruleId},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="riskName != null">#{riskName},</if>
+                <if test="riskType != null">#{riskType},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="targetHost != null">#{targetHost},</if>
+                <if test="targetUrl != null">#{targetUrl},</if>
+                <if test="detectionTime != null">#{detectionTime},</if>
+                <if test="isRisky != null">#{isRisky},</if>
+                <if test="riskDetail != null">#{riskDetail},</if>
+                <if test="responseContent != null">#{responseContent},</if>
+                <if test="errorMessage != null">#{errorMessage},</if>
+                <if test="remediationAdvice != null">#{remediationAdvice},</if>
+                <if test="status != null">#{status},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        update application_risk
+        <set>
+                <if test="ruleId != null">
+                    rule_id = #{ruleId},
+                </if>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="riskName != null">
+                    risk_name = #{riskName},
+                </if>
+                <if test="riskType != null">
+                    risk_type = #{riskType},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="targetHost != null">
+                    target_host = #{targetHost},
+                </if>
+                <if test="targetUrl != null">
+                    target_url = #{targetUrl},
+                </if>
+                <if test="detectionTime != null">
+                    detection_time = #{detectionTime},
+                </if>
+                <if test="isRisky != null">
+                    is_risky = #{isRisky},
+                </if>
+                <if test="riskDetail != null">
+                    risk_detail = #{riskDetail},
+                </if>
+                <if test="responseContent != null">
+                    response_content = #{responseContent},
+                </if>
+                <if test="errorMessage != null">
+                    error_message = #{errorMessage},
+                </if>
+                <if test="remediationAdvice != null">
+                    remediation_advice = #{remediationAdvice},
+                </if>
+                <if test="status != null">
+                    status = #{status},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        update application_risk
+        set 
+            rule_id =  #{ruleId},
+            mac =  #{mac},
+            risk_name =  #{riskName},
+            risk_type =  #{riskType},
+            risk_level =  #{riskLevel},
+            target_host =  #{targetHost},
+            target_url =  #{targetUrl},
+            detection_time =  #{detectionTime},
+            is_risky =  #{isRisky},
+            risk_detail =  #{riskDetail},
+            response_content =  #{responseContent},
+            error_message =  #{errorMessage},
+            remediation_advice =  #{remediationAdvice},
+            status =  #{status},
+            created_at =  #{createdAt}
+        where   id = #{id} 
+    </update>
+
+
+    <!-- 统计总扫描次数 -->
+    <select id="countTotalScans" resultType="int" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam">
+        SELECT COUNT(*) FROM application_risk
+        <where>
+            <if test="startTime != null">
+                AND scan_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND scan_time &lt;= #{endTime}
+            </if>
+            <!-- 你可以继续添加其他筛选条件 -->
+        </where>
+    </select>
+
+    <!-- 统计发现风险数 -->
+    <select id="countFoundRisks" resultType="int" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam">
+        SELECT COUNT(*) FROM application_risk
+        <where>
+            <if test="startTime != null">
+                AND scan_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND scan_time &lt;= #{endTime}
+            </if>
+            AND risk_level &gt; 0  <!-- 假设risk_level>0表示有风险 -->
+        </where>
+    </select>
+
+    <!-- 统计扫描错误数 -->
+    <select id="countScanErrors" resultType="int" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam">
+        SELECT COUNT(*) FROM application_risk
+        <where>
+            <if test="startTime != null">
+                AND scan_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND scan_time &lt;= #{endTime}
+            </if>
+            AND scan_status = 1  <!-- 假设1表示错误 -->
+        </where>
+    </select>
+
+    <select id="groupCountByRiskLevel" resultType="map" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam">
+        SELECT risk_level AS key, COUNT(*) AS value
+        FROM application_risk
+        <where>
+            <if test="startTime != null">
+                AND scan_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND scan_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY risk_level
+    </select>
+
+    <select id="groupCountByRiskType" resultType="map" parameterType="com.tpp.threat_perception_platform.param.ApplicationRiskParam">
+        SELECT risk_type AS key, COUNT(*) AS value
+        FROM application_risk
+        <where>
+            <if test="startTime != null">
+                AND scan_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND scan_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY risk_type
+    </select>
+
+
+
+
+</mapper>
