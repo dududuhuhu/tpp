@@ -69,15 +69,15 @@ public class HotfixServiceImpl implements HotfixService {
     @Override
     public ResponseResult<List<DangerousHotfix>> getDangerousPatches(String mac) {
         // 默认返回前100条
-        return getDangerousPatch(mac, 1, 100);
+        return getDangerousPatch(1, 100);
     }
 
     @Override
-    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(String mac, Integer page, Integer limit) {
-        List<Hotfix> allHotfixes = hotfixMapper.findAll(mac);
+    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(Integer page, Integer limit) {
+        List<Hotfix> allHotfixes = hotfixMapper.findAll();
         List<DangerousHotfix> result = new ArrayList<>();
 
-        System.out.println("开始探测危险补丁：" + mac);
+        System.out.println("开始探测危险补丁：");
         for (Hotfix hotfix : allHotfixes) {
             String hotfixId = hotfix.getHotfixId();
             System.out.println(hotfixId);

@@ -19,6 +19,6 @@ public interface HotfixService {
     // 添加重载方法（无分页）
     ResponseResult<List<DangerousHotfix>> getDangerousPatches(String mac);
 
-    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(String mac, Integer page, Integer limit);
+    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(Integer page, Integer limit);
 
 }

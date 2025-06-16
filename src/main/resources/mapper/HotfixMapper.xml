@@ -25,8 +25,7 @@
         select
         <include refid="Base_Column_List" />
         from hotfix
-        where mac = #{mac}
-        AND updated_time = (SELECT MAX(updated_time) FROM hotfix WHERE mac=#{mac})
+        where updated_time = (SELECT MAX(updated_time) FROM hotfix)
         order by id
     </select>
     <select id="selectByMacAndHotfixId" resultType="com.tpp.threat_perception_platform.pojo.Hotfix">

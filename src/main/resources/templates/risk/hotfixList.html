@@ -66,9 +66,6 @@
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
                                     <option  value="macAddress">MAC地址</option>
-                                    <option value="hostName">主机名</option>
-                                    <option value="ipAddress">IP地址</option>
-                                    <option value="osType">系统类型</option>
                                 </select>
                             </div>
                             <div class="layui-inline">
@@ -183,50 +180,35 @@
         table.render({
             elem: '#LAY-user-manage'
             ,method: 'post'
-            ,url:'/host/list'
+            ,url:'/host/dangerousHotfixRisk'
+            ,contentType: 'application/json'
             ,headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
             }
             ,cellMinWidth: 80
-            ,title: '主机数据表'
+            ,title: '危险补丁探测数据表'
             ,cols: [[
-                {type: 'checkbox', fixed: 'left'}
-                ,{field:'id',title:'ID',width: 45}
-                ,{field:'macAddress', title:'MAC地址',width: 150}
-                ,{field:'hostName', title:'主机名字',width: 120}
-                ,{field:'ipAddress', title:'IP地址',width: 130}
-                ,{field:'status', title:'状态',width: 70, templet: function (d){
-                        return d.status == 1
-                            ? '<button class="layui-btn layui-btn-normal layui-btn-xs">上线</button>'
-                            : '<button class="layui-btn layui-btn-danger layui-btn-xs">下线</button>';
-                    }}
-                ,{field:'osType', title:'系统类型',width: 100, templet: function (d){
-                        let osType = d.osType;
-                        let buttonClass = '';
-                        switch (osType) {
-                            case 'Windows': buttonClass = 'layui-btn-normal'; break;
-                            case 'Linux': buttonClass = 'layui-btn'; break;
-                            case 'MacOS': buttonClass = 'layui-btn-gray'; break;
-                            case 'Android': buttonClass = 'layui-btn-warm'; break;
-                            case 'iOS': buttonClass = 'layui-btn-danger'; break;
-                            case 'Chrome OS': buttonClass = 'layui-btn-primary'; break;
-                            case 'Unix': buttonClass = 'layui-btn-normal'; break;
-                            case 'FreeBSD': buttonClass = 'layui-btn-primary'; break;
-                            case 'VMware ESXi': buttonClass = 'layui-btn-normal'; break;
-                            case 'Xen': buttonClass = 'layui-btn-warm'; break;
-                            default: buttonClass = 'layui-btn-black';
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'macAddress', title: 'MAC地址', width: 160},
+                {field: 'hotfixId', title: '补丁编号', width: 130},
+                {field: 'cve', title: 'CVE编号', width: 150},
+                {field: 'score', title: '评分', width: 80, templet: function (d) {
+                        let color = '';
+                        let score = parseFloat(d.score);
+                        if (score >= 9) {
+                            color = '#FF5722'; // 高危 - 橙红
+                        } else if (score >= 7) {
+                            color = '#FFB800'; // 中危 - 橙黄
+                        } else if (score >= 4) {
+                            color = '#1E9FFF'; // 低危 - 蓝色
+                        } else {
+                            color = '#009688'; // 信息 - 青色
                         }
-                        return `<button class="layui-btn ${buttonClass} layui-btn-xs">${osType}</button>`;
-                    }}
-                ,{field:'osName', title:'系统名字',width: 120}
-                ,{field:'osVersion', title:'系统版本',width: 120}
-                ,{field:'osBit', title:'位数',width: 100}
-                ,{field:'cpuName', title:'CPU',width: 100}
-                ,{field:'ram', title:'内存',width: 100}
-                ,{field:'createTime', title:'采集时间',width: 160, templet: d => formatDate(d.createTime)}
-                ,{field:'updateTime', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.createTime)}
-                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser', width:200}
-            ]]
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${color};">${score}</span>`;
+                    }
+                }
+                ]]
             ,page: { curr: 1, limit: 5 }
             ,limits:[5,10,15,20]
         });
