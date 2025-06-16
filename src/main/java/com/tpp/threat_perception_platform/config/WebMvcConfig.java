@@ -52,8 +52,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 风险发现相关页面
         registry.addViewController("/page/risk/hotfixList").setViewName("risk/hotfixList");
         registry.addViewController("/page/risk/applicationList").setViewName("risk/applicationList");
-        registry.addViewController("/page/risk/systemList").setViewName("risk/systemList");
-        registry.addViewController("/page/risk/vulnerabilityList").setViewName("risk/vulnerabilityList");
+        registry.addViewController("/page/risk/systemList").setViewName("systemList_2");
+        registry.addViewController("/page/risk/vulnerabilityList").setViewName("vulnerabilityList_1");
         registry.addViewController("/page/risk/weakpasswordList").setViewName("risk/weakpasswordList");
 
         registry.addViewController("/page/risk/applicationRiskRulesAdd").setViewName("risk/applicationRiskRulesAdd");
