@@ -237,8 +237,10 @@ public class HostServiceImpl implements HostService {
         }
 
         param.setType("password");
+        System.out.println("mac:"+param.getMacAddress());
         String ip = hostMapper.getIpByMac(param.getMacAddress());
-        param.setIpAddress(param.getMacAddress());
+        System.out.println("ip:"+ip);
+        param.setIpAddress(ip);
         // 将param转换成JSON
         String json = JSON.toJSONString(param);
         // 组装队列的名字
