@@ -58,7 +58,6 @@
             margin-top: 20px;
         }
 
-
         /* 标签内容区域 */
         .layui-tab-content {
             padding: 20px 15px;
@@ -80,18 +79,17 @@
         }
 
         .layui-tab-brief .layui-tab-title {
-            /* 让标签行内块元素居中或靠左 */
             display: flex;
-            gap: 24px; /* 标签之间的间距，24px比较合理，可按需调节 */
-            padding-left: 10px; /* 左侧整体内边距 */
+            gap: 24px;
+            padding-left: 10px;
         }
 
         .layui-tab-brief .layui-tab-title li {
-            padding: 8px 12px; /* 每个标签左右内边距 */
+            padding: 8px 12px;
             cursor: pointer;
             font-size: 14px;
-            white-space: nowrap; /* 防止标签文字换行 */
-            border-bottom: 2px solid transparent; /* 底部边框占位 */
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
             transition: border-color 0.3s ease, color 0.3s ease;
         }
 
@@ -103,6 +101,12 @@
             box-shadow: none !important;
         }
 
+        /* 图表容器样式 */
+        #riskLevelChart, #riskTypeChart {
+            width: 100%;
+            height: 300px;
+        }
+
     </style>
 </head>
 <body>
@@ -110,6 +114,8 @@
 <div class="layui-container" style="width: 100%;">
     <div class="layui-row">
         <div class="layui-col-md12">
+
+            <!-- 主机信息卡片 -->
             <div class="layui-card">
                 <div class="layui-card-header">
                     <span>主机信息</span>
@@ -121,8 +127,7 @@
                                 <label>主机名：</label><span id="hostName">这是一个很长很长很长很长的主机名示例，测试换行对齐效果</span>
                             </div>
                             <div class="layui-col-xs4">
-                                <label>MAC地址：</label
-                                ><span id="macAddress">00-11-22-33-44-55</span>
+                                <label>MAC地址：</label><span id="macAddress">00-11-22-33-44-55</span>
                             </div>
                             <div class="layui-col-xs4">
                                 <label>IP地址：</label><span id="ipAddress">192.168.1.100</span>
@@ -130,8 +135,7 @@
                         </div>
                         <div class="layui-row">
                             <div class="layui-col-xs4">
-                                <label>系统类型：</label
-                                ><span id="osType">Windows 10 专业版，64位，长期支持版本</span>
+                                <label>系统类型：</label><span id="osType">Windows 10 专业版，64位，长期支持版本</span>
                             </div>
                             <div class="layui-col-xs4">
                                 <label>系统名字：</label><span id="osName">Windows 10 Pro</span>
@@ -152,7 +156,14 @@
                             </div>
                         </div>
                     </div>
-
+                </div>
+            </div>
+            <!-- 风险统计图表 -->
+            <div class="layui-card" style="margin-top: 20px;">
+                <div class="layui-card-header">风险统计</div>
+                <div class="layui-card-body">
+                    <div id="riskLevelChart"></div>
+                    <div id="riskTypeChart" style="margin-top: 20px;"></div>
                 </div>
             </div>
 
@@ -164,11 +175,14 @@
                     <table id="patchTable" lay-filter="patchTableFilter"></table>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 
 <script src="/layui/layui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+
 <script type="text/javascript">
     // 日期格式转换函数
     function formatDate(str) {
@@ -180,11 +194,67 @@
             var hours = now.getHours();
             var minutes = now.getMinutes();
             var seconds = now.getSeconds();
+
+            // 补零处理
+            month = month < 10 ? "0" + month : month;
+            date = date < 10 ? "0" + date : date;
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
             return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
         }
         return "";
     }
+
+    function renderRiskCharts(levelCount, typeCount) {
+        const levelChart = echarts.init(document.getElementById('riskLevelChart'));
+        levelChart.setOption({
+            title: { text: '风险等级分布' },
+            tooltip: {},
+            xAxis: { type: 'category', data: Object.keys(levelCount) },
+            yAxis: { type: 'value' },
+            series: [{
+                data: Object.values(levelCount),
+                type: 'bar',
+                itemStyle: { color: '#009688' }
+            }]
+        });
+
+        const typeChart = echarts.init(document.getElementById('riskTypeChart'));
+        typeChart.setOption({
+            title: { text: '风险类型分布' },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: Object.keys(typeCount)
+            },
+            series: [{
+                type: 'pie',
+                radius: '50%',
+                data: Object.keys(typeCount).map(k => ({ name: k, value: typeCount[k] })),
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
+        });
+
+        // 自适应图表大小
+        window.addEventListener('resize', () => {
+            levelChart.resize();
+            typeChart.resize();
+        });
+    }
 </script>
+
 <script type="text/javascript" th:inline="none">
     layui.config({
         base: '/layui/layuiAdmin/'
@@ -221,12 +291,12 @@
                 }
                 document.getElementById('status').innerHTML = statusHtml;
 
-                // ✅ 渲染表格
+                // 渲染风险详情表格
                 table.render({
                     elem: '#patchTable',
                     url: '/host/systemRisk',
                     method: 'post',
-                    contentType: 'application/json',  // ✅ 设置为 application/json
+                    contentType: 'application/json',
                     headers: {
                         'Authorization': localStorage.getItem('token')?.replace(/^Bearer\s/, '')
                     },
@@ -235,7 +305,7 @@
                         page: 1,
                         limit: 5
                     }),
-                    parseData: function(res){ // ✅ 修正 Layui 对返回值的解析逻辑
+                    parseData: function(res){
                         return {
                             code: res.code,
                             msg: res.msg,
@@ -251,13 +321,13 @@
                             field: 'riskLevel',
                             title: '风险等级',
                             width: 86,
-                            align: 'center', // 居中
+                            align: 'center',
                             templet: function (d) {
                                 const levelMap = {
-                                    1: {text: '低', color: '#5FB878'},       // 绿色
-                                    2: {text: '中', color: '#FFB800'},       // 橙色
-                                    3: {text: '高', color: '#FF5722'},       // 红色
-                                    4: {text: '严重', color: '#FF0000'}      // 深红
+                                    1: {text: '低', color: '#5FB878'},
+                                    2: {text: '中', color: '#FFB800'},
+                                    3: {text: '高', color: '#FF5722'},
+                                    4: {text: '严重', color: '#FF0000'}
                                 };
                                 const level = levelMap[d.riskLevel] || {text: '未知', color: '#909399'};
                                 return `<span class="layui-btn layui-btn-xs" style="background-color:${level.color};">${level.text}</span>`;
@@ -267,7 +337,7 @@
                             field: 'isRisky',
                             title: '是否风险',
                             width: 87,
-                            align: 'center', // 居中
+                            align: 'center',
                             templet: function (d) {
                                 return d.isRisky ? '<button class="layui-btn layui-btn-danger layui-btn-xs">是</button>' : '<button class="layui-btn layui-btn-normal layui-btn-xs">否</button>';
                             }
@@ -275,15 +345,34 @@
                         {field: 'detectionOutput', title: '检测输出', width: 75},
                         {field: 'riskDetail', title: '检测细节', width: 75},
                         {field: 'remediationAdvice', title: '修复建议', minWidth: 200},
+                        {field:'createTime', title:'采集时间', width: 160, templet: d => formatDate(d.createTime)},
+                        {field:'updateTime', title:'上线时间', width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.createTime)}
                         ,{field:'createdAt', title:'采集时间',width: 160, templet: d => formatDate(d.createdAt)}
                         ,{field:'updatedAt', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.updatedAt)}
                     ]],
                     page: {curr: 1, limit: 5},
-                    limits: [5, 10, 15, 20]
+                    limits: [5, 10, 15, 20],
+                    done: function(res, curr, count) {
+                        // 统计风险等级、类型
+                        const levelCount = {};
+                        const typeCount = {};
+
+                        res.data.forEach(item => {
+                            const level = item.riskLevel || '未知';
+                            levelCount[level] = (levelCount[level] || 0) + 1;
+
+                            // 注意：这里字段名可能是riskType，需根据接口实际字段调整
+                            const type = item.riskType || '未知';
+                            typeCount[type] = (typeCount[type] || 0) + 1;
+                        });
+
+                        renderRiskCharts(levelCount, typeCount);
+                    }
                 });
             }
         });
     });
 </script>
+
 </body>
 </html>

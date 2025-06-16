@@ -66,9 +66,7 @@
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
                                     <option  value="macAddress">MAC地址</option>
-                                    <option value="hostName">主机名</option>
-                                    <option value="ipAddress">IP地址</option>
-                                    <option value="osType">系统类型</option>
+                                    <option value="riskLevel">风险等级</option>
                                 </select>
                             </div>
                             <div class="layui-inline">
@@ -83,17 +81,13 @@
                     </div>
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
-                            <!-- 主机列表按钮 -->
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="batchdel">删除</button>
                             <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
-
                         </div>
                         <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
 
                         <!-- 表格工具栏 -->
                         <script type="text/html" id="table-useradmin-webuser">
-                            <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="applicationInfo"><i class="layui-icon layui-icon-edit"></i>应用风险详情</a>
-                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+<!--                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>-->
                         </script>
                     </div>
                 </div>
@@ -183,51 +177,47 @@
             ,table = layui.table;
 
         table.render({
-            elem: '#LAY-user-manage'
-            ,method: 'post'
-            ,url:'/host/list'
+            elem: '#LAY-user-manage',
+            method: 'post',
+            url: '/host/applicationRisk',
+            contentType: 'application/json'
             ,headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
             }
             ,cellMinWidth: 80
-            ,title: '主机数据表'
+            ,title: '应用风险探测数据表'
             ,cols: [[
                 {type: 'checkbox', fixed: 'left'}
-                ,{field:'id',title:'ID',width: 45}
                 ,{field:'macAddress', title:'MAC地址',width: 150}
-                ,{field:'hostName', title:'主机名字',width: 120}
-                ,{field:'ipAddress', title:'IP地址',width: 130}
-                ,{field:'status', title:'状态',width: 70, templet: function (d){
-                        return d.status == 1
-                            ? '<button class="layui-btn layui-btn-normal layui-btn-xs">上线</button>'
-                            : '<button class="layui-btn layui-btn-danger layui-btn-xs">下线</button>';
-                    }}
-                ,{field:'osType', title:'系统类型',width: 100, templet: function (d){
-                        let osType = d.osType;
-                        let buttonClass = '';
-                        switch (osType) {
-                            case 'Windows': buttonClass = 'layui-btn-normal'; break;
-                            case 'Linux': buttonClass = 'layui-btn'; break;
-                            case 'MacOS': buttonClass = 'layui-btn-gray'; break;
-                            case 'Android': buttonClass = 'layui-btn-warm'; break;
-                            case 'iOS': buttonClass = 'layui-btn-danger'; break;
-                            case 'Chrome OS': buttonClass = 'layui-btn-primary'; break;
-                            case 'Unix': buttonClass = 'layui-btn-normal'; break;
-                            case 'FreeBSD': buttonClass = 'layui-btn-primary'; break;
-                            case 'VMware ESXi': buttonClass = 'layui-btn-normal'; break;
-                            case 'Xen': buttonClass = 'layui-btn-warm'; break;
-                            default: buttonClass = 'layui-btn-black';
-                        }
-                        return `<button class="layui-btn ${buttonClass} layui-btn-xs">${osType}</button>`;
-                    }}
-                ,{field:'osName', title:'系统名字',width: 120}
-                ,{field:'osVersion', title:'系统版本',width: 120}
-                ,{field:'osBit', title:'位数',width: 100}
-                ,{field:'cpuName', title:'CPU',width: 100}
-                ,{field:'ram', title:'内存',width: 100}
-                ,{field:'createTime', title:'采集时间',width: 160, templet: d => formatDate(d.createTime)}
-                ,{field:'updateTime', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.createTime)}
-                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser', width:200}
+                ,{field:'ruleId',title:'规则ID',width:72}
+                ,{field:'riskName',title:'风险名称',width:220}
+                ,{field:'riskType',title:'风险类型',width:90}
+                ,{
+                    field: 'riskLevel',
+                    title: '风险等级',
+                    width: 86,
+                    align: 'center', // 居中
+                    templet: function (d) {
+                        const levelMap = {
+                            1: {text: '低', color: '#5FB878'},       // 绿色
+                            2: {text: '中', color: '#FFB800'},       // 橙色
+                            3: {text: '高', color: '#FF5722'},       // 红色
+                            4: {text: '严重', color: '#FF0000'}      // 深红
+                        };
+                        const level = levelMap[d.riskLevel] || {text: '未知', color: '#909399'};
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${level.color};">${level.text}</span>`;
+                    }
+                }
+                ,{field: 'remediationAdvice', title: '修复建议', minWidth: 200}
+                , {
+                    field: 'detectionTime',
+                    title: '检测时间',
+                    width: 151,
+                    templet: function (d) {
+                        return d.detectionTime ? new Date(d.detectionTime).toLocaleString() : '';
+                    }
+                }
             ]]
             ,page: { curr: 1, limit: 5 }
             ,limits:[5,10,15,20]
@@ -286,28 +276,6 @@
                     })
                 });
             }
-            else if(obj.event==='applicationInfo'){
-                layer.open({
-                    type: 2,
-                    skin: 'layui-layer-molv',
-                    title: '应用风险详情',
-                    area: ['800px', '600px'],
-                    content: '/page/risk/applicationInfo',
-                    maxmin: true,
-                    btn: ['关闭'],
-                    yes: function(index, layero){
-                        layer.close(index);
-                    },
-                    success: function(layero, index){
-                        // 获取iframe窗口对象
-                        var iframeWin = layero.find('iframe')[0].contentWindow;
-                        // 延迟发送，保证页面2监听就绪
-                        setTimeout(() => {
-                            iframeWin.postMessage(data, '*');
-                        }, 200);
-                    }
-                });
-            }
         });
 
         table.on('tool(LAY-rule-manage)', function(obj){
@@ -334,29 +302,32 @@
             }
         });
 
-        //监听搜索
+        //监听探测情况搜索
         form.on('submit(LAY-sysuser-front-search)', function(data){
             var field = data.field;
             console.log(field);
             //执行重载
             table.reload('LAY-user-manage', {
-                url: '/host/list',
+                url: '/host/applicationRisk',
                 method: "post",
+                contentType: 'application/json',
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
             });
         });
 
-        //监听搜索
+        //监听规则表搜索
         form.on('submit(LAY-sysrule-front-search)', function(data){
             var field = data.field;
             console.log(field);
             //执行重载
             table.reload('LAY-rule-manage', {
                 url: '/rule/application/list',
+                contentType: 'application/json',
                 method: "post",
                 headers: {
                     'Authorization': localStorage.getItem('token')
@@ -368,34 +339,11 @@
 
 
         var active = {
-            // 主机管理相关
-            host_batchdel: function(){
-                var checkData = table.checkStatus('LAY-user-manage').data;
-                if(checkData.length == 0){
-                    return layer.msg('请选择数据');
-                }
-                layer.confirm('确定删除吗？', function (){
-                    var userIds = checkData.map(item => item.id);
-                    $.ajax({
-                        url:"/host/delete",
-                        type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
-                        data:{ids:userIds},
-                        dataType:"json",
-                        success:function (res){
-                            if(res.code == 0){
-                                layer.msg(res.msg);
-                                table.reload('LAY-user-manage');
-                            }else{
-                                layer.msg(res.msg,{icon: 5});
-                            }
-                        }
-                    });
-                });
-            },
+            // 探测情况刷新
             host_refresh: function(){
                 table.reload('LAY-user-manage', {
-                    url: '/host/list',
+                    url: '/host/applicationRisk',
+                    contentType: 'application/json',
                     method: "post",
                     headers: {
                         'Authorization': localStorage.getItem('token')
@@ -403,7 +351,7 @@
                 });
             },
 
-            // 应用规则相关
+            // 规则相关
             rule_batchdel: function(){
                 var checkData = table.checkStatus('LAY-rule-manage').data;
                 if(checkData.length == 0){
