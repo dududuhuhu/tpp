@@ -376,7 +376,8 @@ public class RabbitSysInfoConsumer {
                 // test: 提取危险补丁并输出
                 if (!hotfixList.isEmpty()) {
                     String mac = hotfix.getMac();
-                    List<DangerousHotfix> dangerousList = hotfixService.getDangerousPatches(mac);
+                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(mac);
+                    List<DangerousHotfix> dangerousList = response.getData();
                 } else {
                     System.out.println("未收到任何 Hotfix 数据，跳过危险补丁检测");
                 }

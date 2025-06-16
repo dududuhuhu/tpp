@@ -1,10 +1,7 @@
 package com.tpp.threat_perception_platform.service;
 import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.MyParam;
-import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
-import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
-import com.tpp.threat_perception_platform.pojo.VulnerabilityRules;
-import com.tpp.threat_perception_platform.pojo.WeakPasswords;
+import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,4 +23,12 @@ public interface RuleService {
     public ResponseResult applicationSave(ApplicationRiskRules applicationRiskRules);
 
     public ResponseResult applicatiionRiskRulesList(MyParam param);
+
+    public ResponseResult hotfixRulesList(MyParam param);
+
+    public ResponseResult hotfixDelete(Integer[] ids);
+
+    public ResponseResult hotfixSave(WinCveDb winCveDb);
+
+    public ResponseResult vulnerabilityRulesList(MyParam param);
 }

@@ -35,19 +35,37 @@ public class RuleController {
         return ruleService.getAllVulnerabilityRules();
     }
 
-    @PostMapping("/rule/application/list")
-    public ResponseResult applicationRiskRulesList(MyParam param){
-        return ruleService.applicatiionRiskRulesList(param);
+
+
+
+    @PostMapping("/rule/hotfix/list")
+    public ResponseResult hotfixRulesList(MyParam param){
+        return ruleService.hotfixRulesList(param);
     }
 
-    @PostMapping("/rule/application/delete")
-    public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
-        return ruleService.applicationDelete(ids);
+    @PostMapping("/rule/hotfix/delete")
+    public ResponseResult hotfixRulesDelete(@RequestParam("ids[]") Integer[] ids){
+        return ruleService.hotfixDelete(ids);
     }
-    @PostMapping("/rule/application/save")
-    public ResponseResult applicationRulesSave(@RequestBody ApplicationRiskRules applicationRiskRules){
-        return ruleService.applicationSave(applicationRiskRules);
+    @PostMapping("/rule/hotfix/save")
+    public ResponseResult hotfixRulesSave(@RequestBody WinCveDb winCveDb){
+        return ruleService.hotfixSave(winCveDb);
     }
+
+    @PostMapping("/rule/vulnerability/list")
+    public ResponseResult vulnerabilityRulesList(MyParam param){
+        return ruleService.vulnerabilityRulesList(param);
+    }
+
+//    @PostMapping("/rule/vulnerability/delete")
+//    public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
+//        return ruleService.applicationDelete(ids);
+//    }
+//    @PostMapping("/rule/vulnerability/save")
+//    public ResponseResult applicationRulesSave(@RequestBody ApplicationRiskRules applicationRiskRules){
+//        return ruleService.applicationSave(applicationRiskRules);
+//    }
+
 
 
 

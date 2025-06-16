@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>主机管理</title>
+    <title>安全补丁</title>
     <link rel="stylesheet" href="/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
 </head>
@@ -53,7 +53,7 @@
 <div class="layui-tab layui-tab-brief" lay-filter="hostTab">
     <ul class="layui-tab-title">
         <li class="layui-this">安全补丁详情</li>
-        <li>补丁规则库</li>
+        <li>安全补丁规则库</li>
     </ul>
     <div class="layui-tab-content">
 
@@ -83,8 +83,10 @@
                     </div>
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-type="refresh">刷新</button>
+                            <!-- 主机列表按钮 -->
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="batchdel">删除</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
+
                         </div>
                         <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
 
@@ -106,16 +108,14 @@
                         <div class="layui-form-item">
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
-                                    <option  value="riskType">风险类型</option>
-                                    <option value="riskLevel">风险等级</option>
-                                    <option value="method">检测方法</option>
+                                    <option  value="cve">CVE编号</option>
                                 </select>
                             </div>
                             <div class="layui-inline">
                                 <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
                             </div>
                             <div class="layui-inline">
-                                <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysuser-front-search">
+                                <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysrule-front-search">
                                     <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                                 </button>
                             </div>
@@ -123,15 +123,15 @@
                     </div>
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-type="refresh">刷新</button>
+                            <!-- 补丁规则按钮 -->
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="add">添加</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="batchdel">删除</button>
+                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="rule" data-type="refresh">刷新</button>
                         </div>
                         <table id="LAY-rule-manage" lay-filter="LAY-rule-manage"></table>
 
                         <!-- 表格工具栏 -->
                         <script type="text/html" id="table-rule-webuser">
-                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
                             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
                         </script>
                     </div>
@@ -231,45 +231,42 @@
             ,limits:[5,10,15,20]
         });
 
+        // 规则库
         table.render({
             elem: '#LAY-rule-manage',
-            method: 'get',
-            url: '/rule/hotfix',
+            method: 'post',
+            url: '/rule/hotfix/list',
             headers: {
                 'Authorization': localStorage.getItem('token')
             },
-            parseData: function(res) {
-                let curr = this.page.curr || 1;
-                let limit = this.page.limit || 10;
-                let start = (curr - 1) * limit;
-                let end = start + limit;
-                let pagedData = res.slice(start, end);
-
-                return {
-                    code: 0,
-                    msg: '',
-                    count: res.length,
-                    data: pagedData
-                };
-            },
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
-                {field: 'id', title: 'ID', width: 60},
-                {field: 'riskName', title: '风险名称', width: 200},
-                {field: 'riskDesc', title: '风险描述', minWidth: 300},
-                {field: 'riskType', title: '风险类型', width: 120},
-                {field: 'riskLevel', title: '风险等级', width: 100, templet: function(d){
-                        let map = {1: '低', 2: '中', 3: '高', 4: '严重'};
-                        return map[d.riskLevel] || '未知';
-                    }},
-                {field: 'targetService', title: '目标服务', width: 120},
-                {field: 'detectionMethod', title: '检测方式', width: 100},
-                {field: 'detectionPath', title: '路径', width: 150},
-                {field: 'riskFlag', title: '判断标识', width: 150},
-                {field: 'remediationAdvice', title: '修复建议', minWidth: 300},
-                {field: 'createdAt', title: '创建时间', width: 160, templet: d => formatDate(d.createdAt)},
-                {field: 'updatedAt', title: '更新时间', width: 160, templet: d => formatDate(d.updatedAt)}
-                ,{fixed: 'right', title:'操作', toolbar: '#table-rule-webuser', width:150}
+                {field: 'id', title: 'ID', width: 54},
+                {field: 'cve', title: 'CVE编号', width: 140},
+                {
+                    field: 'score',
+                    title: '评分',
+                    width: 65,
+                    templet: function (d) {
+                        let color = '';
+                        let score = parseFloat(d.score);
+                        if (score >= 9) {
+                            color = '#FF5722'; // 高危 - 橙红
+                        } else if (score >= 7) {
+                            color = '#FFB800'; // 中危 - 橙黄
+                        } else if (score >= 4) {
+                            color = '#1E9FFF'; // 低危 - 蓝色
+                        } else {
+                            color = '#009688'; // 信息 - 青色
+                        }
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${color};">${score}</span>`;
+                    }
+                },
+                {field: 'productIdList', title: '产品ID列表', width: 300},
+                {field: 'kbList', title: '补丁列表', width: 300,},
+                {field: 'cvrfId', title: 'cvrfID', width: 90},
+                {field: 'dt', title: '数据日期', width: 130,templet: d => formatDate(d.dt)},
+                ,{fixed: 'right', title:'操作', toolbar: '#table-rule-webuser', width:80}
             ]],
             page: { curr: 1, limit: 5 },
             limits: [5, 10, 15, 20]
@@ -282,7 +279,7 @@
             if(obj.event === 'del'){
                 layer.confirm('真的删除吗?', function(index){
                     $.ajax({
-                        url:"/host/delete",
+                        url:"/rule/hotfix/delete",
                         type:"post",
                         headers: { 'Authorization': localStorage.getItem('token') },
                         data:{ids:[data.id]},
@@ -298,19 +295,23 @@
                         }
                     })
                 });
-            } else if(obj.event === 'hotfixInfo'){
+            }
+            else if(obj.event==='hotfixInfo'){
                 layer.open({
                     type: 2,
-                    title: '安全补丁详情',
+                    skin: 'layui-layer-molv',
+                    title: '应用风险详情',
                     area: ['800px', '600px'],
-                    content: '/page/host/assetsInfo',
+                    content: '/page/risk/hotfixInfo',
                     maxmin: true,
                     btn: ['关闭'],
-                    yes: function(index){
+                    yes: function(index, layero){
                         layer.close(index);
                     },
-                    success: function(layero){
+                    success: function(layero, index){
+                        // 获取iframe窗口对象
                         var iframeWin = layero.find('iframe')[0].contentWindow;
+                        // 延迟发送，保证页面2监听就绪
                         setTimeout(() => {
                             iframeWin.postMessage(data, '*');
                         }, 200);
@@ -324,7 +325,7 @@
             if(obj.event === 'del'){
                 layer.confirm('真的删除吗?', function(index){
                     $.ajax({
-                        url:"/rule/application/delete",
+                        url:"/rule/hotfix/delete",
                         type:"post",
                         headers: { 'Authorization': localStorage.getItem('token') },
                         data:{ids:[data.id]},
@@ -343,21 +344,42 @@
             }
         });
 
+        //监听搜索
         form.on('submit(LAY-sysuser-front-search)', function(data){
             var field = data.field;
+            console.log(field);
+            //执行重载
             table.reload('LAY-user-manage', {
                 url: '/host/list',
                 method: "post",
                 headers: {
                     'Authorization': localStorage.getItem('token')
                 },
+                data: JSON.stringify(field), // 发送JSON格式的数据
+                where: field
+            });
+        });
+
+        //监听搜索
+        form.on('submit(LAY-sysrule-front-search)', function(data){
+            var field = data.field;
+            console.log(field);
+            //执行重载
+            table.reload('LAY-rule-manage', {
+                url: '/rule/hotfix/list',
+                method: "post",
+                headers: {
+                    'Authorization': localStorage.getItem('token')
+                },
+                data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
             });
         });
 
 
         var active = {
-            batchdel: function(){
+            // 主机管理相关
+            host_batchdel: function(){
                 var checkData = table.checkStatus('LAY-user-manage').data;
                 if(checkData.length == 0){
                     return layer.msg('请选择数据');
@@ -381,7 +403,7 @@
                     });
                 });
             },
-            refresh: function(){
+            host_refresh: function(){
                 table.reload('LAY-user-manage', {
                     url: '/host/list',
                     method: "post",
@@ -389,53 +411,10 @@
                         'Authorization': localStorage.getItem('token')
                     }
                 });
-            }
-            ,add: function(){
-                layer.open({
-                    type: 2
-                    ,title: '添加规则'
-                    ,skin: 'layui-layer-molv'
-                    ,content: '/rule/application/add'
-                    ,maxmin: true
-                    ,area: ['580px', '350px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function (index,layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'LAY-user-front-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                        //监听提交--隐藏按钮
-                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                            var field = data.field; //获取提交的字段
-                            // 通过Ajax方式将参数提交到后端--保存数据库中
-                            $.ajax({
-                                url:"/rule/application/save",
-                                type:"post",
-                                headers: {
-                                    'Authorization': localStorage.getItem('token')
-                                },
-                                data:JSON.stringify(field),
-                                contentType: "application/json;charset=utf-8", //提交参数类型为json格式
-                                dataType:"json",
-                                success:function (res){
-                                    if(res.code === 0){//成功
-                                        layer.msg(res.msg);//弹出提示
-                                        table.reload('LAY-user-manage'); //数据刷新
-                                        layer.close(index); //关闭弹层
-                                    }else{//系统出问题
-                                        layer.msg(res.msg,{icon: 5});//弹出提示
-                                    }
-                                }
-                            })
-                        });
-                        submit.trigger('click');
-                    }
+            },
 
-                });
-            }
-        };
-
-        var active = {
-            batchdel: function(){
+            // 应用规则相关
+            rule_batchdel: function(){
                 var checkData = table.checkStatus('LAY-rule-manage').data;
                 if(checkData.length == 0){
                     return layer.msg('请选择数据');
@@ -443,7 +422,7 @@
                 layer.confirm('确定删除吗？', function (){
                     var userIds = checkData.map(item => item.id);
                     $.ajax({
-                        url:"/rule/hotfixdelete",
+                        url:"/rule/hotfix/delete",
                         type:"post",
                         headers: { 'Authorization': localStorage.getItem('token') },
                         data:{ids:userIds},
@@ -451,7 +430,7 @@
                         success:function (res){
                             if(res.code == 0){
                                 layer.msg(res.msg);
-                                table.reload('LAY-hotfix-manage');
+                                table.reload('LAY-rule-manage');
                             }else{
                                 layer.msg(res.msg,{icon: 5});
                             }
@@ -459,21 +438,69 @@
                     });
                 });
             },
-            refresh: function(){
+            rule_refresh: function(){
                 table.reload('LAY-rule-manage', {
-                    method: 'get',
-                    url: '/rule/applicationRisk',
+                    url: '/rule/hotfix/list',
+                    method: 'post',
                     headers: {
                         'Authorization': localStorage.getItem('token')
+                    }
+                });
+            },
+            rule_add: function(){
+                layer.open({
+                    type: 2,
+                    title: '添加规则',
+                    skin: 'layui-layer-molv',
+                    content: '/page/risk/hotfixAdd',
+                    maxmin: true,
+                    area: ['580px', '600px'],
+                    btn: ['确定', '取消'],
+                    yes: function (index,layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index],
+                            submitID = 'LAY-user-front-submit',
+                            submit = layero.find('iframe').contents().find('#'+ submitID);
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field;
+                            $.ajax({
+                                url:"/rule/hotfix/save",
+                                type:"post",
+                                headers: {
+                                    'Authorization': localStorage.getItem('token')
+                                },
+                                data:JSON.stringify(field),
+                                contentType: "application/json;charset=utf-8",
+                                dataType:"json",
+                                success:function (res){
+                                    if(res.code === 0){
+                                        layer.msg(res.msg);
+                                        table.reload('LAY-rule-manage');
+                                        layer.close(index);
+                                    }else{
+                                        layer.msg(res.msg,{icon: 5});
+                                    }
+                                }
+                            })
+                        });
+                        submit.trigger('click');
                     }
                 });
             }
         };
 
-        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+
+        $('.layuiadmin-btn-useradmin').on('click', function(){
             var type = $(this).data('type');
-            active[type] && active[type].call(this);
+            var tableName = $(this).data('table'); // "user" or "rule"
+
+            // 根据模块前缀调用不同的方法
+            if (tableName === 'user') {
+                active['host_' + type] && active['host_' + type]();
+            } else if (tableName === 'rule') {
+                active['rule_' + type] && active['rule_' + type]();
+            }
         });
+
     });
 </script>
 </body>

@@ -67,11 +67,17 @@ public class HotfixServiceImpl implements HotfixService {
 //    }
 
     @Override
-    public List<DangerousHotfix> getDangerousPatches(String mac) {
+    public ResponseResult<List<DangerousHotfix>> getDangerousPatches(String mac) {
+        // 默认返回前100条
+        return getDangerousPatch(mac, 1, 100);
+    }
+
+    @Override
+    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(String mac, Integer page, Integer limit) {
         List<Hotfix> allHotfixes = hotfixMapper.findAll(mac);
         List<DangerousHotfix> result = new ArrayList<>();
 
-        System.out.println("开始探测危险补丁："+ mac);
+        System.out.println("开始探测危险补丁：" + mac);
         for (Hotfix hotfix : allHotfixes) {
             String hotfixId = hotfix.getHotfixId();
             System.out.println(hotfixId);
@@ -88,9 +94,15 @@ public class HotfixServiceImpl implements HotfixService {
             }
         }
 
-        System.out.println("=== 危险补丁列表 ===");
-        result.forEach(System.out::println);
+        // 手动分页
+        int fromIndex = (page - 1) * limit;
+        int toIndex = Math.min(fromIndex + limit, result.size());
+        List<DangerousHotfix> pageList = (fromIndex >= result.size()) ? new ArrayList<>() : result.subList(fromIndex, toIndex);
 
-        return result;
+        System.out.println("=== 危险补丁分页列表 ===");
+        pageList.forEach(System.out::println);
+
+        return new ResponseResult<>((long) result.size(), pageList);
     }
+
 }

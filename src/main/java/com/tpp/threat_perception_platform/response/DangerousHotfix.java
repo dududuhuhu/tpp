@@ -6,6 +6,32 @@ public class DangerousHotfix {
     private String cve;
     private String score;
 
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    /**
+     * 页码
+     */
+    private Integer page;
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    /**
+     * 限制
+     */
+    private Integer limit;
+
     public String getMacAddress() {
         return macAddress;
     }

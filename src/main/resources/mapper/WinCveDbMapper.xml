@@ -34,10 +34,41 @@
     <select id="findByHotfixId" resultType="com.tpp.threat_perception_platform.pojo.WinCveDb">
         SELECT * FROM win_cve_db WHERE FIND_IN_SET(#{hotfixId}, kb_list) > 0
     </select>
+    <select id="findRulesBySearchTypeAndKeywords"
+            resultType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        select
+        <include refid="Base_Column_List" />
+        from win_cve_db
+        <where>
+            <if test="searchType != null and searchType != '' and keywords != null and keywords != ''">
+                and (
+                <choose>
+                    <when test="searchType == 'cve'">
+                        cve like concat('%',#{keywords},'%')
+                    </when>
+                </choose>
+                )
+            </if>
+        </where>
+        order by id
+    </select>
+    <select id="selectByCve" resultType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        select
+        <include refid="Base_Column_List" />
+        from win_cve_db
+        where  cve = #{cve}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from win_cve_db
         where  id = #{id} AND dt = #{dt} 
+    </delete>
+    <delete id="delete">
+        delete from win_cve_db
+        where  id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </delete>
     <insert id="insert">
         insert into win_cve_db
@@ -98,4 +129,24 @@
             cvrf_id =  #{cvrfId}
         where   id = #{id} AND dt = #{dt} 
     </update>
+    <update id="updateKbListByCve" parameterType="com.tpp.threat_perception_platform.pojo.WinCveDb">
+        UPDATE win_cve_db
+        SET
+            kb_list = CASE
+                          WHEN kb_list IS NULL OR kb_list = '' THEN #{kbList}
+                          WHEN kb_list LIKE CONCAT('%', #{kbList}, '%') THEN kb_list  -- 已包含则保持不变
+                          ELSE TRIM(BOTH ',' FROM CONCAT(kb_list, ',', #{kbList}))
+                END,
+
+            product_id_list = CASE
+                                  WHEN product_id_list IS NULL OR product_id_list = '' THEN #{productIdList}
+                                  WHEN product_id_list LIKE CONCAT('%', #{productIdList}, '%') THEN product_id_list  -- 已包含则保持不变
+                                  ELSE TRIM(BOTH ',' FROM CONCAT(product_id_list, ',', #{productIdList}))
+                END
+        WHERE cve = #{cve}
+    </update>
+
+
+
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import org.springframework.data.repository.query.Param;
 
@@ -12,6 +13,8 @@ import java.util.List;
 * @Entity com.tpp.threat_perception_platform.pojo.WinCveDb
 */
 public interface WinCveDbMapper {
+
+    List<WinCveDb> findRulesBySearchTypeAndKeywords(MyParam param);
 
     int deleteByPrimaryKey(Long id);
 
@@ -28,4 +31,10 @@ public interface WinCveDbMapper {
     List<WinCveDb> findAll();
 
     List<WinCveDb> findByHotfixId(@Param("hotfixId") String hotfixId);
+
+    WinCveDb selectByCve(String cve);
+
+    void delete(Integer[] ids);
+
+    void updateKbListByCve(WinCveDb winCveDb);
 }
