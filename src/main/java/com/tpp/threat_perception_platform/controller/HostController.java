@@ -1,9 +1,6 @@
 package com.tpp.threat_perception_platform.controller;
 
-import com.tpp.threat_perception_platform.param.AssetsParam;
-import com.tpp.threat_perception_platform.param.HotfixParam;
-import com.tpp.threat_perception_platform.param.MyParam;
-import com.tpp.threat_perception_platform.param.WeakpasswordParam;
+import com.tpp.threat_perception_platform.param.*;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
 import com.tpp.threat_perception_platform.pojo.WinCveDb;
@@ -33,6 +30,8 @@ public class HostController {
     private HotfixService hotfixService;
     @Autowired
     private WeakpasswordRiskService weakpasswordRiskService;
+    @Autowired
+    private VulnerabilityService vulnerabilityService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -135,6 +134,23 @@ public class HostController {
     @PostMapping("/host/weakpasswordRisk")
     public ResponseResult getWeakpassword(@RequestBody WeakpasswordParam param) {
         return weakpasswordRiskService.weakpasswordList(param);
+    }
+
+    /**
+     * 漏洞发现
+     */
+    @PostMapping("/host/vulnerabilityDiscovery")
+    public ResponseResult vulnerabilityDiscovery(@RequestBody VulnerabilityParam param) {
+        // 下发指令
+        return hostService.vulnerabilityDiscovery(param);
+    }
+
+    /**
+     * 漏洞展示
+     */
+    @PostMapping("/host/vulnerabilityRisk")
+    public ResponseResult getVulnerability(@RequestBody VulnerabilityParam param) {
+        return vulnerabilityService.vulnerabilityRiskList(param);
     }
 
 }

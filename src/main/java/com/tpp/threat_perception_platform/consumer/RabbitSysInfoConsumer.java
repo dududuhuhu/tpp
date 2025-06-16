@@ -44,6 +44,9 @@ public class RabbitSysInfoConsumer {
     @Autowired
     private WeakpasswordRiskService weakpasswordRiskService;
 
+    @Autowired
+    private VulnerabilityService vulnerabilityService;
+
     @RabbitListener(queues = "sysinfo_queue")
     public void receive(String message, @Headers Map<String,Object> headers,
                         Channel channel) throws IOException {
@@ -299,6 +302,32 @@ public class RabbitSysInfoConsumer {
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
                 ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
+                System.out.println("Save result: " + result.getMsg());
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "vulnerability_queue")
+    public void receiveVulnerability(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received vulnerability message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            List<VulnerabilityRisk> vulnerabilityRiskList = JSON.parseArray(message, VulnerabilityRisk.class);
+
+            // 循环保存每一个
+            for (VulnerabilityRisk vulnerabilityRisk: vulnerabilityRiskList) {
+                ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk);
                 System.out.println("Save result: " + result.getMsg());
             }
 
