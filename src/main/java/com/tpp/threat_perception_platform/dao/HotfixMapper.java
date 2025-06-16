@@ -24,7 +24,7 @@ public interface HotfixMapper {
 
     int updateByPrimaryKey(Hotfix record);
 
-    List<Hotfix> findAll(String mac);
+    List<Hotfix> findAll();
 
     Hotfix selectByMacAndHotfixId(String mac, String hotfixId);
 

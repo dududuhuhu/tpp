@@ -46,7 +46,8 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
         String mac= param.getMacAddress();
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
-        List<WeakpasswordRisk> weakpasswordRiskList = weakpasswordRiskMapper.findAll(mac);
+        // 查询weak = true
+        List<WeakpasswordRisk> weakpasswordRiskList = weakpasswordRiskMapper.findAll();
         // 构架pageInfo
         PageInfo<WeakpasswordRisk> pageInfo = new PageInfo<>(weakpasswordRiskList);
 

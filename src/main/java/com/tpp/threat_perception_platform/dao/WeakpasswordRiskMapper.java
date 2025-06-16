@@ -27,5 +27,5 @@ public interface WeakpasswordRiskMapper {
 
     WeakpasswordRisk selectByMacAndUsername(String mac, String username);
 
-    List<WeakpasswordRisk> findAll(String mac);
+    List<WeakpasswordRisk> findAll();
 }

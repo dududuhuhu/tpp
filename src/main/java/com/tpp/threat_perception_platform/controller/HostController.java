@@ -152,7 +152,7 @@ public class HostController {
     public ResponseResult<List<DangerousHotfix>> getDangerousPatches(@RequestBody HotfixParam param) {
         System.out.println("param:"+param);
         System.out.println("param.mac:"+param.getMacAddress());
-        return hotfixService.getDangerousPatch(param.getMacAddress(), param.getPage(), param.getLimit());
+        return hotfixService.getDangerousPatch(param.getPage(), param.getLimit());
     }
 
     /**
