@@ -51,6 +51,15 @@ public class RuleController {
     public ResponseResult hotfixRulesSave(@RequestBody WinCveDb winCveDb){
         return ruleService.hotfixSave(winCveDb);
     }
+    
+    @PostMapping("/rule/application/delete")
+    public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
+        return ruleService.applicationDelete(ids);
+    }
+    @PostMapping("/rule/application/save")
+    public ResponseResult applicationRulesSave(@RequestBody ApplicationRiskRules applicationRiskRules){
+        return ruleService.applicationSave(applicationRiskRules);
+    }
 
     @PostMapping("/rule/vulnerability/list")
     public ResponseResult vulnerabilityRulesList(MyParam param){
@@ -66,6 +75,11 @@ public class RuleController {
 //        return ruleService.applicationSave(applicationRiskRules);
 //    }
 
+
+    @PostMapping("/rule/system/save")
+    public ResponseResult systemRulesSave(@RequestBody SystemRiskRules systemRiskRules){
+        return ruleService.systemSave(systemRiskRules);
+    }
 
 
 

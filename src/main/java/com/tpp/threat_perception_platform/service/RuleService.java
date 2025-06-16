@@ -31,4 +31,6 @@ public interface RuleService {
     public ResponseResult hotfixSave(WinCveDb winCveDb);
 
     public ResponseResult vulnerabilityRulesList(MyParam param);
+
+    public ResponseResult systemSave(SystemRiskRules systemRiskRules);
 }

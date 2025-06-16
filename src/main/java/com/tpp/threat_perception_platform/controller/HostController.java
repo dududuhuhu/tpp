@@ -41,6 +41,9 @@ public class HostController {
     @Autowired
     private ApplicationRiskService applicationRiskService;
 
+    @Autowired
+    private SystemRiskService systemRiskService;
+
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
         return hostService.hostList(param);
@@ -126,6 +129,12 @@ public class HostController {
     public ResponseResult getApplicationRiskInfo(@RequestBody ApplicationRiskParam param){
         return applicationRiskService.appRiskList(param);
     }
+
+    @PostMapping("/host/systemRisk")
+    public ResponseResult getSystemRiskInfo(@RequestBody SystemRiskParam param){
+        return systemRiskService.systemRiskList(param);
+    }
+
 
     /**
      * 补丁发现

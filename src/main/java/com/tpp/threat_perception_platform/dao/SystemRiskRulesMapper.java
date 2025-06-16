@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
 import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
 
 import java.util.List;
@@ -25,4 +26,6 @@ public interface SystemRiskRulesMapper {
     int updateByPrimaryKey(SystemRiskRules record);
 
     List<SystemRiskRules> selectAllRules();
+
+    SystemRiskRules selectByRuleName(String riskName);
 }

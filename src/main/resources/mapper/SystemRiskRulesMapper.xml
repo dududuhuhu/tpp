@@ -34,6 +34,13 @@
         where is_active=1
     </select>
 
+    <select id="selectByRuleName" resultType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
+        select
+        <include refid="Base_Column_List" />
+        from system_risk_rules
+        where risk_name = #{riskName} limit 1
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from system_risk_rules
         where  id = #{id} 
