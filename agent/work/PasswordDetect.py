@@ -17,6 +17,7 @@ class SMBWeakPasswordScanner:
             response = requests.get(url, timeout=5)
             response.raise_for_status()
             data = response.json()  # 应该是一个字符串列表
+            print(data)
             print(f"已获得{len(data)}条弱口令")
             return data if isinstance(data, list) else []
         except Exception as e:

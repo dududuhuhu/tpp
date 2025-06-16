@@ -160,4 +160,20 @@ public class RuleServiceImpl implements RuleService {
         systemRiskRulesMapper.insertSelective(systemRiskRules);
         return new ResponseResult<>(0, "添加成功！");
     }
+
+    @Override
+    public ResponseResult systemRiskRulesList(MyParam param) {
+        // 设置分页参数
+        PageHelper.startPage(param.getPage(), param.getLimit());
+        List<SystemRiskRules> systemList = null;
+        if (param.getSearchType() != null && param.getSearchType() != "" && param.getKeywords() != null && !param.getKeywords().isEmpty()) {
+            systemList = systemRiskRulesMapper.findRulesBySearchTypeAndKeywords(param);
+        } else {
+            systemList = systemRiskRulesMapper.findAll();
+        }
+        // 构架pageInfo
+        PageInfo<SystemRiskRules> pageInfo = new PageInfo<>(systemList);
+
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    }
 }

@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
 import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
 
@@ -28,4 +29,8 @@ public interface SystemRiskRulesMapper {
     List<SystemRiskRules> selectAllRules();
 
     SystemRiskRules selectByRuleName(String riskName);
+
+    List<SystemRiskRules> findRulesBySearchTypeAndKeywords(MyParam param);
+
+    List<SystemRiskRules> findAll();
 }

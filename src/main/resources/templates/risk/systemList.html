@@ -234,23 +234,17 @@
 
         table.render({
             elem: '#LAY-rule-manage',
-            method: 'get',
-            url: '/rule/systemRisk',
+            method: 'post',
+            url: '/rule/system/list',
             headers: {
                 'Authorization': localStorage.getItem('token')
             },
             parseData: function(res) {
-                let curr = this.page.curr || 1;
-                let limit = this.page.limit || 10;
-                let start = (curr - 1) * limit;
-                let end = start + limit;
-                let pagedData = res.slice(start, end);
-
                 return {
-                    code: 0,
-                    msg: '',
-                    count: res.length,
-                    data: pagedData
+                    code: 0,            // 0 表示成功
+                    msg: res.msg || "", // 可选
+                    count: res.count || res.data.length, // 分页用
+                    data: res.data      // 表格数据
                 };
             },
             cols: [[

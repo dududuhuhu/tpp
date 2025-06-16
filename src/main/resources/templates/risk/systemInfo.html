@@ -273,10 +273,10 @@
                             }
                         },
                         {field: 'detectionOutput', title: '检测输出', width: 75},
-                        {field: 'detectionDetail', title: '检测细节', width: 75},
+                        {field: 'riskDetail', title: '检测细节', width: 75},
                         {field: 'remediationAdvice', title: '修复建议', minWidth: 200},
-                        ,{field:'createTime', title:'采集时间',width: 160, templet: d => formatDate(d.createTime)}
-                        ,{field:'updateTime', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.createTime)}
+                        ,{field:'createdAt', title:'采集时间',width: 160, templet: d => formatDate(d.createdAt)}
+                        ,{field:'updatedAt', title:'上线时间',width: 160, templet: d => d.updateTime ? formatDate(d.updateTime) : formatDate(d.updatedAt)}
                     ]],
                     page: {curr: 1, limit: 5},
                     limits: [5, 10, 15, 20]

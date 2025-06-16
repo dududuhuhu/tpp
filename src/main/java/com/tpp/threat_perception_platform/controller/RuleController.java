@@ -37,6 +37,7 @@ public class RuleController {
 
 
 
+
     @PostMapping("/rule/hotfix/list")
     public ResponseResult hotfixRulesList(MyParam param){
         return ruleService.hotfixRulesList(param);
@@ -56,7 +57,6 @@ public class RuleController {
     public ResponseResult applicationRiskRulesList(MyParam param){
         return ruleService.applicatiionRiskRulesList(param);
     }
-
     @PostMapping("/rule/application/delete")
     public ResponseResult applicationRulesDelete(@RequestParam("ids[]") Integer[] ids){
         return ruleService.applicationDelete(ids);
@@ -90,6 +90,14 @@ public class RuleController {
     public ResponseResult systemRulesSave(@RequestBody SystemRiskRules systemRiskRules){
         return ruleService.systemSave(systemRiskRules);
     }
+
+
+    @PostMapping("/rule/system/list")
+    public ResponseResult systemRulesList(MyParam param){
+        return ruleService.systemRiskRulesList(param);
+    }
+
+
 
 
 

@@ -12,6 +12,7 @@ import com.tpp.threat_perception_platform.service.WeakpasswordRiskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -30,6 +31,7 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
         if (db != null) {
             return new ResponseResult<>(1003, "该弱密码风险记录已存在！");
         }
+        weakpasswordRisk.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
 
         // 添加
         weakpasswordRiskMapper.insert(weakpasswordRisk);
