@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.rabbitmq.client.Channel;
 
+import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
+import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
@@ -39,11 +41,15 @@ public class RabbitSysInfoConsumer {
     @Autowired
     private ApplicationRiskService applicationRiskService;
 
+
     @Autowired
     private SystemRiskService systemRiskService;
 
     @Autowired
     private HotfixService hotfixService;
+
+    @Autowired
+    private WeakpasswordRiskService weakpasswordRiskService;
 
     @RabbitListener(queues = "sysinfo_queue")
     public void receive(String message, @Headers Map<String,Object> headers,
@@ -307,7 +313,6 @@ public class RabbitSysInfoConsumer {
         }
     }
 
-    /*
     @RabbitListener(queues = "systemRisk_queue")
     public void receiveSystemRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received SystemRisk list message: " + message);
@@ -355,7 +360,6 @@ public class RabbitSysInfoConsumer {
             }
         }
     }
-*/
 
 
     @RabbitListener(queues = "hotfix_queue")
@@ -376,6 +380,32 @@ public class RabbitSysInfoConsumer {
                 } else {
                     System.out.println("未收到任何 Hotfix 数据，跳过危险补丁检测");
                 }
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "password_queue")
+    public void receiveWeakpassword(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received weakpassword message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            List<WeakpasswordRisk> weakpasswordRiskList = JSON.parseArray(message, WeakpasswordRisk.class);
+
+            // 循环保存每一个
+            for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
+                ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
+                System.out.println("Save result: " + result.getMsg());
             }
 
             // 手动 ack

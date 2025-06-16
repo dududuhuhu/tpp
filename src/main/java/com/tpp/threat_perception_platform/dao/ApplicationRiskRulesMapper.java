@@ -1,6 +1,8 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,4 +27,12 @@ public interface ApplicationRiskRulesMapper {
     int updateByPrimaryKey(ApplicationRiskRules record);
 
     List<ApplicationRiskRules> selectAllRules();
+
+    void delete(@Param("ids") Integer[] ids);
+
+    ApplicationRiskRules selectByRuleName(String riskName);
+
+    List<ApplicationRiskRules> findRulesBySearchTypeAndKeywords(MyParam param);
+
+    List<ApplicationRiskRules> findAll();
 }

@@ -71,6 +71,11 @@
         from host
         order by id
     </select>
+    <select id="getIpByMac" resultType="java.lang.String">
+        select ip_address
+        from host
+        where mac_address = #{macAddress}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from host

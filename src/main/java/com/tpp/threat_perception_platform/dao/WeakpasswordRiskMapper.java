@@ -1,6 +1,9 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.pojo.Hotfix;
 import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
+
+import java.util.List;
 
 /**
 * @author 34617
@@ -22,4 +25,7 @@ public interface WeakpasswordRiskMapper {
 
     int updateByPrimaryKey(WeakpasswordRisk record);
 
+    WeakpasswordRisk selectByMacAndUsername(String mac, String username);
+
+    List<WeakpasswordRisk> findAll(String mac);
 }

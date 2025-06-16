@@ -5,15 +5,15 @@ import com.tpp.threat_perception_platform.param.AssetsParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
+import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.Host;
-import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 @RestController
 public class HostController {
@@ -30,6 +30,10 @@ public class HostController {
     private ServiceInfoService serviceInfoService;
     @Autowired
     private HotfixService hotfixService;
+    @Autowired
+    private WeakpasswordRiskService weakpasswordRiskService;
+    @Autowired
+    private ApplicationRiskService applicationRiskService;
 
     @PostMapping("/host/list")
     public ResponseResult hostList(MyParam param){
@@ -112,6 +116,11 @@ public class HostController {
         return hostService.systemRiskDiscovery(param);
     }
 
+    @PostMapping("/host/applicationRisk")
+    public ResponseResult getApplicationRiskInfo(@RequestBody ApplicationRiskParam param){
+        return applicationRiskService.appRiskList(param);
+    }
+
     /**
      * 补丁发现
      */
@@ -124,9 +133,26 @@ public class HostController {
     /**
      * 危险补丁展示
      */
-    @PostMapping("/host/dangerousHotfixShow")
+    @PostMapping("/host/dangerousHotfixRisk")
     public List<DangerousHotfix> getDangerousPatches(@RequestBody HotfixParam param) {
         return hotfixService.getDangerousPatches(param.getMacAddress());
+    }
+
+    /**
+     * 弱密码发现
+     */
+    @PostMapping("/host/weakPasswordDiscovery")
+    public ResponseResult weakpasswordDiscovery(@RequestBody WeakpasswordParam param) {
+        // 下发指令
+        return hostService.weakpasswordDiscovery(param);
+    }
+
+    /**
+     * 弱密码展示
+     */
+    @PostMapping("/host/weakpasswordRisk")
+    public ResponseResult getWeakpassword(@RequestBody WeakpasswordParam param) {
+        return weakpasswordRiskService.weakpasswordList(param);
     }
 
 }

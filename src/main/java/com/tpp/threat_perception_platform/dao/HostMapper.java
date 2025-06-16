@@ -45,4 +45,6 @@ public interface HostMapper {
 
     List<Host> findHostsBySearchTypeAndKeywords(@Param("param") MyParam param );
 
+    String getIpByMac(String macAddress);
+
 }
