@@ -8,6 +8,7 @@ import org.bouncycastle.jce.spec.ECPrivateKeySpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -22,6 +23,35 @@ public class SignKeyPair extends KeyPair {
     private static final String EC_CURVE = "secp256r1"; // Same as P-256
     private static final String SIGNATURE_ALGORITHM = "SHA256withECDSA";
     private static final String BC_PROVIDER = "BC";
+
+
+    /**
+     * 将字节数组转换为Base64编码的字符串
+     * @param data 字节数组
+     * @return Base64编码的字符串
+     */
+    public static String translateBytesToStr(byte[] data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Input data cannot be null");
+        }
+        // 使用 Java 内置 Base64 编码
+        return java.util.Base64.getEncoder().encodeToString(data);
+    }
+
+    /**
+     * 将Base64编码的字符串转换回字节数组
+     * @param data Base64编码的字符串
+     * @return 解码后的字节数组
+     */
+    public static byte[] translateStrToBytes(String data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Input string cannot be null");
+        }
+        // 使用 Java 内置 Base64 解码
+        return java.util.Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
+    }
+
+
 
     static {
         if (Security.getProvider(BC_PROVIDER) == null) {
@@ -42,7 +72,7 @@ public class SignKeyPair extends KeyPair {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EC_ALGORITHM, BC_PROVIDER);
             ECNamedCurveParameterSpec parameterSpec = ECNamedCurveTable.getParameterSpec(EC_CURVE);
             keyPairGenerator.initialize(parameterSpec);
-            
+
             java.security.KeyPair keyPair = keyPairGenerator.generateKeyPair();
             this.pri = keyPair.getPrivate();
             this.pub = keyPair.getPublic();
@@ -60,7 +90,7 @@ public class SignKeyPair extends KeyPair {
         if (this.pri == null) {
             throw new RuntimeException("Private key absent.");
         }
-        
+
         try {
             Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM, BC_PROVIDER);
             signature.initSign(this.pri);
@@ -81,7 +111,7 @@ public class SignKeyPair extends KeyPair {
         if (this.pub == null) {
             throw new RuntimeException("Public key absent.");
         }
-        
+
         try {
             Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM, BC_PROVIDER);
             sig.initVerify(this.pub);
@@ -104,13 +134,13 @@ public class SignKeyPair extends KeyPair {
             KeyFactory keyFactory = KeyFactory.getInstance(EC_ALGORITHM, BC_PROVIDER);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(pubKeyBytes);
             PublicKey publicKey = keyFactory.generatePublic(keySpec);
-            
+
             // 执行ECDH密钥协商
             KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", BC_PROVIDER);
             keyAgreement.init(this.pri);
             keyAgreement.doPhase(publicKey, true);
             byte[] sharedSecret = keyAgreement.generateSecret();
-            
+
             // 对共享密钥进行哈希处理，生成AES密钥
             MessageDigest digest = MessageDigest.getInstance("SHA-256", BC_PROVIDER);
             return digest.digest(sharedSecret);
@@ -125,12 +155,26 @@ public class SignKeyPair extends KeyPair {
     public void generatePublicKey() {
         if (this.pri != null && this.pub == null) {
             try {
+                // Get the EC parameters
+                ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(EC_CURVE);
+
+                // Get the private key value (d)
+                org.bouncycastle.jce.interfaces.ECPrivateKey ecPrivateKey = 
+                    (org.bouncycastle.jce.interfaces.ECPrivateKey) this.pri;
+                java.math.BigInteger d = ecPrivateKey.getD();
+
+                // Calculate the public key point Q = d * G
+                org.bouncycastle.math.ec.ECPoint Q = ecSpec.getG().multiply(d);
+
+                // Create the public key specification
+                ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(Q, ecSpec);
+
+                // Generate the public key
                 KeyFactory keyFactory = KeyFactory.getInstance(EC_ALGORITHM, BC_PROVIDER);
-                this.pub = keyFactory.generatePublic(
-                    new X509EncodedKeySpec(
-                        keyFactory.getKeySpec(this.pri, PKCS8EncodedKeySpec.class).getEncoded()
-                    )
-                );
+                this.pub = keyFactory.generatePublic(pubKeySpec);
+
+                // Update the PEM strings
+                this.serialize();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to generate public key from private key", e);
             }
@@ -168,7 +212,7 @@ public class SignKeyPair extends KeyPair {
         if (this.pri != null) {
             this.pemPri = keySerialize(this.pri, true);
         }
-        
+
         if (this.pub != null) {
             this.pemPub = keySerialize(this.pub, false);
         }

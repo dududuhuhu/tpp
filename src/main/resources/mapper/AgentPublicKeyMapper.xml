@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AgentPublicKeyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AgentPublicKey">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="pemPub" column="pem_pub" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,pem_pub
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from agent_public_key
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from agent_public_key
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AgentPublicKey" useGeneratedKeys="true">
+        insert into agent_public_key
+        ( id,mac,pem_pub)
+        values (#{id},#{mac},#{pemPub})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AgentPublicKey" useGeneratedKeys="true">
+        insert into agent_public_key
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="pemPub != null">pem_pub,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="pemPub != null">#{pemPub},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AgentPublicKey">
+        update agent_public_key
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="pemPub != null">
+                    pem_pub = #{pemPub},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AgentPublicKey">
+        update agent_public_key
+        set 
+            mac =  #{mac},
+            pem_pub =  #{pemPub}
+        where   id = #{id} 
+    </update>
+
+    <insert id="insertAgentPublicKey" parameterType="com.tpp.threat_perception_platform.pojo.AgentPublicKey">
+        INSERT INTO agent_public_key (mac, pem_pub)
+        VALUES (#{mac}, #{pemPub})
+        ON DUPLICATE KEY UPDATE pem_pub = #{pemPub}
+    </insert>
+
+    <select id="selectByMac" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM agent_public_key
+        WHERE mac = #{mac}
+    </select>
+</mapper>
