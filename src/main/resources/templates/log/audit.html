@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>审计日志</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" style="position: sticky; top: 0; z-index: 999; background-color: #fff; border-radius: 0; border-top: 4px solid #d2d2d2;">
+        <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">mac地址</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keywords" placeholder="请输入mac地址" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysuser-front-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div id="timelineContainer"></div>
+        </div>
+
+
+
+            <script type="text/html" id="table-useradmin-webuser">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+
+
+            <!--  创建时间格式化处理 -->
+            <script type="text/html" id="createTimeTpl">
+                {{formatDate(d.createTime)}}
+            </script>
+
+            <!--  更新时间格式化处理 -->
+            <script type="text/html" id="updateTimeTpl">
+                {{formatDate(d.updateTime)}}
+            </script>
+
+        </div>
+    </div>
+</div>
+
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    // 日期格式转换函数
+    function formatDate(str) {
+        if(str != null){
+            var now = new Date(str);
+            var year = now.getFullYear();  //取得4位数的年份
+            var month = now.getMonth() + 1;  //取得日期中的月份，其中0表示1月，11表示12月
+            var date = now.getDate();      //返回日期月份中的天数（1到31）
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            return year + "-" + month + "-" + date +" "+hours+":"+minutes+":"+seconds;
+        }
+        return "";
+    }
+</script>
+<script type="text/javascript">
+    layui.config({
+        base: '/layui/layuiAdmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['layer','table','form'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,layer = layui.layer
+            ,table = layui.table;
+
+
+        const allTimelines = [
+            {
+                title: "主机 A 漏洞记录",
+                data: [
+                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
+                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
+                ]
+            },
+            {
+                title: "主机 B 漏洞记录",
+                data: [
+                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
+                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                ]
+            },
+            {
+                title: "主机 A 漏洞记录",
+                data: [
+                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
+                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
+                ]
+            },
+            {
+                title: "主机 B 漏洞记录",
+                data: [
+                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
+                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                ]
+            },
+            {
+                title: "主机 A 漏洞记录",
+                data: [
+                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
+                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
+                ]
+            },
+            {
+                title: "主机 B 漏洞记录",
+                data: [
+                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
+                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                ]
+            },
+            {
+                title: "主机 A 漏洞记录",
+                data: [
+                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
+                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
+                ]
+            },
+            {
+                title: "主机 B 漏洞记录",
+                data: [
+                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
+                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                ]
+            }
+        ];
+
+        let finalHTML = '';
+        allTimelines.forEach(group => {
+            let timelineHTML = `<div class="layui-card">
+                    <div class="layui-card-header">${group.title}</div>
+                    <div class="layui-card-body">
+                      <ul class="layui-timeline">`;
+
+            group.data.forEach(item => {
+                timelineHTML += `
+                      <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                          <h3 class="layui-timeline-title">${item.time}</h3>
+                          <p><strong>[${item.level}]</strong> ${item.desc}</p>
+                        </div>
+                      </li>
+                    `;
+            });
+
+            timelineHTML += `</ul></div></div>`;
+            finalHTML += timelineHTML;
+        });
+
+        document.getElementById('timelineContainer').innerHTML = finalHTML;
+
+        //监听搜索
+        form.on('submit(LAY-sysuser-front-search)', function(data){
+            var field = data.field;
+            //执行重载
+            table.reload('LAY-user-manage', {
+                url: '/user/list',
+                method: "post",
+                headers: {
+                    'Authorization': localStorage.getItem('token')
+                },
+                where: field
+            });
+        });
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+</body>
+</html>
