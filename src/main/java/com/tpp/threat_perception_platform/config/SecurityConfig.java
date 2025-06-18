@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.config;
 
 import com.tpp.threat_perception_platform.filter.JwtAuthenticationTokenFilter;
+import com.tpp.threat_perception_platform.filter.PermissionCheckFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
+    @Autowired
+    private PermissionCheckFilter permissionCheckFilter;
 
     // 创建BCryptPasswordEncoder注入容器
     @Bean
@@ -64,11 +68,17 @@ public class SecurityConfig {
                     auth.requestMatchers("/lib/**").anonymous();
                     auth.requestMatchers("/fonts/**").anonymous();
                     auth.requestMatchers("/layui/**").anonymous();
+
+                    // for test only!
+                    auth.requestMatchers("/test/**").anonymous();
+
                     // 除上面外的所有请求全部需要鉴权认证
                     auth.anyRequest().authenticated();
                 });
         // 把token校验过滤器添加到过滤器链中
         httpSecurity.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        // 把权限校验过滤器添加到过滤器链中，在token校验过滤器之后
+        httpSecurity.addFilterAfter(permissionCheckFilter, JwtAuthenticationTokenFilter.class);
         return httpSecurity.build();
     }
 }
