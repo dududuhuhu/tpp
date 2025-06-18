@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AcctChgLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AcctChgLog">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="eventId" column="event_id" />
+            <result property="eventTime" column="event_time" />
+            <result property="action" column="action" />
+            <result property="targetUser" column="target_user" />
+            <result property="operatorUser" column="operator_user" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,event_id,event_time,action,target_user,
+        operator_user,created_at,updated_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from acct_chg_log
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from acct_chg_log
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLog" useGeneratedKeys="true">
+        insert into acct_chg_log
+        ( id,mac,event_id,event_time,action,target_user,
+        operator_user,created_at,updated_at)
+        values (#{id},#{mac},#{eventId},#{eventTime},#{action},#{targetUser},
+        #{operatorUser},#{createdAt},#{updatedAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLog" useGeneratedKeys="true">
+        insert into acct_chg_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="eventId != null">event_id,</if>
+                <if test="eventTime != null">event_time,</if>
+                <if test="action != null">action,</if>
+                <if test="targetUser != null">target_user,</if>
+                <if test="operatorUser != null">operator_user,</if>
+                <if test="createdAt != null">created_at,</if>
+                <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="eventId != null">#{eventId},</if>
+                <if test="eventTime != null">#{eventTime},</if>
+                <if test="action != null">#{action},</if>
+                <if test="targetUser != null">#{targetUser},</if>
+                <if test="operatorUser != null">#{operatorUser},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+                <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
+        update acct_chg_log
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="eventId != null">
+                    event_id = #{eventId},
+                </if>
+                <if test="eventTime != null">
+                    event_time = #{eventTime},
+                </if>
+                <if test="action != null">
+                    action = #{action},
+                </if>
+                <if test="targetUser != null">
+                    target_user = #{targetUser},
+                </if>
+                <if test="operatorUser != null">
+                    operator_user = #{operatorUser},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+                <if test="updatedAt != null">
+                    updated_at = #{updatedAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
+        update acct_chg_log
+        set 
+            mac =  #{mac},
+            event_id =  #{eventId},
+            event_time =  #{eventTime},
+            action =  #{action},
+            target_user =  #{targetUser},
+            operator_user =  #{operatorUser},
+            created_at =  #{createdAt},
+            updated_at =  #{updatedAt}
+        where   id = #{id} 
+    </update>
+
+    <select id="selectByMac" parameterType="String" resultType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
+        SELECT * FROM acct_chg_log WHERE mac = #{mac}
+    </select>
+
+    <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.LogParam" resultType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
+        SELECT * FROM acct_chg_log
+        WHERE
+        <if test="mac != null and mac != ''">
+            mac = #{mac}
+        </if>
+        <!-- 根据需求添加更多条件 -->
+    </select>
+
+    <select id="selectByIds" parameterType="list" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM acct_chg_log
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectByUniqueFields" resultType="AcctChgLog">
+        SELECT *
+        FROM acct_chg_log
+        WHERE mac = #{mac}
+          AND event_id = #{action.eventId}
+          AND event_time = #{action.timestamp}
+          AND action = #{action.action}
+          AND operator_user = #{action.operatorUser}
+          AND target_user = #{action.targetUser}
+            LIMIT 1
+    </select>
+
+    <!-- AcctChgLogMapper.xml -->
+    <select id="selectByMacOrderedByTime" resultType="AcctChgLog" parameterType="String">
+        SELECT *
+        FROM acct_chg_log
+        WHERE mac = #{mac}
+        ORDER BY event_time ASC
+    </select>
+
+
+
+
+</mapper>
