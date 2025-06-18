@@ -59,6 +59,7 @@ public class LoginUserImpl implements LoginServcie {
         // 把token响应给前端
         HashMap<String, String> map = new HashMap<>();
         map.put("token", jwt);
+        map.put("userid", user.getId().toString());
         return new ResponseResult<Object>(200, "登录成功！", map);
 
         // 没有授权

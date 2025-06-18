@@ -54,6 +54,7 @@
 							localStorage.setItem("username", username);
 							// 保存token
 							localStorage.setItem("token", response.data.token);
+							localStorage.setItem("id", parseInt(resposne.data.userid));
 							// 重定向到主页
 							window.location.href = "/page/index";
 						});
