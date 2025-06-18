@@ -312,6 +312,7 @@
                 url: url,
                 method: 'POST',
                 headers: {
+                    'userId':localStorage.getItem('userId'),
                     'Authorization': localStorage.getItem('token'),
                     'userId':localStorage.getItem('id'),
                     'Content-Type': 'application/json'
