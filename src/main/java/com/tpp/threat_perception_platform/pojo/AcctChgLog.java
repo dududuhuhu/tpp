@@ -20,7 +20,7 @@ public class AcctChgLog {
     /**
      * 事件ID
      */
-    private String eventId;
+    private Integer eventId;
 
     /**
      * 事件时间
@@ -83,14 +83,14 @@ public class AcctChgLog {
     /**
      * 事件ID
      */
-    public String getEventId() {
+    public Integer getEventId() {
         return eventId;
     }
 
     /**
      * 事件ID
      */
-    public void setEventId(String eventId) {
+    public void setEventId(Integer eventId) {
         this.eventId = eventId;
     }
 
