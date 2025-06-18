@@ -184,6 +184,7 @@
             ,contentType: 'application/json'
             ,headers: {
                 'Authorization': localStorage.getItem('token'),
+                'userId':localStorage.getItem('id'),
                 'Content-Type': 'application/json'
             }
             ,cellMinWidth: 80
@@ -219,7 +220,8 @@
             method: 'post',
             url: '/rule/hotfix/list',
             headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'userId':localStorage.getItem('id')
             },
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
@@ -263,7 +265,8 @@
                     $.ajax({
                         url:"/rule/hotfix/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:[data.id]},
                         dataType:"json",
                         success:function (res){
@@ -309,7 +312,8 @@
                     $.ajax({
                         url:"/rule/hotfix/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:[data.id]},
                         dataType:"json",
                         success:function (res){
@@ -335,7 +339,8 @@
                 url: '/host/list',
                 method: "post",
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
@@ -351,7 +356,8 @@
                 url: '/rule/hotfix/list',
                 method: "post",
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
@@ -371,7 +377,8 @@
                     $.ajax({
                         url:"/host/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:userIds},
                         dataType:"json",
                         success:function (res){
@@ -390,7 +397,8 @@
                     url: '/host/list',
                     method: "post",
                     headers: {
-                        'Authorization': localStorage.getItem('token')
+                        'Authorization': localStorage.getItem('token'),
+                        'userId':localStorage.getItem('id')
                     }
                 });
             },

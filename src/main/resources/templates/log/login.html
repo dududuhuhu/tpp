@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录日志风险时间轴</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .layui-container {
+            margin-top: 20px;
+            padding-bottom: 50px;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #ffffff;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .layui-card {
+            margin: 16px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .layui-card-header {
+            background-color: #fafafa;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .layui-card-body {
+            background-color: white;
+            padding: 20px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .risk-user {
+            display: inline-block;
+            background: #fef0ef;
+            color: #e74c3c;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .risk-time {
+            display: inline-block;
+            background: #fff8e6;
+            color: #f39c12;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .no-data {
+            padding: 30px;
+            text-align: center;
+            color: #999;
+        }
+
+        .search-bar-sticky {
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            background: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            border-radius: 0 0 8px 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 标题 + 搜索栏 -->
+<div class="layui-card sticky-header">
+    <div class="layui-card-header">
+        🕒 登录日志分析（含风险标记）
+        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
+            🔄 同步
+        </button>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form">
+            <div class="layui-inline" style="margin-right: 10px;">
+                <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-normal" id="search-btn">
+                    <i class="layui-icon layui-icon-search"></i> 搜索
+                </button>
+                <button class="layui-btn layui-btn-primary" id="reset-btn">重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 时间轴展示 -->
+<div class="layui-container" id="timeline-container"></div>
+
+<!-- AI 报告弹窗模板 -->
+<script type="text/html" id="aiReportTemplate">
+    <div style="padding: 20px;">
+        <h3>🧠 AI 分析报告 - MAC: {{d.mac}}</h3>
+        <p><strong>登录次数：</strong> {{d.total}}</p>
+        <p><strong>风险用户登录：</strong> {{d.riskUser}} 次</p>
+        <p><strong>非正常时间登录：</strong> {{d.riskTime}} 次</p>
+        <p style="margin-top:10px;"><strong>总结：</strong> {{d.summary}}</p>
+    </div>
+</script>
+
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['layer', 'laytpl'], function () {
+        const $ = layui.$;
+        const layer = layui.layer;
+        const laytpl = layui.laytpl;
+
+        const timelineData = [
+            { mac: "00:11:22:33:44:55", username: "admin", login_time: "2025-06-17 03:12:00", is_risk_user: true, is_risk_time: true },
+            { mac: "00:11:22:33:44:55", username: "admin", login_time: "2025-06-17 10:12:00", is_risk_user: true, is_risk_time: false },
+            { mac: "AA:BB:CC:DD:EE:FF", username: "guest", login_time: "2025-06-17 10:12:00", is_risk_user: false, is_risk_time: false },
+            { mac: "66:77:88:99:AA:BB", username: "test", login_time: "2025-06-17 02:30:00", is_risk_user: false, is_risk_time: true }
+        ];
+
+        function renderTimeline(data) {
+            let html = '';
+            const grouped = {};
+
+            // 分组：按 mac 分类
+            data.forEach(item => {
+                if (!grouped[item.mac]) grouped[item.mac] = [];
+                grouped[item.mac].push(item);
+            });
+
+            for (let mac in grouped) {
+                html += `
+            <div class="layui-card">
+              <div class="layui-card-header">
+                💻 MAC 地址：<strong>${mac}</strong>
+                <button class="layui-btn layui-btn-xs layui-btn-warm" style="float: right;" onclick="showAiReport('${mac}')">
+                  📊 查看AI分析报告
+                </button>
+              </div>
+              <div class="layui-card-body">
+                <ul class="layui-timeline">
+            `;
+
+                grouped[mac].forEach(item => {
+                    html += `
+                <li class="layui-timeline-item">
+                  <i class="layui-icon layui-timeline-axis"></i>
+                  <div class="layui-timeline-content layui-text">
+                    <h3 class="layui-timeline-title">${item.login_time}</h3>
+                    <p>
+                      👤 用户：<strong>${item.username}</strong><br>
+                      ${item.is_risk_user ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                      ${item.is_risk_time ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                      ${(!item.is_risk_user && !item.is_risk_time) ? '✅ 正常登录' : ''}
+                    </p>
+                  </div>
+                </li>
+                `;
+                });
+
+                html += `</ul></div></div>`;
+            }
+
+            $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
+        }
+
+        // 点击按钮展示AI分析
+        window.showAiReport = function(mac) {
+            const records = timelineData.filter(item => item.mac === mac);
+            const total = records.length;
+            const riskUser = records.filter(r => r.is_risk_user).length;
+            const riskTime = records.filter(r => r.is_risk_time).length;
+
+            let summary = '该设备登录记录正常。';
+            if (riskUser || riskTime) {
+                summary = '该设备存在部分异常行为：';
+                if (riskUser) summary += `包含 ${riskUser} 次风险用户登录；`;
+                if (riskTime) summary += `包含 ${riskTime} 次非正常时间登录；`;
+            }
+
+            layer.open({
+                type: 1,
+                title: false,
+                area: ['400px', '300px'],
+                shadeClose: true,
+                content: laytpl($('#aiReportTemplate').html()).render({
+                    mac: mac,
+                    total: total,
+                    riskUser: riskUser,
+                    riskTime: riskTime,
+                    summary: summary
+                })
+            });
+        };
+
+        // 搜索按钮
+        $('#search-btn').on('click', function () {
+            const keyword = $('#mac-search').val().trim().toLowerCase();
+            const filtered = timelineData.filter(item => item.mac.toLowerCase().includes(keyword));
+            renderTimeline(filtered);
+        });
+
+        // 重置按钮
+        $('#reset-btn').on('click', function () {
+            $('#mac-search').val('');
+            renderTimeline(timelineData);
+        });
+
+        // 初始化
+        renderTimeline(timelineData);
+    });
+</script>
+</body>
+</html>

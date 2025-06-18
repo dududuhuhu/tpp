@@ -1,187 +1,282 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>审计日志</title>
-    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
-    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+    <title>审计日志时间轴</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css">
+    <style>
+        body {
+            background-color: #f2f3f5;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .layui-card {
+            margin-bottom: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .layui-card-header {
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #fafafa;
+            border-bottom: 1px solid #e6e6e6;
+            padding: 16px 24px;
+        }
+
+        .layui-card-body {
+            padding: 20px 24px;
+        }
+
+        .layui-timeline-title {
+            color: #1e9fff;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .layui-timeline-content {
+            background-color: #f9f9f9;
+            border-left: 3px solid #1e9fff;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .layui-timeline-content:hover {
+            background-color: #eef7ff;
+        }
+
+        .layui-timeline-content p {
+            margin: 6px 0 0;
+            color: #555;
+        }
+
+        .search-form {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background-color: #fff;
+            border-top: 4px solid #1e9fff;
+            border-bottom: 1px solid #eee;
+            padding: 12px 24px;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #ffffff;
+            padding: 20px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .layui-inline input {
+            width: 240px;
+        }
+
+        #timeline-container {
+            padding: 10px 5px;
+        }
+
+        .user-info {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .user-time {
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
 
+<div class="sticky-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>🕒 审计日志分析</div>
+        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" id="sync-btn">
+            <i class="layui-icon layui-icon-refresh"></i> 同步
+        </button>
+    </div>
+
+    <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-inline" style="margin-right: 10px;">
+            <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-normal" id="search-btn">
+                <i class="layui-icon layui-icon-search"></i> 搜索
+            </button>
+            <button class="layui-btn layui-btn-primary" id="reset-btn">
+                <i class="layui-icon layui-icon-refresh-1"></i> 重置
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 审计日志时间线区域 -->
 <div class="layui-fluid">
     <div class="layui-card">
-        <div class="layui-form layui-card-header layuiadmin-card-header-auto" style="position: sticky; top: 0; z-index: 999; background-color: #fff; border-radius: 0; border-top: 4px solid #d2d2d2;">
-        <div class="layui-form-item">
-                <div class="layui-inline">
-                    <label class="layui-form-label">mac地址</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="keywords" placeholder="请输入mac地址" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysuser-front-search">
-                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
         <div class="layui-card-body">
-            <div id="timelineContainer"></div>
-        </div>
-
-
-
-            <script type="text/html" id="table-useradmin-webuser">
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
-            </script>
-
-
-            <!--  创建时间格式化处理 -->
-            <script type="text/html" id="createTimeTpl">
-                {{formatDate(d.createTime)}}
-            </script>
-
-            <!--  更新时间格式化处理 -->
-            <script type="text/html" id="updateTimeTpl">
-                {{formatDate(d.updateTime)}}
-            </script>
-
+            <div id="timeline-container"></div>
         </div>
     </div>
 </div>
 
 <script src="/layui/layui.js"></script>
-<script type="text/javascript">
-    // 日期格式转换函数
-    function formatDate(str) {
-        if(str != null){
-            var now = new Date(str);
-            var year = now.getFullYear();  //取得4位数的年份
-            var month = now.getMonth() + 1;  //取得日期中的月份，其中0表示1月，11表示12月
-            var date = now.getDate();      //返回日期月份中的天数（1到31）
-            var hours = now.getHours();
-            var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
-            return year + "-" + month + "-" + date +" "+hours+":"+minutes+":"+seconds;
-        }
-        return "";
-    }
-</script>
-<script type="text/javascript">
-    layui.config({
-        base: '/layui/layuiAdmin/' //静态资源所在路径
-    }).extend({
-        index: 'lib/index' //主入口模块
-    }).use(['layer','table','form'], function(){
-        var $ = layui.$
-            ,form = layui.form
-            ,layer = layui.layer
-            ,table = layui.table;
-
+<script>
+    layui.config({ base: '/layui/layuiAdmin/' }).extend({ index: 'lib/index' }).use(['layer', 'form'], function () {
+        var $ = layui.$, form = layui.form;
 
         const allTimelines = [
             {
-                title: "主机 A 漏洞记录",
-                data: [
-                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
-                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
+                "mac": "00:11:22:33:44:55",
+                "username": "admin",
+                "login_time": "2025-06-17 08:00:00",
+                "logoff_time": "2025-06-17 09:00:00",
+                "actions": [
+                    {
+                        "event_id": 4720,
+                        "timestamp": "2025-06-17 08:10:00",
+                        "action": "创建用户",
+                        "details": "管理员 admin 创建了用户 test"
+                    },
+                    {
+                        "event_id": 5140,
+                        "timestamp": "2025-06-17 08:20:00",
+                        "action": "访问共享资源",
+                        "details": "访问了共享目录 \\\\192.168.1.10\\configs"
+                    }
                 ]
             },
             {
-                title: "主机 B 漏洞记录",
-                data: [
-                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
-                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                "mac": "AA:BB:CC:DD:EE:FF",
+                "username": "test",
+                "login_time": "2025-06-17 09:05:00",
+                "logoff_time": "2025-06-17 10:30:00",
+                "actions": [
+                    {
+                        "event_id": 4624,
+                        "timestamp": "2025-06-17 09:05:00",
+                        "action": "登录成功",
+                        "details": "用户 test 登录成功，来源：本地控制台"
+                    },
+                    {
+                        "event_id": 5140,
+                        "timestamp": "2025-06-17 09:10:00",
+                        "action": "访问共享资源",
+                        "details": "访问了共享文件 \\\\192.168.1.100\\Docs\\report.docx"
+                    },
+                    {
+                        "event_id": 4670,
+                        "timestamp": "2025-06-17 09:20:00",
+                        "action": "对象权限更改",
+                        "details": "修改注册表 HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+                    },
+                    {
+                        "event_id": 4738,
+                        "timestamp": "2025-06-17 10:00:00",
+                        "action": "账户属性更改",
+                        "details": "用户 test 的账户属性发生了修改"
+                    },
+                    {
+                        "event_id": 4634,
+                        "timestamp": "2025-06-17 10:30:00",
+                        "action": "注销",
+                        "details": "用户 test 注销系统"
+                    }
                 ]
             },
             {
-                title: "主机 A 漏洞记录",
-                data: [
-                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
-                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
-                ]
-            },
-            {
-                title: "主机 B 漏洞记录",
-                data: [
-                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
-                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
-                ]
-            },
-            {
-                title: "主机 A 漏洞记录",
-                data: [
-                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
-                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
-                ]
-            },
-            {
-                title: "主机 B 漏洞记录",
-                data: [
-                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
-                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
-                ]
-            },
-            {
-                title: "主机 A 漏洞记录",
-                data: [
-                    { time: "2025-06-17 14:30", level: "高危漏洞", desc: "Tomcat 默认页面泄露" },
-                    { time: "2025-06-17 13:20", level: "中危漏洞", desc: "FTP 弱口令" }
-                ]
-            },
-            {
-                title: "主机 B 漏洞记录",
-                data: [
-                    { time: "2025-06-17 11:00", level: "信息", desc: "扫描任务启动" },
-                    { time: "2025-06-17 10:00", level: "高危漏洞", desc: "Redis 未授权访问" }
+                "mac": "66:77:88:99:AA:BB",
+                "username": "analyst",
+                "login_time": "2025-06-17 13:00:00",
+                "logoff_time": "2025-06-17 14:15:00",
+                "actions": [
+                    {
+                        "event_id": 4624,
+                        "timestamp": "2025-06-17 13:00:00",
+                        "action": "登录成功",
+                        "details": "用户 analyst 登录成功，来源：远程桌面"
+                    },
+                    {
+                        "event_id": 4723,
+                        "timestamp": "2025-06-17 13:05:00",
+                        "action": "尝试更改密码",
+                        "details": "用户 analyst 尝试修改自己的密码"
+                    },
+                    {
+                        "event_id": 5140,
+                        "timestamp": "2025-06-17 13:20:00",
+                        "action": "访问共享资源",
+                        "details": "访问了共享目录 \\\\192.168.1.15\\backups"
+                    },
+                    {
+                        "event_id": 4634,
+                        "timestamp": "2025-06-17 14:15:00",
+                        "action": "注销",
+                        "details": "用户 analyst 注销系统"
+                    }
                 ]
             }
         ];
 
-        let finalHTML = '';
-        allTimelines.forEach(group => {
-            let timelineHTML = `<div class="layui-card">
-                    <div class="layui-card-header">${group.title}</div>
-                    <div class="layui-card-body">
-                      <ul class="layui-timeline">`;
 
-            group.data.forEach(item => {
-                timelineHTML += `
-                      <li class="layui-timeline-item">
-                        <i class="layui-icon layui-timeline-axis"></i>
-                        <div class="layui-timeline-content layui-text">
-                          <h3 class="layui-timeline-title">${item.time}</h3>
-                          <p><strong>[${item.level}]</strong> ${item.desc}</p>
+        function renderTimelines(data) {
+            let html = '';
+            data.forEach(user => {
+                let userHTML = `
+                    <div class="layui-card">
+                      <div class="layui-card-header">
+                        <div class="user-info">👤 <strong>${user.username}</strong>（MAC: ${user.mac}）</div>
+                        <div class="user-time">
+                          <span style="color: #5FB878;">🟢 登录时间：${user.login_time}</span>
+                          &nbsp;&nbsp;
+                          <span style="color: #FF5722;">🔴 注销时间：${user.logoff_time}</span>
                         </div>
-                      </li>
+                      </div>
+                      <div class="layui-card-body">
+                        <ul class="layui-timeline">
+                `;
+                user.actions.forEach(action => {
+                    userHTML += `
+                        <li class="layui-timeline-item">
+                            <i class="layui-icon layui-timeline-axis"></i>
+                            <div class="layui-timeline-content layui-text">
+                                <h3 class="layui-timeline-title">${action.timestamp}</h3>
+                                <p><strong>${action.action}</strong>（事件ID: ${action.event_id}）<br>${action.details || '暂无详情'}</p>
+                            </div>
+                        </li>
                     `;
+                });
+                userHTML += `</ul></div></div>`;
+                html += userHTML;
             });
+            document.getElementById('timeline-container').innerHTML = html || '<p style="padding: 20px;">暂无日志数据</p>';
+        }
 
-            timelineHTML += `</ul></div></div>`;
-            finalHTML += timelineHTML;
+        // 初始渲染
+        renderTimelines(allTimelines);
+
+        // 手动搜索按钮
+        $('#search-btn').on('click', function () {
+            const keyword = $('#mac-search').val().trim().toLowerCase();
+            const filtered = allTimelines.filter(u => u.mac.toLowerCase().includes(keyword));
+            renderTimelines(filtered);
         });
 
-        document.getElementById('timelineContainer').innerHTML = finalHTML;
-
-        //监听搜索
-        form.on('submit(LAY-sysuser-front-search)', function(data){
-            var field = data.field;
-            //执行重载
-            table.reload('LAY-user-manage', {
-                url: '/user/list',
-                method: "post",
-                headers: {
-                    'Authorization': localStorage.getItem('token')
-                },
-                where: field
-            });
+        // 重置
+        $('#reset-btn').on('click', function () {
+            $('#mac-search').val('');
+            renderTimelines(allTimelines);
         });
-        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
-            var type = $(this).data('type');
-            active[type] ? active[type].call(this) : '';
-        });
-
     });
 </script>
 </body>

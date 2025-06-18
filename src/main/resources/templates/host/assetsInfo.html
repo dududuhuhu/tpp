@@ -313,6 +313,7 @@
                 method: 'POST',
                 headers: {
                     'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id'),
                     'Content-Type': 'application/json'
                 },
                 contentType: 'application/json',

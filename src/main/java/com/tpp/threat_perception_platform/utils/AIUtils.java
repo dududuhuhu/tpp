@@ -33,7 +33,7 @@ public class AIUtils {
                 .build();
 
         GenerationParam param = GenerationParam.builder()
-                .apiKey(System.getenv("sk-09107e052e9c4ad4ad7e3dd49c75145c")) // 更安全的写法
+                .apiKey("sk-09107e052e9c4ad4ad7e3dd49c75145c")
                 .model("qwen-plus")
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
