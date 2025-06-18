@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.LoginActionMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.LoginAction">
+            <id property="id" column="id" />
+            <result property="loginLogId" column="login_log_id" />
+            <result property="eventId" column="event_id" />
+            <result property="timestamp" column="timestamp" />
+            <result property="action" column="action" />
+            <result property="details" column="details" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,login_log_id,event_id,timestamp,action,details
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from login_action
+        where  id = #{id} 
+    </select>
+    <select id="selectByloginLogIdAndeventIdAndtimestamp"
+            resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        select
+        <include refid="Base_Column_List" />
+        from login_action
+        where login_log_id = #{loginLogId} and event_id = #{eventId} and timestamp = #{timestamp}
+    </select>
+    <select id="selectByLoginLogId" resultType="com.tpp.threat_perception_platform.pojo.LoginAction">
+        select
+        <include refid="Base_Column_List" />
+        from login_action
+        where login_log_id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from login_action
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginAction" useGeneratedKeys="true">
+        insert into login_action
+        ( id,login_log_id,event_id,timestamp,action,details)
+        values (#{id},#{loginLogId},#{eventId},#{timestamp},#{action},#{details})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginAction" useGeneratedKeys="true">
+        insert into login_action
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="loginLogId != null">login_log_id,</if>
+                <if test="eventId != null">event_id,</if>
+                <if test="timestamp != null">timestamp,</if>
+                <if test="action != null">action,</if>
+                <if test="details != null">details,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="loginLogId != null">#{loginLogId},</if>
+                <if test="eventId != null">#{eventId},</if>
+                <if test="timestamp != null">#{timestamp},</if>
+                <if test="action != null">#{action},</if>
+                <if test="details != null">#{details},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.LoginAction">
+        update login_action
+        <set>
+                <if test="loginLogId != null">
+                    login_log_id = #{loginLogId},
+                </if>
+                <if test="eventId != null">
+                    event_id = #{eventId},
+                </if>
+                <if test="timestamp != null">
+                    timestamp = #{timestamp},
+                </if>
+                <if test="action != null">
+                    action = #{action},
+                </if>
+                <if test="details != null">
+                    details = #{details},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.LoginAction">
+        update login_action
+        set 
+            login_log_id =  #{loginLogId},
+            event_id =  #{eventId},
+            timestamp =  #{timestamp},
+            action =  #{action},
+            details =  #{details}
+        where   id = #{id} 
+    </update>
+</mapper>

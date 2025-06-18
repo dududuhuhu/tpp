@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AcctChgReportMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AcctChgReport">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="eventId" column="event_id" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="riskDescription" column="risk_description" />
+            <result property="suggestedAction" column="suggested_action" />
+            <result property="analysisTime" column="analysis_time" />
+            <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,event_id,risk_level,risk_description,suggested_action,
+        analysis_time,created_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from acct_chg_report
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from acct_chg_report
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgReport" useGeneratedKeys="true">
+        insert into acct_chg_report
+        ( id,mac,event_id,risk_level,risk_description,suggested_action,
+        analysis_time,created_at)
+        values (#{id},#{mac},#{eventId},#{riskLevel},#{riskDescription},#{suggestedAction},
+        #{analysisTime},#{createdAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgReport" useGeneratedKeys="true">
+        insert into acct_chg_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="eventId != null">event_id,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="riskDescription != null">risk_description,</if>
+                <if test="suggestedAction != null">suggested_action,</if>
+                <if test="analysisTime != null">analysis_time,</if>
+                <if test="createdAt != null">created_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="eventId != null">#{eventId},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="riskDescription != null">#{riskDescription},</if>
+                <if test="suggestedAction != null">#{suggestedAction},</if>
+                <if test="analysisTime != null">#{analysisTime},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgReport">
+        update acct_chg_report
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="eventId != null">
+                    event_id = #{eventId},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="riskDescription != null">
+                    risk_description = #{riskDescription},
+                </if>
+                <if test="suggestedAction != null">
+                    suggested_action = #{suggestedAction},
+                </if>
+                <if test="analysisTime != null">
+                    analysis_time = #{analysisTime},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgReport">
+        update acct_chg_report
+        set 
+            mac =  #{mac},
+            event_id =  #{eventId},
+            risk_level =  #{riskLevel},
+            risk_description =  #{riskDescription},
+            suggested_action =  #{suggestedAction},
+            analysis_time =  #{analysisTime},
+            created_at =  #{createdAt}
+        where   id = #{id} 
+    </update>
+</mapper>

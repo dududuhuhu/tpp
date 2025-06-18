@@ -190,4 +190,13 @@ public class HostController {
         return vulnerabilityService.vulnerabilityRiskList(param);
     }
 
+
+    /**
+     * 审计日志展示实例
+     */
+//    public ResponseResult<List<LogParam>> getAllLoginLogsWithActions() {
+//        List<LogParam> logs = loginLogService.getLogParamsWithActions(); // 你可以在 Service 中实现这个方法
+//        return new ResponseResult<>(0, "查询成功", logs);
+//    }
+
 }
