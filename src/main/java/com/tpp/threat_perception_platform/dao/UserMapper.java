@@ -44,4 +44,10 @@ public interface UserMapper {
 
     int updateByPrimaryKey(User record);
 
+    /**
+     * 获取用户可访问的路径
+     * @param userId 用户ID
+     * @return 路径列表
+     */
+    List<String> getUserAccessiblePaths(@Param("userId") Integer userId);
 }

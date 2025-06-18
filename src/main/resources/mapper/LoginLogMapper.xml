@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.LoginLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.LoginLog">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="username" column="username" />
+            <result property="loginTime" column="login_time" />
+            <result property="logoffTime" column="logoff_time" />
+            <result property="createTime" column="create_time" />
+            <result property="isRiskUser" column="is_risk_user" />
+            <result property="isRiskTime" column="is_risk_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,username,login_time,logoff_time,create_time,
+        is_risk_user,is_risk_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from login_log
+        where  id = #{id} 
+    </select>
+    <select id="selectByMacAndUsernameAndLoginTime"
+            resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        select
+        <include refid="Base_Column_List" />
+        from login_log
+        where mac = #{mac} and username = #{username} and login_time = #{loginTime}
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        select
+        <include refid="Base_Column_List" />
+        from login_log
+        where created_time = (SELECT MAX(created_time) FROM hotfix)
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from login_log
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginLog" useGeneratedKeys="true">
+        insert into login_log
+        ( id,mac,username,login_time,logoff_time,
+        is_risk_user,is_risk_time)
+        values (#{id},#{mac},#{username},#{loginTime},#{logoffTime},
+        #{isRiskUser},#{isRiskTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginLog" useGeneratedKeys="true">
+        insert into login_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="username != null">username,</if>
+                <if test="loginTime != null">login_time,</if>
+                <if test="logoffTime != null">logoff_time,</if>
+                <if test="createTime != null">create_time,</if>
+                <if test="isRiskUser != null">is_risk_user,</if>
+                <if test="isRiskTime != null">is_risk_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="username != null">#{username},</if>
+                <if test="loginTime != null">#{loginTime},</if>
+                <if test="logoffTime != null">#{logoffTime},</if>
+                <if test="createTime != null">#{createTime},</if>
+                <if test="isRiskUser != null">#{isRiskUser},</if>
+                <if test="isRiskTime != null">#{isRiskTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        update login_log
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="username != null">
+                    username = #{username},
+                </if>
+                <if test="loginTime != null">
+                    login_time = #{loginTime},
+                </if>
+                <if test="logoffTime != null">
+                    logoff_time = #{logoffTime},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime},
+                </if>
+                <if test="isRiskUser != null">
+                    is_risk_user = #{isRiskUser},
+                </if>
+                <if test="isRiskTime != null">
+                    is_risk_time = #{isRiskTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        update login_log
+        set 
+            mac =  #{mac},
+            username =  #{username},
+            login_time =  #{loginTime},
+            logoff_time =  #{logoffTime},
+            create_time =  #{createTime},
+            is_risk_user =  #{isRiskUser},
+            is_risk_time =  #{isRiskTime}
+        where   id = #{id} 
+    </update>
+</mapper>

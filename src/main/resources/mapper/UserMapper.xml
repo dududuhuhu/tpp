@@ -152,4 +152,12 @@
             last_login_time =  #{lastLoginTime,jdbcType=TIMESTAMP}
         where   id = #{id,jdbcType=INTEGER} 
     </update>
+
+    <!-- 获取用户可访问的路径 -->
+    <select id="getUserAccessiblePaths" resultType="java.lang.String">
+        SELECT rp.path
+        FROM user u
+        JOIN role_path rp ON rp.role_id = u.user_role
+        WHERE u.id = #{userId}
+    </select>
 </mapper>

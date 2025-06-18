@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 封装登录用的信息
@@ -21,6 +22,8 @@ public class LoginUser implements UserDetails {
     private String password;
 
     private Integer id;
+
+    private List<String> accessiblePathList;
 
     public LoginUser(String username, String password, Integer id) {
         this.username = username;
