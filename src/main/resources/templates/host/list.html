@@ -424,7 +424,8 @@
                 url: '/host/list',
                 method: "post",
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id'),
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
