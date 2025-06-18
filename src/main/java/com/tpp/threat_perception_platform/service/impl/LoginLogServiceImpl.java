@@ -1,5 +1,10 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.exception.ApiException;
+import com.alibaba.dashscope.exception.InputRequiredException;
+import com.alibaba.dashscope.exception.NoApiKeyException;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.LoginLogMapper;
@@ -7,6 +12,7 @@ import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.LoginLog;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.LoginLogService;
+import com.tpp.threat_perception_platform.utils.AIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

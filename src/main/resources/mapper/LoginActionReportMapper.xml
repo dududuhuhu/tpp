@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.LoginActionReportMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.LoginActionReport">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="username" column="username" />
+            <result property="loginTime" column="login_time" />
+            <result property="logoffTime" column="logoff_time" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="suspicious" column="suspicious" />
+            <result property="reason" column="reason" />
+            <result property="aiPrompt" column="ai_prompt" />
+            <result property="aiRawOutput" column="ai_raw_output" />
+            <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,username,login_time,logoff_time,risk_level,
+        suspicious,reason,ai_prompt,ai_raw_output,create_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from login_action_report
+        where  id = #{id} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from login_action_report
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginActionReport" useGeneratedKeys="true">
+        insert into login_action_report
+        ( id,mac,username,login_time,logoff_time,risk_level,
+        suspicious,reason,ai_prompt,ai_raw_output,create_time)
+        values (#{id},#{mac},#{username},#{loginTime},#{logoffTime},#{riskLevel},
+        #{suspicious},#{reason},#{aiPrompt},#{aiRawOutput},#{createTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LoginActionReport" useGeneratedKeys="true">
+        insert into login_action_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="username != null">username,</if>
+                <if test="loginTime != null">login_time,</if>
+                <if test="logoffTime != null">logoff_time,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="suspicious != null">suspicious,</if>
+                <if test="reason != null">reason,</if>
+                <if test="aiPrompt != null">ai_prompt,</if>
+                <if test="aiRawOutput != null">ai_raw_output,</if>
+                <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="username != null">#{username},</if>
+                <if test="loginTime != null">#{loginTime},</if>
+                <if test="logoffTime != null">#{logoffTime},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="suspicious != null">#{suspicious},</if>
+                <if test="reason != null">#{reason},</if>
+                <if test="aiPrompt != null">#{aiPrompt},</if>
+                <if test="aiRawOutput != null">#{aiRawOutput},</if>
+                <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.LoginActionReport">
+        update login_action_report
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="username != null">
+                    username = #{username},
+                </if>
+                <if test="loginTime != null">
+                    login_time = #{loginTime},
+                </if>
+                <if test="logoffTime != null">
+                    logoff_time = #{logoffTime},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="suspicious != null">
+                    suspicious = #{suspicious},
+                </if>
+                <if test="reason != null">
+                    reason = #{reason},
+                </if>
+                <if test="aiPrompt != null">
+                    ai_prompt = #{aiPrompt},
+                </if>
+                <if test="aiRawOutput != null">
+                    ai_raw_output = #{aiRawOutput},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.LoginActionReport">
+        update login_action_report
+        set 
+            mac =  #{mac},
+            username =  #{username},
+            login_time =  #{loginTime},
+            logoff_time =  #{logoffTime},
+            risk_level =  #{riskLevel},
+            suspicious =  #{suspicious},
+            reason =  #{reason},
+            ai_prompt =  #{aiPrompt},
+            ai_raw_output =  #{aiRawOutput},
+            create_time =  #{createTime}
+        where   id = #{id} 
+    </update>
+</mapper>
