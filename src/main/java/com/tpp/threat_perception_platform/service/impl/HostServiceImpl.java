@@ -257,7 +257,7 @@ public class HostServiceImpl implements HostService {
 
         param.setType("vulnerability");
         String ip = hostMapper.getIpByMac(param.getMacAddress());
-        param.setIpAddress(param.getMacAddress());
+        param.setIpAddress(ip);
         // 将param转换成JSON
         String json = JSON.toJSONString(param);
         // 组装队列的名字
