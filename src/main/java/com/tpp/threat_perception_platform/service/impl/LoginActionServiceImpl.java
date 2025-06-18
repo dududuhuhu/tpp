@@ -12,7 +12,6 @@ import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.LoginAction;
 import com.tpp.threat_perception_platform.pojo.LoginActionReport;
 import com.tpp.threat_perception_platform.pojo.LoginLog;
-import com.tpp.threat_perception_platform.pojo.LoginLogReport;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.LoginActionService;
 import com.tpp.threat_perception_platform.utils.AIUtils;
