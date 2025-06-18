@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -43,10 +44,13 @@ public class LoginUserImpl implements LoginServcie {
         }
         // 如果认证通过了，使用UUID(用户ID)生成JWT
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+
         // 把完整的用户信息存入redis, 有效期1个小时
         String uuid = JwtUtil.getUUID();
         String jwt = JwtUtil.createJWT(uuid);
         loginUser.setUuid(uuid);
+        List<String> accessiblePath = userService.getUserAccessiblePath(loginUser.getId());
+        loginUser.setAccessiblePathList(accessiblePath);
         redisCache.setCacheObject("login_" + uuid, JSON.toJSONString(loginUser), 60 * 60, TimeUnit.SECONDS);
 
         // 更新登录时间
@@ -59,6 +63,7 @@ public class LoginUserImpl implements LoginServcie {
         // 把token响应给前端
         HashMap<String, String> map = new HashMap<>();
         map.put("token", jwt);
+        map.put("userid", user.getId().toString());
         return new ResponseResult<Object>(200, "登录成功！", map);
 
         // 没有授权

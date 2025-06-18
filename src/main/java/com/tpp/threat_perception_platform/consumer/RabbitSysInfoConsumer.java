@@ -58,6 +58,12 @@ public class RabbitSysInfoConsumer {
     @Autowired
     private AcctChgLogService acctChgLogService;
 
+    @Autowired
+    private LoginLogService loginLogService;
+
+    @Autowired
+    private LoginActionService loginActionService;
+
     @RabbitListener(queues = "sysinfo_queue")
     public void receive(String message, @Headers Map<String,Object> headers,
                         Channel channel) throws IOException {
@@ -484,4 +490,59 @@ public class RabbitSysInfoConsumer {
             channel.basicAck(deliveryTag, false);
         }
     }
+
+    @RabbitListener(queues = "auditLog_queue")
+    public void receiveAuditLog(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received auditLog message: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
+        try {
+            List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
+
+            for (LogParam param : logParams) {
+                // 构造 LoginLog
+                LoginLog log = new LoginLog();
+                log.setMac(param.getMac());
+                log.setUsername(param.getUsername());
+                log.setLoginTime(param.getLoginTime());
+                log.setLogoffTime(param.getLogoffTime());
+                log.setIsRiskUser(param.getIsRiskUser());
+                log.setIsRiskTime(param.getIsRiskTime());
+
+                // 保存 login_log 并获取主键
+                loginLogService.saveLoginLog(log);
+                int logId = log.getId();
+
+                // 循环保存 login_action
+                for (LogParam.Action action : param.getActions()) {
+                    LoginAction loginAction = new LoginAction();
+                    loginAction.setLoginLogId(logId);
+                    loginAction.setEventId(action.getEventId());
+                    loginAction.setTimestamp(action.getTimestamp());
+                    loginAction.setAction(action.getAction());
+                    loginAction.setDetails(action.getDetails());
+
+                    loginActionService.saveLoginAction(loginAction);
+                }
+            }
+
+            // 消息处理成功，ACK
+            channel.basicAck(deliveryTag, false);
+
+            // test
+            // 调用获取所有登录日志带动作的方法
+            List<LogParam> allLogs = loginActionService.getLoginLogsWithActions();
+
+            // 转成JSON字符串打印（用fastjson）
+            String logsJson = JSON.toJSONString(allLogs, true);  // 第二个参数true表示格式化输出
+            System.out.println("当前数据库中所有登录日志及动作：\n" + logsJson);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process login logs: " + message);
+            // 出错也 ack，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
 }
