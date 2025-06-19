@@ -135,7 +135,7 @@
             username =  #{username},
             login_time =  #{loginTime},
             logoff_time =  #{logoffTime},
-            create_time =  #{createTime},
+            create_time =  NOW(),
             is_risk_user =  #{isRiskUser},
             is_risk_time =  #{isRiskTime}
         where   id = #{id} 

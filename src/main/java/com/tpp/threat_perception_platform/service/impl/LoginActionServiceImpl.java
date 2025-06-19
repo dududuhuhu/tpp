@@ -142,6 +142,7 @@ public class LoginActionServiceImpl implements LoginActionService {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
 
+        System.out.println("loginparam:"+param);
         // 查询所有分析报告
         List<LoginActionReport> reportList = loginActionReportMapper.findAllByMacAndUsernameAndLoginTime(param.getMac(), param.getUsername(),param.getLoginTime());
 

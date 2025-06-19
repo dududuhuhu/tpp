@@ -52,6 +52,9 @@ public class LoginLogServiceImpl implements LoginLogService {
             // 存在但更新
             loginLog.setId(db.getId());
             loginLogMapper.updateByMacAndUsernameAndLoginTime(loginLog);
+            // 强制更新某字段，让 ON UPDATE 生效
+            db.setIsRiskUser(db.getIsRiskUser()); // 即使值不变，强制设置
+            loginLogMapper.updateByPrimaryKey(db);
             return new ResponseResult<>(1003, "该记录已存在！");
         }
 
@@ -90,7 +93,7 @@ public class LoginLogServiceImpl implements LoginLogService {
                 map.put("type", "loginLog");
                 List<String> names = accountInfoMapper.selectAllNamesByMac(host.getMacAddress());
                 map.put("username",names);
-                String json = JSON.toJSONString(map);  // 结果是 {"type":"auditLog"}
+                String json = JSON.toJSONString(map);
                 // 组装队列的名字
                 String routingKey=host.getMacAddress().replace(":","");
                 rabbitService.sendMessage("agent_exchange",routingKey,json);

@@ -14,7 +14,7 @@ def to_beijing_time(utc_str):
 class AuditLogDetector:
     def __init__(self, data: dict):
         self.path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-        self.start_time = datetime.now() - timedelta(hours=24)
+        self.start_time = datetime.now() - timedelta(days=7)
         self.end_time = datetime.now()
 
     def detect(self):

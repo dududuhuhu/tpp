@@ -28,5 +28,7 @@ public interface AccountInfoMapper {
     List<AccountInfo> findAll(@Param("param") MyParam param);
 
     List<String> selectAllNamesByMac(String macAddress);
+
+    AccountInfo selectByNameAndMac(String username, String mac);
 }
 

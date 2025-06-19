@@ -33,8 +33,17 @@ public class ReportController {
     }
     @PostMapping("/audit/analyze")
     public ResponseResult analyzeAudit(@RequestBody LogParam param) {
+
         loginActionService.saveLoginActionReport(param);
+        System.out.println("report:"+loginActionService.loginActionReportList(param));
         return loginActionService.loginActionReportList(param);
     }
 
+
+    @PostMapping("audit/result")
+    public ResponseResult Auditreport(@RequestBody LogParam param) {
+        System.out.println("param:"+param);
+        System.out.println("report:"+loginActionService.loginActionReportList(param));
+        return loginActionService.loginActionReportList(param);
+    }
 }

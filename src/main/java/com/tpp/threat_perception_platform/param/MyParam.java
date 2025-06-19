@@ -14,11 +14,8 @@ public class MyParam {
     /**
      * 页码
      */
-    private Integer page;
-    /**
-     * 限制
-     */
-    private Integer limit;
+    private Integer page = 1;
+    private Integer limit = 10;
     /**
      * 开始时间
      */
