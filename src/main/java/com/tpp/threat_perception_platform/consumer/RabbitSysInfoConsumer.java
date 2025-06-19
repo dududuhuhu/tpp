@@ -491,6 +491,8 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+
+    // 两个队列还是分开
     @RabbitListener(queues = "auditLog_queue")
     public void receiveAuditLog(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received auditLog message: " + message);

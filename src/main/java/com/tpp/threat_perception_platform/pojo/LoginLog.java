@@ -6,7 +6,8 @@ import java.util.Date;
  * 主机登录日志表
  * @TableName login_log
  */
-public class LoginLog {
+public class
+LoginLog {
     /**
      * 自增ID，主键
      */

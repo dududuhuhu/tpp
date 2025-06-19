@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>审计日志时间轴</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .layui-container { margin-top: 20px; padding-bottom: 50px; }
+        .sticky-header {
+            position: sticky; top: 0; z-index: 100; background-color: #fff;
+            padding: 16px 20px; font-size: 18px; font-weight: bold;
+            color: #333; border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        .layui-card { margin: 16px 0; border-radius: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
+        .layui-card-header {
+            background-color: #fafafa; font-size: 16px; font-weight: bold;
+            padding: 14px 20px; border-bottom: 1px solid #eee;
+            border-top-left-radius: 12px; border-top-right-radius: 12px;
+        }
+        .layui-card-body {
+            background-color: white; padding: 20px;
+            border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+        }
+        .no-data {
+            padding: 30px; text-align: center; color: #999;
+        }
+        .search-bar-sticky {
+            position: sticky; top: 60px; z-index: 99; background: #fff;
+            padding: 12px 20px; border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 标题 + 搜索栏 -->
+<div class="layui-card sticky-header">
+    <div class="layui-card-header">
+        🕒 登录日志分析（含风险标记）
+        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
+            🔄 同步
+        </button>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form">
+            <div class="layui-inline" style="margin-right: 10px;">
+                <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline" style="margin-right: 10px;">
+                <input type="text" id="start-time" placeholder="开始时间" class="layui-input">
+            </div>
+            <div class="layui-inline" style="margin-right: 10px;">
+                <input type="text" id="end-time" placeholder="结束时间" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-normal" id="search-btn"><i class="layui-icon layui-icon-search"></i> 搜索</button>
+                <button class="layui-btn layui-btn-primary" id="reset-btn">重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 时间轴展示 -->
+<div class="layui-container" id="timeline-container"></div>
+<div id="pagination" style="text-align: center; padding: 20px;"></div>
+
+<script src="/layui/layui.js"></script>
+<script>
+    layui.config({ base: '/layui/layuiAdmin/' }).extend({ index: 'lib/index' }).use(['layer', 'form', 'laydate', 'laypage'], function () {
+        var $ = layui.$,
+            form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate,
+            laypage = layui.laypage;
+
+        laydate.render({ elem: '#start-time', type: 'datetime' });
+        laydate.render({ elem: '#end-time', type: 'datetime' });
+
+        function getRiskColor(event_id) {
+            if ([4720, 4726, 4738].includes(event_id)) return '#e74c3c';
+            if ([4670, 4723].includes(event_id)) return '#f39c12';
+            return '#5FB878';
+        }
+
+        function renderTimelines(data) {
+            if (data.length === 0) {
+                document.getElementById('timeline-container').innerHTML = '<p class="no-data">暂无匹配的审计日志</p>';
+                return;
+            }
+            let html = '';
+            data.forEach(user => {
+                let userHTML = `<div class="layui-card">
+                    <div class="layui-card-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; line-height: 1.8; gap: 8px;">
+                        <div style="font-weight: bold;">👤 ${user.username}</div>
+                        <div style="flex: 1 1 auto;">💻 MAC: ${user.mac}　🟢 登录：<span style="color:green">${user.login_time}</span>　🔴 注销：<span style="color:red">${user.logoff_time}</span></div>
+                        <div style="flex-shrink: 0;"><button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${user.mac}">🧠 查看AI分析</button></div>
+                    </div>
+                    <div class="layui-card-body">
+                        <ul class="layui-timeline">`;
+                user.actions.forEach(action => {
+                    userHTML += `<li class="layui-timeline-item">
+                            <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
+                            <div class="layui-timeline-content layui-text">
+                                <h3 class="layui-timeline-title">${action.timestamp}</h3>
+                                <p><strong>${action.action}</strong>（事件ID: ${action.event_id}）<br>${action.details || '暂无详情'}</p>
+                            </div>
+                        </li>`;
+                });
+                userHTML += `</ul></div></div>`;
+                html += userHTML;
+            });
+            $('#timeline-container').html(html);
+        }
+
+        let page = 1;
+        let limit = 5;
+        let totalCount = 0;
+        let latestCreateTime = null;
+
+        function getMaxCreateTime(data) {
+            if (!Array.isArray(data)) return null;
+            const times = data.map(item => new Date(item.createTime));
+            const max = times.length ? new Date(Math.max(...times)) : null;
+            return max ? max.toISOString() : null;
+        }
+
+        function fetchData() {
+            const mac = $('#mac-search').val().trim();
+            const start = $('#start-time').val();
+            const end = $('#end-time').val();
+
+            $.ajax({
+                url: '/logs/audit',
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({ mac: mac || null, loginTime: start || null, logoffTime: end || null, page: page, limit: limit }),
+                success: function (res) {
+                    if (res.code === 0) {
+                        totalCount = res.count || 0;
+                        const newMaxTime = getMaxCreateTime(res.data || []);
+                        if (newMaxTime !== latestCreateTime) {
+                            latestCreateTime = newMaxTime;
+                            renderTimelines(res.data || []);
+                            renderPagination();
+                        }
+                    } else {
+                        $('#timeline-container').html('<div class="no-data">加载失败</div>');
+                    }
+                },
+                error: function () {
+                    $('#timeline-container').html('<div class="no-data">接口异常</div>');
+                }
+            });
+        }
+
+        setInterval(() => { fetchData(); }, 10000);
+
+        function renderPagination() {
+            laypage.render({
+                elem: 'pagination',
+                count: totalCount,
+                limit: limit,
+                curr: page,
+                layout: ['prev', 'page', 'next', 'count'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        limit = obj.limit;
+                        fetchData();
+                    }
+                }
+            });
+        }
+
+        // 同步按钮点击事件
+        $('#sync-btn').click(function () {
+            layer.load(1, { shade: [0.1, '#fff'] }); // 加载动画
+
+            $.ajax({
+                url: '/logs/audit/sync',  // 后端触发消息队列的接口
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                success: function (res) {
+                    layer.closeAll('loading');
+                    if (res.code === 0) {
+                        layer.msg('同步请求已发送，稍后自动刷新数据');
+                    } else {
+                        layer.msg('同步失败：' + res.msg, { icon: 2 });
+                    }
+                },
+                error: function () {
+                    layer.closeAll('loading');
+                    layer.msg('同步请求失败', { icon: 2 });
+                }
+            });
+        });
+
+        $('#search-btn').click(function () { page = 1; fetchData(); });
+        $('#reset-btn').click(function () { $('#mac-search').val(''); $('#start-time').val(''); $('#end-time').val(''); page = 1; fetchData(); });
+        fetchData();
+    });
+</script>
+</body>
+</html>

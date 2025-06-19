@@ -1,4 +1,6 @@
 import json
+import uuid
+
 from mq.consumer import Consumer
 from mq.publisher import Publisher
 from work.HotfixDetect import HotfixDetector
@@ -8,7 +10,7 @@ from work.SystemRiskDetect import SystemRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
 from work.AssetsDetect import *
 from threading import Thread
-from ..Logs.logs import audit_user_activity, analyze_login_logs,audit_account_changes
+from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
 
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
@@ -53,42 +55,11 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
             detector = None
         #     需要更新消费队列
         elif data['type'] == 'auditLog':
-            from datetime import datetime, timedelta
-
-            end_time = datetime.now()
-            start_time = end_time - timedelta(hours=24)
-            path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-            suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-            # 审计日志
-            detector = audit_user_activity(path, start_time, end_time)
-            detector['mac']=data['macAddress']
-            t = Thread(target=wrapper, args=('auditLog', detector, publisher, True))
-            t.start()
+             detector = AuditLogDetector(data)
         elif data['type'] == 'loginLog':
-            from datetime import datetime, timedelta
-
-            end_time = datetime.now()
-            start_time = end_time - timedelta(hours=24)
-            path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-            suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-            # 审计日志
-            detector = analyze_login_logs(path, suspicious_users=suspicious_accounts, start_time=start_time,
-                       end_time=end_time)
-            detector['mac']=data['macAddress']
-            t = Thread(target=wrapper, args=('loginLog', detector, publisher, True))
-            t.start()
-        elif data['type'] == 'accountChangLog':
-            from datetime import datetime, timedelta
-
-            end_time = datetime.now()
-            start_time = end_time - timedelta(hours=24)
-            path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-            suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-            # 审计日志
-            detector = audit_account_changes(path, start_time, end_time)
-            detector['mac']=data['macAddress']
-            t = Thread(target=wrapper, args=('accountChangLog', detector, publisher, True))
-            t.start()
+            detector = LoginLogDetector(data)
+        elif data['type'] == 'accountChangeLog':
+            detector = AccountChangeLogDetector(data)
         else:
             print(f"Unknown message type: {data['type']}")
         if detector:

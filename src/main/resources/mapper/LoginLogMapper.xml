@@ -39,6 +39,21 @@
         from login_log
         where create_time = (SELECT MAX(create_time) FROM hotfix)
     </select>
+    <select id="selectByCondition" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        SELECT * FROM login_log
+        <where>
+            <if test="param.mac != null and param.mac != ''">
+                AND mac = #{param.mac}
+            </if>
+            <if test="param.loginTime != null">
+                AND login_time &gt;= #{param.loginTime}
+            </if>
+            <if test="param.logoffTime != null">
+                AND logoff_time &lt;= #{param.logoffTime}
+            </if>
+        </where>
+        ORDER BY login_time DESC
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from login_log

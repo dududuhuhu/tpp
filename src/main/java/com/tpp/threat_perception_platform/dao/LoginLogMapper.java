@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.LoginLog;
 
 import java.util.Date;
@@ -28,6 +29,8 @@ public interface LoginLogMapper {
     LoginLog selectByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 
     List<LoginLog> findAll();
+
+    List<LoginLog> selectByCondition(LogParam param);
 
     void updateByMacAndUsernameAndLoginTime(LoginLog loginLog);
 }

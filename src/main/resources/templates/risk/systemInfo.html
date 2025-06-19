@@ -298,7 +298,8 @@
                     method: 'post',
                     contentType: 'application/json',
                     headers: {
-                        'Authorization': localStorage.getItem('token')?.replace(/^Bearer\s/, '')
+                        'Authorization': localStorage.getItem('token')?.replace(/^Bearer\s/, ''),
+                        'userId':localStorage.getItem('id')
                     },
                     where: JSON.stringify({
                         macAddress: data.macAddress,
