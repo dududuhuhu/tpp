@@ -54,8 +54,8 @@ public class LoginActionServiceImpl implements LoginActionService {
      * @return
      */
     @Override
-    public List<LogParam> getLoginLogsWithActions(){
-        List<LoginLog> loginLogs = loginLogMapper.findAll();
+    public List<LogParam> getLoginLogsWithActions(LogParam params){
+        List<LoginLog> loginLogs = loginLogMapper.findAll(params);
 
         List<LogParam> result = new ArrayList<>();
         for (LoginLog log : loginLogs) {
@@ -152,22 +152,11 @@ public class LoginActionServiceImpl implements LoginActionService {
     }
 
     private String generatePrompt(LogParam logParam) {
-        // 根据需要生成提示词，示例保持之前的样式
         StringBuilder sb = new StringBuilder();
-        sb.append("你是一名专业的日志数据风险分析师，请根据以下用户行为日志分析是否存在异常或可疑行为，并以 JSON 格式返回结果：\n");
+        sb.append("请根据以下用户行为日志，判断是否存在异常或可疑行为，直接以标准 JSON 格式返回结果，不要添加注释或说明文字。\n");
+        sb.append("以下是日志数据：\n");
         sb.append(JSONObject.toJSONString(logParam));
-        sb.append("\n\n风险评估指南：\n");
-        sb.append("1. 整体风险等级：综合考虑操作行为、时间、操作频率等因素，评估为“High（高）”、“Medium（中）”、“Low（低）”或“Safe（安全）”。\n");
-        sb.append("   - High：存在多个高风险操作（如权限提升、账号删除），且多发生在非工作时间（凌晨0-6点）或短时间内频繁高危操作。\n");
-        sb.append("   - Medium：存在一定可疑行为，但时间相对正常，或频繁但为中等风险操作。\n");
-        sb.append("   - Low：操作大多为常规行为，时间正常，无明显异常。\n");
-        sb.append("   - Safe：无可疑操作行为。\n");
-        sb.append("2. 高风险事件数量：列出高风险事件及其数量。\n");
-        sb.append("3. 风险评分：为每个事件打分（0~10）。\n");
-        sb.append("4. 操作频率：统计用户操作频率，尤其是高风险操作。\n");
-        sb.append("5. 风险描述：总结异常行为的原因，包括时间、频率、操作类型等。\n");
-        sb.append("6. 建议措施：根据风险等级提出相应处理建议。\n\n");
-        sb.append("请以如下 JSON 格式输出：\n");
+        sb.append("\n请直接以如下格式返回（不包含markdown标记、解释说明或其他文字）：\n");
         sb.append("{\n");
         sb.append("  \"suspicious\": true/false,\n");
         sb.append("  \"risk_level\": \"High/Medium/Low/Safe\",\n");
@@ -175,5 +164,6 @@ public class LoginActionServiceImpl implements LoginActionService {
         sb.append("}");
         return sb.toString();
     }
+
 
 }

@@ -34,10 +34,22 @@
         where mac = #{mac} and username = #{username} and login_time = #{loginTime}
     </select>
     <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
-        select
+        SELECT
         <include refid="Base_Column_List" />
-        from login_log
-        where create_time = (SELECT MAX(create_time) FROM login_log)
+        FROM login_log
+        <where>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="loginTime != null">
+                AND login_time &gt;= #{loginTime}
+            </if>
+            <if test="logoffTime != null">
+                AND logoff_time &lt;= #{logoffTime}
+            </if>
+            <!-- 限定最新的一次创建时间 -->
+            AND create_time = (SELECT MAX(create_time) FROM login_log)
+        </where>
     </select>
     <select id="selectByCondition" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
         SELECT * FROM login_log

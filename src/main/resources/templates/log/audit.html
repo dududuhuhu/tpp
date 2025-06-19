@@ -114,7 +114,14 @@
     🔴 注销：<span style="color:red">${formatDateTime(user.logoffTime)}</span>
 </div>
 
-                        <div style="flex-shrink: 0;"><button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${user.mac}">🧠 查看AI分析</button></div>
+                       <div style="flex-shrink: 0;">
+  <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn"
+          data-mac="${user.mac}"
+          data-username="${user.username}"
+          data-loginTime="${user.loginTime}">
+      🧠 查看AI分析
+  </button>
+</div>
                     </div>
                     <div class="layui-card-body">
                         <ul class="layui-timeline">`;
@@ -167,7 +174,7 @@
                 data: JSON.stringify({ mac: mac || null, loginTime: start || null, logoffTime: end || null, page: page, limit: limit }),
                 success: function (res) {
                     console.log("res:",res);
-                    if (res.code === 1) {
+                    if (res.code === 0) {
                         totalCount = res.count || 0;
                         const newMaxTime = getMaxCreateTime(res.data || []);
                         if (newMaxTime !== latestCreateTime) {
@@ -203,6 +210,135 @@
                 }
             });
         }
+
+        $(document).on('click', '.ai-btn', function () {
+            const mac = $(this).data('mac');
+            const username=$(this).data('username');
+            const loginTime=$(this).data('loginTime');
+            layer.load(1, {shade: [0.1, '#fff']});
+
+            $.ajax({
+                url: '/api/report/audit/analyze',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId': localStorage.getItem('id')
+                },
+                data: JSON.stringify({mac: mac,username:username,loginTime:loginTime}),
+                success: function (res) {
+                    console.log("reportres:",res);
+                    layer.closeAll('loading');
+                    if (res && res.overall_risk_level) {
+                        const data = res;
+
+                        // 构造 HTML（整合图表容器和文字报告）
+                        let html = `
+                    <div style="padding: 20px; font-size: 14px;">
+                        <h2 style="margin-bottom: 10px;">📊 风险分析报告</h2>
+                       <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                            <!-- 整体风险等级卡片 -->
+                            <div style="flex: 1; background: #fff5f5; border-radius: 12px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 26px; color: #e74c3c;">${data.overall_risk_level}</div>
+                                    <div style="color: #e74c3c; font-weight: bold;">🔴 整体风险等级</div>
+                                </div>
+                                <div style="font-size: 28px;">📊</div>
+                            </div>
+
+                            <!-- 高风险事件数卡片 -->
+                            <div style="flex: 1; background: #fffaf0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 26px; color: #f39c12;">${data.high_risk_event_count}</div>
+                                    <div style="color: #f39c12; font-weight: bold;">📌 高风险事件数</div>
+                                </div>
+                                <div style="font-size: 28px;">📍</div>
+                            </div>
+                        </div>
+
+                        <div id="risk-chart" style="width: 100%; height: 250px; margin-top: 20px;"></div>
+                        <div id="freq-chart" style="width: 100%; height: 250px; margin-top: 20px;"></div>
+
+                        <h3 style="margin-top: 30px;">📌 高风险事件</h3>
+                        ${data.high_risk_events.map(e => `
+                            <div style="background: #f9f9f9; padding: 10px 15px; margin: 10px 0; border-left: 5px solid #e74c3c; border-radius: 6px;">
+                                <p><strong>事件ID：</strong>${e.event_id} | <strong>评分：</strong>${e.risk_score}</p>
+                                <p><strong>操作：</strong>${e.action}</p>
+                                <p><strong>描述：</strong>${e.risk_description}</p>
+                                <p><strong>时间：</strong>${e.event_time}</p>
+                                <p><strong>目标用户：</strong>${e.target_user} | <strong>操作者：</strong>${e.operator_user}</p>
+                            </div>
+                        `).join('')}
+
+
+
+                        <h3 style="margin-top: 30px;">📝 风险描述</h3>
+                        <p>${data.risk_description}</p>
+
+                        <h3 style="margin-top: 30px;">✅ 建议措施</h3>
+                        <p>${data.suggested_action}</p>
+                    </div>
+                `;
+
+                        // 打开弹窗 + 图表渲染
+                        layer.open({
+                            type: 1,
+                            title: 'AI 风险分析报告',
+                            area: ['100%', '100%'],     // 最大化尺寸
+                            offset: '0px',
+                            shadeClose: true,
+                            content: `<div style="max-height: 580px; overflow-y: auto;">${html}</div>`,
+                            success: function () {
+                                const riskChart = echarts.init(document.getElementById('risk-chart'));
+                                riskChart.setOption({
+                                    title: {text: '风险评分分布', left: 'center'},
+                                    tooltip: {},
+                                    xAxis: {
+                                        type: 'category',
+                                        data: data.risk_scores.map(r => r.event_id),
+                                        name: '事件ID'
+                                    },
+                                    yAxis: {
+                                        type: 'value',
+                                        name: '评分',
+                                        max: 10
+                                    },
+                                    series: [{
+                                        data: data.risk_scores.map(r => r.risk_score),
+                                        type: 'bar',
+                                        itemStyle: {color: '#e74c3c'}
+                                    }]
+                                });
+
+                                const freqChart = echarts.init(document.getElementById('freq-chart'));
+                                freqChart.setOption({
+                                    title: {text: '用户操作频率', left: 'center'},
+                                    tooltip: {trigger: 'item'},
+                                    legend: {bottom: '0%'},
+                                    series: [{
+                                        type: 'pie',
+                                        radius: '55%',
+                                        data: data.operation_frequencies.map(f => ({
+                                            name: f.user,
+                                            value: f.frequency
+                                        })),
+                                        label: {
+                                            formatter: '{b}: {c}次 ({d}%)'
+                                        }
+                                    }]
+                                });
+                            }
+                        });
+                    } else {
+                        layer.msg('AI分析失败：数据异常', {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.closeAll('loading');
+                    layer.msg('AI分析请求失败', {icon: 2});
+                }
+            });
+        });
 
         // 同步按钮点击事件
         $('#sync-btn').click(function () {

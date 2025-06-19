@@ -9,7 +9,7 @@ import java.util.List;
 public interface LoginActionService {
     ResponseResult saveLoginAction(LoginAction loginAction);
 
-    List<LogParam> getLoginLogsWithActions();
+    List<LogParam> getLoginLogsWithActions(LogParam param);
 
     void saveLoginActionReport(LogParam logParam);
 

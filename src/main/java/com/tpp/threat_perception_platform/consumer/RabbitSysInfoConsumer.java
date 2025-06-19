@@ -533,7 +533,7 @@ public class RabbitSysInfoConsumer {
 
             // test
             // 调用获取所有登录日志带动作的方法
-            List<LogParam> allLogs = loginActionService.getLoginLogsWithActions();
+            List<LogParam> allLogs = loginActionService.getLoginLogsWithActions(null);
 
             // 转成JSON字符串打印（用fastjson）
             String logsJson = JSON.toJSONString(allLogs, true);  // 第二个参数true表示格式化输出

@@ -2,6 +2,7 @@ package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.LoginLog;
+import io.lettuce.core.dynamic.annotation.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -28,7 +29,7 @@ public interface LoginLogMapper {
 
     LoginLog selectByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 
-    List<LoginLog> findAll();
+    List<LoginLog> findAll(@Param("params") LogParam params);
 
     List<LoginLog> selectByCondition(LogParam param);
 

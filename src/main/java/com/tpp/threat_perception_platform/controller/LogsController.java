@@ -31,9 +31,9 @@ public class LogsController {
     private LoginActionService loginActionService;
 
     @PostMapping("/logs/audit")
-    public ResponseResult<List<LogParam>> getAllLoginLogsWithActions()
+    public ResponseResult<List<LogParam>> getAllLoginLogsWithActions(@RequestBody LogParam param)
     {
-        List<LogParam> logs = loginActionService.getLoginLogsWithActions(); // 你可以在 Service 中实现这个方法
+        List<LogParam> logs = loginActionService.getLoginLogsWithActions(param); // 你可以在 Service 中实现这个方法
         return new ResponseResult<>((long) logs.size(), logs);
     }
 
