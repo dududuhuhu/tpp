@@ -12,4 +12,6 @@ public interface LoginActionService {
     List<LogParam> getLoginLogsWithActions();
 
     void saveLoginActionReport(LogParam logParam);
+
+    ResponseResult loginActionReportList(LogParam param);
 }
