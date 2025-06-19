@@ -29,6 +29,13 @@
         from login_action_report
         where  id = #{id} 
     </select>
+    <select id="findAllByMacAndUsernameAndLoginTime"
+            resultType="com.tpp.threat_perception_platform.pojo.LoginActionReport">
+        select
+        <include refid="Base_Column_List" />
+        from login_action_report
+        where mac = #{mac} and username = #{username} and login_time = #{loginTime}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from login_action_report
