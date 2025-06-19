@@ -88,6 +88,16 @@
             return '#5FB878';
         }
 
+        // 工具函数：格式化 ISO 时间为 yyyy-MM-dd HH:mm:ss（自动转东八区）
+        function formatDateTime(isoString) {
+            if (!isoString) return '未知';
+            const date = new Date(isoString);
+            if (isNaN(date.getTime())) return '无效时间';
+            return new Date(date.getTime() + 8 * 60 * 60 * 1000) // 转东八区
+                .toISOString().replace('T', ' ').substring(0, 19);
+        }
+
+
         function renderTimelines(data) {
             if (data.length === 0) {
                 document.getElementById('timeline-container').innerHTML = '<p class="no-data">暂无匹配的审计日志</p>';
@@ -98,17 +108,23 @@
                 let userHTML = `<div class="layui-card">
                     <div class="layui-card-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; line-height: 1.8; gap: 8px;">
                         <div style="font-weight: bold;">👤 ${user.username}</div>
-                        <div style="flex: 1 1 auto;">💻 MAC: ${user.mac}　🟢 登录：<span style="color:green">${user.login_time}</span>　🔴 注销：<span style="color:red">${user.logoff_time}</span></div>
+                        <div style="flex: 1 1 auto;">
+    💻 MAC: ${user.mac}　
+    🟢 登录：<span style="color:green">${formatDateTime(user.loginTime)}</span>　
+    🔴 注销：<span style="color:red">${formatDateTime(user.logoffTime)}</span>
+</div>
+
                         <div style="flex-shrink: 0;"><button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${user.mac}">🧠 查看AI分析</button></div>
                     </div>
                     <div class="layui-card-body">
                         <ul class="layui-timeline">`;
                 user.actions.forEach(action => {
+                    console.log("action:",action);
                     userHTML += `<li class="layui-timeline-item">
                             <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
                             <div class="layui-timeline-content layui-text">
                                 <h3 class="layui-timeline-title">${action.timestamp}</h3>
-                                <p><strong>${action.action}</strong>（事件ID: ${action.event_id}）<br>${action.details || '暂无详情'}</p>
+                                <p><strong>${action.action}</strong>（事件ID: ${action.eventId}）<br>${action.details || '暂无详情'}</p>
                             </div>
                         </li>`;
                 });
@@ -125,9 +141,14 @@
 
         function getMaxCreateTime(data) {
             if (!Array.isArray(data)) return null;
-            const times = data.map(item => new Date(item.createTime));
-            const max = times.length ? new Date(Math.max(...times)) : null;
-            return max ? max.toISOString() : null;
+            const times = data
+                .map(item => {
+                    const ts = item.logoffTime || item.loginTime;
+                    const d = new Date(ts);
+                    return isNaN(d.getTime()) ? null : d;
+                })
+                .filter(d => d !== null);
+            return times.length ? new Date(Math.max(...times)).toISOString() : null;
         }
 
         function fetchData() {
@@ -145,7 +166,8 @@
                 contentType: 'application/json',
                 data: JSON.stringify({ mac: mac || null, loginTime: start || null, logoffTime: end || null, page: page, limit: limit }),
                 success: function (res) {
-                    if (res.code === 0) {
+                    console.log("res:",res);
+                    if (res.code === 1) {
                         totalCount = res.count || 0;
                         const newMaxTime = getMaxCreateTime(res.data || []);
                         if (newMaxTime !== latestCreateTime) {

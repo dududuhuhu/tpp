@@ -34,7 +34,7 @@ public class LogsController {
     public ResponseResult<List<LogParam>> getAllLoginLogsWithActions()
     {
         List<LogParam> logs = loginActionService.getLoginLogsWithActions(); // 你可以在 Service 中实现这个方法
-        return new ResponseResult<>(0, "查询成功", logs);
+        return new ResponseResult<>((long) logs.size(), logs);
     }
 
     @PostMapping("/logs/audit/sync")

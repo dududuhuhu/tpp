@@ -1,5 +1,7 @@
 package com.tpp.threat_perception_platform.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -25,6 +27,7 @@ public class LoginAction {
     /**
      * 事件发生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date timestamp;
 
     /**
