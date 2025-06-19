@@ -31,4 +31,6 @@ public interface LoginLogMapper {
     List<LoginLog> findAll();
 
     List<LoginLog> selectByCondition(LogParam param);
+
+    void updateByMacAndUsernameAndLoginTime(LoginLog loginLog);
 }
