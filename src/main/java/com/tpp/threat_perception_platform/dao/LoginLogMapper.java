@@ -28,4 +28,6 @@ public interface LoginLogMapper {
     LoginLog selectByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 
     List<LoginLog> findAll();
+
+    void updateByMacAndUsernameAndLoginTime(LoginLog loginLog);
 }

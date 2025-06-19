@@ -473,8 +473,8 @@ public class RabbitSysInfoConsumer {
                 log.setUsername(param.getUsername());
                 log.setLoginTime(param.getLoginTime());
                 log.setLogoffTime(param.getLogoffTime());
-                log.setIsRiskUser(param.getIsRiskUser());
-                log.setIsRiskTime(param.getIsRiskTime());
+                // log.setIsRiskUser(param.getIsRiskUser());
+                // log.setIsRiskTime(param.getIsRiskTime());
 
                 // 保存 login_log 并获取主键
                 loginLogService.saveLoginLog(log);
@@ -504,6 +504,38 @@ public class RabbitSysInfoConsumer {
             String logsJson = JSON.toJSONString(allLogs, true);  // 第二个参数true表示格式化输出
             System.out.println("当前数据库中所有登录日志及动作：\n" + logsJson);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process login logs: " + message);
+            // 出错也 ack，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "loginLog_queue")
+    public void receiveLoginLog(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received loginLog message: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
+        try {
+            List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
+
+            for (LogParam param : logParams) {
+                // 构造 LoginLog
+                LoginLog log = new LoginLog();
+                log.setMac(param.getMac());
+                log.setUsername(param.getUsername());
+                log.setLoginTime(param.getLoginTime());
+                // log.setLogoffTime(param.getLogoffTime());
+                log.setIsRiskUser(param.getIsRiskUser());
+                log.setIsRiskTime(param.getIsRiskTime());
+
+                // 保存 login_log 并获取主键
+                loginLogService.saveLoginLog(log);
+            }
+
+            // 消息处理成功，ACK
+            channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to process login logs: " + message);

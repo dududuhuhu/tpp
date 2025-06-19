@@ -37,7 +37,7 @@
         select
         <include refid="Base_Column_List" />
         from login_log
-        where created_time = (SELECT MAX(created_time) FROM hotfix)
+        where create_time = (SELECT MAX(create_time) FROM hotfix)
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -112,5 +112,20 @@
             is_risk_user =  #{isRiskUser},
             is_risk_time =  #{isRiskTime}
         where   id = #{id} 
+    </update>
+    <update id="updateByMacAndUsernameAndLoginTime">
+        update login_log
+        <set>
+            <if test="logoffTime != null">
+                logoff_time = #{logoffTime},
+            </if>
+            <if test="isRiskUser != null">
+                is_risk_user = #{isRiskUser},
+            </if>
+            <if test="isRiskTime != null">
+                is_risk_time = #{isRiskTime},
+            </if>
+        </set>
+        where mac = #{mac} and username = #{username} and login_time = #{loginTime}
     </update>
 </mapper>

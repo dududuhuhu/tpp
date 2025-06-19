@@ -34,6 +34,9 @@ public class LoginLogServiceImpl implements LoginLogService {
         // 先查询是否已存在
         LoginLog db = loginLogMapper.selectByMacAndUsernameAndLoginTime(loginLog.getMac(), loginLog.getUsername(),loginLog.getLoginTime());
         if (db != null) {
+            // 存在但更新
+            loginLog.setId(db.getId());
+            loginLogMapper.updateByMacAndUsernameAndLoginTime(loginLog);
             return new ResponseResult<>(1003, "该记录已存在！");
         }
 
