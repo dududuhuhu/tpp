@@ -1,0 +1,100 @@
+package com.tpp.threat_perception_platform.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.tpp.threat_perception_platform.dao.AcctChgLogMapper;
+import com.tpp.threat_perception_platform.param.LogParam;
+import com.tpp.threat_perception_platform.pojo.AcctChgLog;
+import com.tpp.threat_perception_platform.response.ResponseResult;
+import com.tpp.threat_perception_platform.service.AcctChgLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Service
+public class AcctChgLogServiceImpl implements AcctChgLogService {
+
+    @Autowired
+    private AcctChgLogMapper acctChgLogMapper;
+
+    /**
+     * 保存账号变更日志数据
+     */
+    @Override
+    public Integer saveAcctChgLog(String mac, List<LogParam.Action> actions) {
+        if (actions == null || actions.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+        for (LogParam.Action action : actions) {
+            AcctChgLog log = new AcctChgLog();
+            log.setMac(mac);
+            log.setEventId(action.getEventId());
+            log.setEventTime(action.getTimestamp());
+            log.setAction(action.getAction());
+            log.setTargetUser(action.getTargetUser());
+            log.setOperatorUser(action.getOperatorUser());
+
+            // 查询是否已存在相同日志记录
+            AcctChgLog existingLog = acctChgLogMapper.selectByUniqueFields(mac, action);
+
+
+
+            Date now = new Date();
+            if (existingLog != null) {
+                // 已存在，更新 update_time
+                existingLog.setUpdatedAt(now);
+                count += acctChgLogMapper.updateByPrimaryKey(existingLog);
+            } else {
+                // 不存在，插入新记录
+                log.setCreatedAt(now);
+                log.setUpdatedAt(now);
+                count += acctChgLogMapper.insert(log);
+            }
+        }
+
+        return count;
+    }
+
+
+
+    /**
+     * 按MAC查询账号变更日志
+     */
+    @Override
+    public ResponseResult<List<AcctChgLog>> getAcctChgLogByMac(String mac) {
+        List<AcctChgLog> logs = acctChgLogMapper.selectByMac(mac);
+        long count = logs != null ? logs.size() : 0;
+        return new ResponseResult<>(count, logs);
+    }
+
+    /**
+     * 条件查询账号变更日志
+     */
+    @Override
+    public ResponseResult<List<AcctChgLog>> queryAcctChgLog(LogParam param) {
+        List<AcctChgLog> logs = acctChgLogMapper.selectByParam(param);
+        long count = logs != null ? logs.size() : 0;
+        return new ResponseResult<>(count, logs);
+    }
+
+    @Override
+    public ResponseResult<List<AcctChgLog>> listAcctChgLog(LogParam param) {
+        // 开启分页，假设param中有page和limit
+        PageHelper.startPage(param.getPage(), param.getLimit());
+
+        // 查询符合条件的日志列表
+        List<AcctChgLog> logList = acctChgLogMapper.selectByParam(param);
+
+        // 构造分页信息
+        PageInfo<AcctChgLog> pageInfo = new PageInfo<>(logList);
+
+        // 返回总数和当前页数据
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    }
+
+}

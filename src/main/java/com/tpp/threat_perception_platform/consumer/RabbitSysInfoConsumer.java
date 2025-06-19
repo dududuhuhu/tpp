@@ -56,6 +56,9 @@ public class RabbitSysInfoConsumer {
     private VulnerabilityService vulnerabilityService;
 
     @Autowired
+    private AcctChgLogService acctChgLogService;
+
+    @Autowired
     private LoginLogService loginLogService;
 
     @Autowired
@@ -454,6 +457,36 @@ public class RabbitSysInfoConsumer {
 
             // 即使出错，也 ack，避免消息积压
             Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "accountChangeLog_queue")
+    public void receiveAccountChange(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received account change message: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
+        try {
+            // 反序列化 JSON 到 LogParam 对象（包含 mac 和 actions）
+            LogParam param = JSON.parseObject(message, LogParam.class);
+
+            if (param.getMac() == null || param.getActions() == null || param.getActions().isEmpty()) {
+                System.err.println("Invalid account change message: missing mac or actions");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 调用业务服务保存
+            Integer savedCount = acctChgLogService.saveAcctChgLog(param.getMac(), param.getActions());
+            System.out.println("Saved " + savedCount + " account change logs for mac: " + param.getMac());
+
+            // 手动确认消息
+            channel.basicAck(deliveryTag, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process account change message: " + message);
+
+            // 即使失败，手动 ack 防止消息积压（根据业务需求可改为重试或死信）
             channel.basicAck(deliveryTag, false);
         }
     }
