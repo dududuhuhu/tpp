@@ -213,7 +213,7 @@ public class RabbitSysInfoConsumer {
                 account.setHarmfulKey(isHarmful ? harmfulKey : null);
 
                 try {
-                    int res = accountInfoService.saveAccountInfo(account);
+                    int res = accountInfoService.analyzeAndSaveAccountInfo(account);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save account: " + account);
