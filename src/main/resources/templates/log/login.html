@@ -141,6 +141,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify({ mac: mac || null, page: page, limit: limit }),
                 success: function (res) {
+                    console.log("res:",res);
                     if (res.code === 0) {
                         totalCount = res.count;
                         renderTimeline(res.data);
@@ -175,12 +176,12 @@
                     html += `<li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">${item.login_time}</h3>
+                       <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
                         <p>
                           👤 用户：<strong>${item.username}</strong><br>
-                          ${item.is_risk_user ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
-                          ${item.is_risk_time ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
-                          ${(!item.is_risk_user && !item.is_risk_time) ? '✅ 正常登录' : ''}
+                          ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                          ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                          ${(!item.isRiskUser && !item.isRiskTime) ? '✅ 正常登录' : ''}
                         </p>
                     </div>
                 </li>`;
@@ -189,6 +190,8 @@
             }
             $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
         }
+
+
 
         function renderPagination() {
             laypage.render({
@@ -202,6 +205,7 @@
                         page = obj.curr;
                         limit = obj.limit;
                         fetchData();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 }
             });

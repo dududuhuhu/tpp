@@ -37,7 +37,7 @@
         select
         <include refid="Base_Column_List" />
         from login_log
-        where create_time = (SELECT MAX(create_time) FROM hotfix)
+        where create_time = (SELECT MAX(create_time) FROM login_log)
     </select>
     <select id="selectByCondition" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
         SELECT * FROM login_log

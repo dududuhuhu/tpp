@@ -6,6 +6,7 @@ import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.AcctChgLogService;
 import com.tpp.threat_perception_platform.service.AuditLogService;
+import com.tpp.threat_perception_platform.service.LoginActionService;
 import com.tpp.threat_perception_platform.service.LoginLogService;
 import com.tpp.threat_perception_platform.vo.LoginLogWithActionsVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class LogsController {
@@ -24,11 +27,14 @@ public class LogsController {
     private LoginLogService loginLogService;
     @Autowired
     private AcctChgLogService acctChgLogService;
+    @Autowired
+    private LoginActionService loginActionService;
 
     @PostMapping("/logs/audit")
-    public ResponseResult getAuditLog(@RequestBody LogParam param) {
-        PageInfo<LoginLogWithActionsVO> pageInfo = auditLogService.getAuditLogList(param);
-        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    public ResponseResult<List<LogParam>> getAllLoginLogsWithActions()
+    {
+        List<LogParam> logs = loginActionService.getLoginLogsWithActions(); // 你可以在 Service 中实现这个方法
+        return new ResponseResult<>(0, "查询成功", logs);
     }
 
     @PostMapping("/logs/audit/sync")
