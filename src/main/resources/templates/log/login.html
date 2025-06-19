@@ -116,122 +116,136 @@
 
 <!-- 时间轴展示 -->
 <div class="layui-container" id="timeline-container"></div>
-
-<!-- AI 报告弹窗模板 -->
-<script type="text/html" id="aiReportTemplate">
-    <div style="padding: 20px;">
-        <h3>🧠 AI 分析报告 - MAC: {{d.mac}}</h3>
-        <p><strong>登录次数：</strong> {{d.total}}</p>
-        <p><strong>风险用户登录：</strong> {{d.riskUser}} 次</p>
-        <p><strong>非正常时间登录：</strong> {{d.riskTime}} 次</p>
-        <p style="margin-top:10px;"><strong>总结：</strong> {{d.summary}}</p>
-    </div>
-</script>
+<div id="pagination" style="text-align: center; padding: 20px;"></div>
 
 <script src="/layui/layui.js"></script>
 <script>
-    layui.use(['layer', 'laytpl'], function () {
+    layui.use(['layer', 'laypage', 'form'], function () {
         const $ = layui.$;
         const layer = layui.layer;
-        const laytpl = layui.laytpl;
+        const laypage = layui.laypage;
 
-        const timelineData = [
-            { mac: "00:11:22:33:44:55", username: "admin", login_time: "2025-06-17 03:12:00", is_risk_user: true, is_risk_time: true },
-            { mac: "00:11:22:33:44:55", username: "admin", login_time: "2025-06-17 10:12:00", is_risk_user: true, is_risk_time: false },
-            { mac: "AA:BB:CC:DD:EE:FF", username: "guest", login_time: "2025-06-17 10:12:00", is_risk_user: false, is_risk_time: false },
-            { mac: "66:77:88:99:AA:BB", username: "test", login_time: "2025-06-17 02:30:00", is_risk_user: false, is_risk_time: true }
-        ];
+        let page = 1;
+        let limit = 5;
+        let totalCount = 0;
+
+        function fetchData() {
+            const mac = $('#mac-search').val().trim();
+            $.ajax({
+                url: '/logs/login',
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({ mac: mac || null, page: page, limit: limit }),
+                success: function (res) {
+                    if (res.code === 0) {
+                        totalCount = res.count;
+                        renderTimeline(res.data);
+                        renderPagination();
+                    } else {
+                        $('#timeline-container').html('<div class="no-data">⚠ 加载失败</div>');
+                    }
+                },
+                error: function () {
+                    $('#timeline-container').html('<div class="no-data">⚠ 请求异常</div>');
+                }
+            });
+        }
 
         function renderTimeline(data) {
             let html = '';
             const grouped = {};
-
-            // 分组：按 mac 分类
             data.forEach(item => {
                 if (!grouped[item.mac]) grouped[item.mac] = [];
                 grouped[item.mac].push(item);
             });
 
             for (let mac in grouped) {
-                html += `
-            <div class="layui-card">
-              <div class="layui-card-header">
-                💻 MAC 地址：<strong>${mac}</strong>
-                <button class="layui-btn layui-btn-xs layui-btn-warm" style="float: right;" onclick="showAiReport('${mac}')">
-                  📊 查看AI分析报告
-                </button>
-              </div>
-              <div class="layui-card-body">
-                <ul class="layui-timeline">
-            `;
+                html += `<div class="layui-card">
+                <div class="layui-card-header">
+                    💻 MAC 地址：<strong>${mac}</strong>
+                </div>
+                <div class="layui-card-body">
+                    <ul class="layui-timeline">`;
 
                 grouped[mac].forEach(item => {
-                    html += `
-                <li class="layui-timeline-item">
-                  <i class="layui-icon layui-timeline-axis"></i>
-                  <div class="layui-timeline-content layui-text">
-                    <h3 class="layui-timeline-title">${item.login_time}</h3>
-                    <p>
-                      👤 用户：<strong>${item.username}</strong><br>
-                      ${item.is_risk_user ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
-                      ${item.is_risk_time ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
-                      ${(!item.is_risk_user && !item.is_risk_time) ? '✅ 正常登录' : ''}
-                    </p>
-                  </div>
-                </li>
-                `;
+                    html += `<li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">${item.login_time}</h3>
+                        <p>
+                          👤 用户：<strong>${item.username}</strong><br>
+                          ${item.is_risk_user ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                          ${item.is_risk_time ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                          ${(!item.is_risk_user && !item.is_risk_time) ? '✅ 正常登录' : ''}
+                        </p>
+                    </div>
+                </li>`;
                 });
-
                 html += `</ul></div></div>`;
             }
-
             $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
         }
 
-        // 点击按钮展示AI分析
-        window.showAiReport = function(mac) {
-            const records = timelineData.filter(item => item.mac === mac);
-            const total = records.length;
-            const riskUser = records.filter(r => r.is_risk_user).length;
-            const riskTime = records.filter(r => r.is_risk_time).length;
-
-            let summary = '该设备登录记录正常。';
-            if (riskUser || riskTime) {
-                summary = '该设备存在部分异常行为：';
-                if (riskUser) summary += `包含 ${riskUser} 次风险用户登录；`;
-                if (riskTime) summary += `包含 ${riskTime} 次非正常时间登录；`;
-            }
-
-            layer.open({
-                type: 1,
-                title: false,
-                area: ['400px', '300px'],
-                shadeClose: true,
-                content: laytpl($('#aiReportTemplate').html()).render({
-                    mac: mac,
-                    total: total,
-                    riskUser: riskUser,
-                    riskTime: riskTime,
-                    summary: summary
-                })
+        function renderPagination() {
+            laypage.render({
+                elem: 'pagination',
+                count: totalCount,
+                limit: limit,
+                curr: page,
+                layout: ['prev', 'page', 'next', 'count'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        limit = obj.limit;
+                        fetchData();
+                    }
+                }
             });
-        };
+        }
 
-        // 搜索按钮
-        $('#search-btn').on('click', function () {
-            const keyword = $('#mac-search').val().trim().toLowerCase();
-            const filtered = timelineData.filter(item => item.mac.toLowerCase().includes(keyword));
-            renderTimeline(filtered);
+        // 同步按钮点击事件
+        $('#sync-btn').click(function () {
+            layer.load(1, { shade: [0.1, '#fff'] }); // 加载动画
+
+            $.ajax({
+                url: '/logs/login/sync',  // 后端触发消息队列的接口
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                success: function (res) {
+                    layer.closeAll('loading');
+                    if (res.code === 0) {
+                        layer.msg('同步请求已发送，稍后自动刷新数据');
+                    } else {
+                        layer.msg('同步失败：' + res.msg, { icon: 2 });
+                    }
+                },
+                error: function () {
+                    layer.closeAll('loading');
+                    layer.msg('同步请求失败', { icon: 2 });
+                }
+            });
         });
 
-        // 重置按钮
+        $('#search-btn').on('click', function () {
+            page = 1;
+            fetchData();
+        });
+
         $('#reset-btn').on('click', function () {
             $('#mac-search').val('');
-            renderTimeline(timelineData);
+            page = 1;
+            fetchData();
         });
 
-        // 初始化
-        renderTimeline(timelineData);
+
+        fetchData();
     });
 </script>
 </body>

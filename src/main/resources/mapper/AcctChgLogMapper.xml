@@ -114,10 +114,13 @@
 
     <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.LogParam" resultType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
         SELECT * FROM acct_chg_log
-        WHERE
-        <if test="mac != null and mac != ''">
-            mac = #{mac}
-        </if>
+        <where>
+            1 = 1
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+
+        </where>
         <!-- 根据需求添加更多条件 -->
     </select>
 

@@ -8,4 +8,6 @@ public interface LoginLogService {
     ResponseResult saveLoginLog(LoginLog loginLog);
 
     ResponseResult loginLogList(LogParam param);
+
+    ResponseResult loginLogDiscovery();
 }

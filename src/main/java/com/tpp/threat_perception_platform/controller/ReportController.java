@@ -21,8 +21,10 @@ public class ReportController {
      * @param mac MAC 地址
      * @return 风险分析报告 JSON
      */
-    @GetMapping("/acct-chg/analyze")
-    public JSONObject analyzeAcctChgReportByMac(@RequestParam("mac") String mac) {
+    @PostMapping("/acct-chg/analyze")
+    public JSONObject analyzeAcctChgReportByMac(@RequestBody JSONObject body) {
+        String mac = body.getString("mac");
         return accChgReportService.analyzeAndGenerateReportByMac(mac);
     }
+
 }

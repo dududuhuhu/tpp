@@ -27,5 +27,6 @@ public interface AccountInfoMapper {
     int updateByPrimaryKey(AccountInfo record);
     List<AccountInfo> findAll(@Param("param") MyParam param);
 
+    List<String> selectAllNamesByMac(String macAddress);
 }
 

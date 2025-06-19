@@ -1,24 +1,30 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.AcctChgLogMapper;
+import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.AcctChgLog;
+import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.AcctChgLogService;
+import com.tpp.threat_perception_platform.service.RabbitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AcctChgLogServiceImpl implements AcctChgLogService {
 
     @Autowired
     private AcctChgLogMapper acctChgLogMapper;
+    @Autowired
+    private HostMapper hostMapper;
+    @Autowired
+    private RabbitService rabbitService;
 
     /**
      * 保存账号变更日志数据
@@ -95,6 +101,27 @@ public class AcctChgLogServiceImpl implements AcctChgLogService {
 
         // 返回总数和当前页数据
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    }
+
+    @Override
+    public ResponseResult accountChangeLogDiscovery() {
+        List<Host> db_hostList = hostMapper.findAll();
+        if(db_hostList.isEmpty()){
+            return new ResponseResult<>(1003,"无主机在线！");
+        }
+        for(Host host : db_hostList){
+            // 去比较更新时间和当前时间判断主机是否在线
+            if (host != null && host.getUpdateTime() != null && new Date().getTime() - host.getUpdateTime().getTime() < 4000)
+            {
+                Map<String, String> map = new HashMap<>();
+                map.put("type", "accountChangeLog");
+                String json = JSON.toJSONString(map);  // 结果是 {"type":"auditLog"}
+                // 组装队列的名字
+                String routingKey=host.getMacAddress().replace(":","");
+                rabbitService.sendMessage("agent_exchange",routingKey,json);
+            }
+        }
+        return new ResponseResult(0, "开始同步，请稍后查看！");
     }
 
 }

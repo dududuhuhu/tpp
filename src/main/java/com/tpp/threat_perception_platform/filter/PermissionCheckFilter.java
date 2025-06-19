@@ -35,6 +35,8 @@ public class PermissionCheckFilter extends OncePerRequestFilter {
                     return;
                 }
             }
+//            filterChain.doFilter(request, response);
+//            return;
             // If logged in, but without permission, return 403 Forbidden
             WebUtils.renderString(response, JSON.toJSONString(new ResponseResult<>(403, "没有访问权限")));
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

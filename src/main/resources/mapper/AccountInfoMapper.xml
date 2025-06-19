@@ -43,6 +43,18 @@
         AND updated_at = (SELECT MAX(updated_at) FROM account_info WHERE mac=#{param.macAddress})
         order by id
     </select>
+    <select id="selectAllNamesByMac" resultType="java.lang.String">
+        SELECT name
+        FROM account_info
+        WHERE mac = #{macAddress}
+          AND is_harmful = 1
+          AND updated_at = (
+            SELECT MAX(updated_at)
+            FROM account_info
+            WHERE mac = #{macAddress}
+        )
+        ORDER BY id
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from account_info
