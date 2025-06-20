@@ -1,12 +1,15 @@
 package com.tpp.threat_perception_platform.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
  * 主机登录日志表
  * @TableName login_log
  */
-public class LoginLog {
+public class
+LoginLog {
     /**
      * 自增ID，主键
      */
@@ -22,20 +25,14 @@ public class LoginLog {
      */
     private String username;
 
-    /**
-     * 用户登录时间
-     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date loginTime;
 
-    /**
-     * 用户注销时间
-     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date logoffTime;
-
-    /**
-     * 记录创建时间
-     */
-    private Date createTime;
 
     /**
      * 是否为危险账户：1表示是，0表示否

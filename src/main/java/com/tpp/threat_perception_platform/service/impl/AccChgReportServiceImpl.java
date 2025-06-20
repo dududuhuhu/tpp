@@ -32,8 +32,10 @@ public class AccChgReportServiceImpl implements AccChgReportService {
         // 拼接日志信息
         StringBuilder logInfoBuilder = new StringBuilder();
         for (AcctChgLog log : logs) {
-            logInfoBuilder.append(String.format("事件时间：%s\n操作行为：%s\n被操作用户：%s\n操作用户：%s\n\n",
-                    log.getEventTime(), log.getAction(), log.getTargetUser(), log.getOperatorUser()));
+            logInfoBuilder.append(String.format(
+                    "事件ID：%s\n事件时间：%s\n操作行为：%s\n被操作用户：%s\n操作用户：%s\n\n",
+                    log.getEventId(), log.getEventTime(), log.getAction(), log.getTargetUser(), log.getOperatorUser()
+            ));
         }
 
         // AI 提示词模板

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录日志风险时间轴</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .layui-container {
+            margin-top: 20px;
+            padding-bottom: 50px;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #ffffff;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .layui-card {
+            margin: 16px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .layui-card-header {
+            background-color: #fafafa;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .layui-card-body {
+            background-color: white;
+            padding: 20px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .risk-user {
+            display: inline-block;
+            background: #fef0ef;
+            color: #e74c3c;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .risk-time {
+            display: inline-block;
+            background: #fff8e6;
+            color: #f39c12;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .no-data {
+            padding: 30px;
+            text-align: center;
+            color: #999;
+        }
+
+        .search-bar-sticky {
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            background: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            border-radius: 0 0 8px 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 标题 + 搜索栏 -->
+<div class="layui-card sticky-header">
+    <div class="layui-card-header">
+        🕒 登录日志分析（含风险标记）
+        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
+            🔄 同步
+        </button>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form">
+            <div class="layui-inline" style="margin-right: 10px;">
+                <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-normal" id="search-btn">
+                    <i class="layui-icon layui-icon-search"></i> 搜索
+                </button>
+                <button class="layui-btn layui-btn-primary" id="reset-btn">重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 时间轴展示 -->
+<div class="layui-container" id="timeline-container"></div>
+<div id="pagination" style="text-align: center; padding: 20px;"></div>
+
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['layer', 'laypage', 'form'], function () {
+        const $ = layui.$;
+        const layer = layui.layer;
+        const laypage = layui.laypage;
+
+        let page = 1;
+        let limit = 5;
+        let totalCount = 0;
+
+        function fetchData() {
+            const mac = $('#mac-search').val().trim();
+            $.ajax({
+                url: '/logs/login',
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({ mac: mac || null, page: page, limit: limit }),
+                success: function (res) {
+                    console.log("res:",res);
+                    if (res.code === 0) {
+                        totalCount = res.count;
+                        renderTimeline(res.data);
+                        renderPagination();
+                    } else {
+                        $('#timeline-container').html('<div class="no-data">⚠ 加载失败</div>');
+                    }
+                },
+                error: function () {
+                    $('#timeline-container').html('<div class="no-data">⚠ 请求异常</div>');
+                }
+            });
+        }
+
+        function renderTimeline(data) {
+            let html = '';
+            const grouped = {};
+            data.forEach(item => {
+                if (!grouped[item.mac]) grouped[item.mac] = [];
+                grouped[item.mac].push(item);
+            });
+
+            for (let mac in grouped) {
+                html += `<div class="layui-card">
+                <div class="layui-card-header">
+                    💻 MAC 地址：<strong>${mac}</strong>
+                </div>
+                <div class="layui-card-body">
+                    <ul class="layui-timeline">`;
+
+                grouped[mac].forEach(item => {
+                    html += `<li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                       <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
+                        <p>
+                          👤 用户：<strong>${item.username}</strong><br>
+                          ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                          ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                          ${(!item.isRiskUser && !item.isRiskTime) ? '✅ 正常登录' : ''}
+                        </p>
+                    </div>
+                </li>`;
+                });
+                html += `</ul></div></div>`;
+            }
+            $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
+        }
+
+
+
+        function renderPagination() {
+            laypage.render({
+                elem: 'pagination',
+                count: totalCount,
+                limit: limit,
+                curr: page,
+                layout: ['prev', 'page', 'next', 'count'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        page = obj.curr;
+                        limit = obj.limit;
+                        fetchData();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
+            });
+        }
+
+        // 同步按钮点击事件
+        $('#sync-btn').click(function () {
+            layer.load(1, { shade: [0.1, '#fff'] }); // 加载动画
+
+            $.ajax({
+                url: '/logs/login/sync',  // 后端触发消息队列的接口
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
+                },
+                success: function (res) {
+                    layer.closeAll('loading');
+                    if (res.code === 0) {
+                        layer.msg('同步请求已发送，稍后自动刷新数据');
+                    } else {
+                        layer.msg('同步失败：' + res.msg, { icon: 2 });
+                    }
+                },
+                error: function () {
+                    layer.closeAll('loading');
+                    layer.msg('同步请求失败', { icon: 2 });
+                }
+            });
+        });
+
+        $('#search-btn').on('click', function () {
+            page = 1;
+            fetchData();
+        });
+
+        $('#reset-btn').on('click', function () {
+            $('#mac-search').val('');
+            page = 1;
+            fetchData();
+        });
+
+
+        fetchData();
+    });
+</script>
+</body>
+</html>

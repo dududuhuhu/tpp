@@ -91,7 +91,8 @@
             ,method: 'post'
             ,url:'/role/list' //后端接口
             ,headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'userId':localStorage.getItem('id')
             }
             ,width: 'auto'// 自适应宽度
             ,cellMinWidth: 80 //全局定义常规单元格的最小宽度
@@ -120,7 +121,8 @@
                         url:"/role/delete", //请求后端接口地址
                         type:"post", //请求方式get | post
                         headers: {
-                            'Authorization': localStorage.getItem('token')
+                            'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id')
                         },
                         data:{ids:[data.id]}, //数据
                         dataType:"json", //后端返回参数类型
@@ -171,7 +173,8 @@
                                 url:"/role/edit",
                                 type:"post",
                                 headers: {
-                                    'Authorization': localStorage.getItem('token')
+                                    'Authorization': localStorage.getItem('token'),
+                                    'userId':localStorage.getItem('id')
                                 },
                                 data:JSON.stringify(field),
                                 contentType: "application/json;charset=utf-8", //提交参数类型为json格式
@@ -202,7 +205,8 @@
                 url: '/role/list',
                 method: "post",
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
                 },
                 where: field
             });
@@ -229,7 +233,8 @@
                         url:"/role/delete",
                         type:"post",
                         headers: {
-                            'Authorization': localStorage.getItem('token')
+                            'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id')
                         },
                         data:{ids:roleIds},
                         dataType:"json",
@@ -266,7 +271,8 @@
                                     url:"/role/save",
                                     type:"post",
                                     headers: {
-                                        'Authorization': localStorage.getItem('token')
+                                        'Authorization': localStorage.getItem('token'),
+                                        'userId':localStorage.getItem('id')
                                     },
                                     data:JSON.stringify(field),
                                     contentType: "application/json;charset=utf-8", //提交参数类型为json格式

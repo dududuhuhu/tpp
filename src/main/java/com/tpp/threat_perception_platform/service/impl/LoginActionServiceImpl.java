@@ -5,6 +5,8 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.LoginActionMapper;
 import com.tpp.threat_perception_platform.dao.LoginActionReportMapper;
 import com.tpp.threat_perception_platform.dao.LoginLogMapper;
@@ -52,8 +54,8 @@ public class LoginActionServiceImpl implements LoginActionService {
      * @return
      */
     @Override
-    public List<LogParam> getLoginLogsWithActions(){
-        List<LoginLog> loginLogs = loginLogMapper.findAll();
+    public List<LogParam> getLoginLogsWithActions(LogParam params){
+        List<LoginLog> loginLogs = loginLogMapper.findAll(params);
 
         List<LogParam> result = new ArrayList<>();
         for (LoginLog log : loginLogs) {
@@ -130,18 +132,38 @@ public class LoginActionServiceImpl implements LoginActionService {
         }
     }
 
+    /**
+     * 查询 AI 用户行为分析结果列表
+     * @param param 查询参数（包含分页信息）
+     * @return 分页结果
+     */
+    @Override
+    public ResponseResult loginActionReportList(LogParam param) {
+        // 设置分页参数
+        PageHelper.startPage(param.getPage(), param.getLimit());
+
+        // 查询所有分析报告
+        List<LoginActionReport> reportList = loginActionReportMapper.findAllByMacAndUsernameAndLoginTime(param.getMac(), param.getUsername(),param.getLoginTime());
+
+        // 构建分页信息
+        PageInfo<LoginActionReport> pageInfo = new PageInfo<>(reportList);
+
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
+    }
+
     private String generatePrompt(LogParam logParam) {
-        // 根据需要生成提示词，示例保持之前的样式
         StringBuilder sb = new StringBuilder();
-        sb.append("请根据以下用户行为日志分析是否存在异常或可疑行为，并以 JSON 格式返回结果：\n");
+        sb.append("请根据以下用户行为日志，判断是否存在异常或可疑行为，直接以标准 JSON 格式返回结果，不要添加注释或说明文字。\n");
+        sb.append("以下是日志数据：\n");
         sb.append(JSONObject.toJSONString(logParam));
-        sb.append("\n请以如下 JSON 格式输出：\n");
+        sb.append("\n请直接以如下格式返回（不包含markdown标记、解释说明或其他文字）：\n");
         sb.append("{\n");
         sb.append("  \"suspicious\": true/false,\n");
         sb.append("  \"risk_level\": \"High/Medium/Low/Safe\",\n");
-        sb.append("  \"reason\": \"简单描述判断依据\"\n");
+        sb.append("  \"reason\": \"简要说明判断依据\"\n");
         sb.append("}");
         return sb.toString();
     }
+
 
 }

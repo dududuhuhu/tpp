@@ -27,11 +27,11 @@ public class LogParam {
     /**
      * 页码
      */
-    private Integer page;
+    private Integer page = 1;
     /**
      * 限制
      */
-    private Integer limit;
+    private Integer limit = 10;
 
     // 操作事件中的字段，对应不同日志可能有不同含义
     public static class Action {

@@ -2,6 +2,9 @@ package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.pojo.LoginActionReport;
 
+import java.util.Date;
+import java.util.List;
+
 /**
 * @author 34617
 * @description 针对表【login_action_report(AI用户行为分析结果表)】的数据库操作Mapper
@@ -22,4 +25,5 @@ public interface LoginActionReportMapper {
 
     int updateByPrimaryKey(LoginActionReport record);
 
+    List<LoginActionReport> findAllByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 }

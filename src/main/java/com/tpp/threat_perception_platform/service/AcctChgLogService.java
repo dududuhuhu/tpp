@@ -36,4 +36,6 @@ public interface AcctChgLogService {
      * @return 分页结果，包含总数和当前页数据列表
      */
     ResponseResult<List<AcctChgLog>> listAcctChgLog(LogParam param);
+
+    ResponseResult accountChangeLogDiscovery();
 }

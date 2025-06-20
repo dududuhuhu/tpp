@@ -183,6 +183,7 @@
             contentType: 'application/json'
             ,headers: {
                 'Authorization': localStorage.getItem('token'),
+                'userId':localStorage.getItem('id'),
                 'Content-Type': 'application/json'
             }
             ,cellMinWidth: 80
@@ -228,7 +229,8 @@
             method: 'post',
             url: '/rule/application/list',
             headers: {
-                'Authorization': localStorage.getItem('token')
+                'Authorization': localStorage.getItem('token'),
+                'userId':localStorage.getItem('id')
             },
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
@@ -261,7 +263,8 @@
                     $.ajax({
                         url:"/rule/application/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:[data.id]},
                         dataType:"json",
                         success:function (res){
@@ -285,7 +288,8 @@
                     $.ajax({
                         url:"/rule/application/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:[data.id]},
                         dataType:"json",
                         success:function (res){
@@ -313,6 +317,7 @@
                 contentType: 'application/json',
                 headers: {
                     'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id'),
                     'Content-Type': 'application/json'
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
@@ -330,7 +335,8 @@
                 contentType: 'application/json',
                 method: "post",
                 headers: {
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': localStorage.getItem('token'),
+                    'userId':localStorage.getItem('id')
                 },
                 data: JSON.stringify(field), // 发送JSON格式的数据
                 where: field
@@ -346,7 +352,8 @@
                     contentType: 'application/json',
                     method: "post",
                     headers: {
-                        'Authorization': localStorage.getItem('token')
+                        'Authorization': localStorage.getItem('token'),
+                        'userId':localStorage.getItem('id')
                     }
                 });
             },
@@ -362,7 +369,8 @@
                     $.ajax({
                         url:"/rule/application/delete",
                         type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token') },
+                        headers: { 'Authorization': localStorage.getItem('token'),
+                            'userId':localStorage.getItem('id') },
                         data:{ids:userIds},
                         dataType:"json",
                         success:function (res){
@@ -381,7 +389,8 @@
                     url: '/rule/application/list',
                     method: 'post',
                     headers: {
-                        'Authorization': localStorage.getItem('token')
+                        'Authorization': localStorage.getItem('token'),
+                        'userId':localStorage.getItem('id')
                     }
                 });
             },
@@ -404,7 +413,8 @@
                                 url:"/rule/application/save",
                                 type:"post",
                                 headers: {
-                                    'Authorization': localStorage.getItem('token')
+                                    'Authorization': localStorage.getItem('token'),
+                                    'userId':localStorage.getItem('id')
                                 },
                                 data:JSON.stringify(field),
                                 contentType: "application/json;charset=utf-8",

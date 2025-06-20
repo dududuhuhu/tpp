@@ -67,6 +67,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/risk/weakpasswordInfo").setViewName("risk/weakpasswordInfo");
         registry.addViewController("/page/risk/vulnerabilityInfo").setViewName("risk/vulnerabilityInfo");
 
+         // 日志相关页面
+        registry.addViewController("/page/log/audit").setViewName("log/audit");
+        registry.addViewController("/page/log/login").setViewName("log/login");
+        registry.addViewController("/page/log/accountChange").setViewName("log/accountChange");
 
 
 
