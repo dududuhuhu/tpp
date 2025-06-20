@@ -4,13 +4,15 @@ import pika
 from pika.exchange_type import ExchangeType
 from mq.service import Service
 from utils import logger
+from utils.crypto.src.asymmetric import SignKeyPair
+from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
 
 class Publisher(Service):
     """
     发布者类，用于向 RabbitMQ 发布消息
     """
 
-    def __init__(self, exchange, amqp_url, exchange_type=ExchangeType.direct):
+    def __init__(self, exchange, amqp_url, sign_key_pair:SignKeyPair, mac:str, exchange_type=ExchangeType.direct):
         # 初始化父类并设置发布确认相关的状态值
         super().__init__(exchange, amqp_url, exchange_type)
         self._deliveries = None       # 保存已发送但尚未确认的消息 delivery_tag
@@ -18,6 +20,10 @@ class Publisher(Service):
         self._nacked = None           # 被拒绝的消息数量
         self._message_number = None   # 已发送消息的序号
         self._publish_lock: Lock = Lock()  # 发布操作加锁，避免并发问题
+
+        # Security associated
+        self._sign_key_pair = sign_key_pair
+        self._mac = mac
 
     def _app_on_bindok(self, frame, userdata):
         """
@@ -103,10 +109,16 @@ class Publisher(Service):
                 content_type='application/json'
             )
 
+            body = {
+                "mac":self._mac,
+                "messege":message,
+                "sig":translate_bytes_to_str(self._sign_key_pair.sign((self._mac + message).encode('utf-8')))
+            }
+
             self._channel.basic_publish(
                 exchange=self._exchange,
                 routing_key=routing_key,
-                body=message,  # ✅ 不要再 json.dumps
+                body=json.dumps(body),
                 properties=properties
             )
 
