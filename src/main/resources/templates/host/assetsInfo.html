@@ -230,7 +230,6 @@
                         {field: 'id', title: 'ID', width: 55},
                         {field: 'mac', title: 'MAC地址', width: 150},
                         {field: 'name', title: '主机名', width: 150},
-                        {field: 'fullName', title: '全名', width: 200},
                         {field: 'sid', title: 'SID', width: 180},
                         {field: 'sidType', title: 'SID类型', width: 100},
                         {field: 'status', title: '状态', width: 100},
@@ -241,14 +240,14 @@
                         {field: 'passwordRequired', title: '密码必填', width: 100, templet: function(d) { return d.passwordRequired === 1 ? '是' : '否'; }},
                         {field: 'createdAt', title: '创建时间', width: 160, templet: function(d) { return formatDate(d.createdAt); }},
                         {field: 'updatedAt', title: '更新时间', width: 160, templet: function(d) { return d.updatedAt ? formatDate(d.updatedAt) : formatDate(d.createdAt); }},
-                        {field: 'isHarmful', title: '是否有害', width: 150, templet: function(d) {
+                        {field: 'isHarmful', title: '是否风险', width: 150, templet: function(d) {
                                 if (d.isHarmful === 1) {
                                     return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
                                 } else {
                                     return "<button class='layui-btn layui-btn-normal layui-btn-xs'>否</button>";
                                 }
                             }},
-                        {field: 'harmfulKey', title: '有害位置', width: 180},
+                        {field: 'harmfulKey', title: '风险原因', width: 180},
                     ]
                 ];
             } else if (url.includes('/host/serviceInfo')) {

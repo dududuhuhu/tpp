@@ -101,43 +101,55 @@
                 document.getElementById('timeline-container').innerHTML = '<p class="no-data">暂无匹配的审计日志</p>';
                 return;
             }
+
             let html = '';
             data.forEach(user => {
                 let userHTML = `<div class="layui-card">
-                <div class="layui-card-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; line-height: 1.8; gap: 8px;">
-                    <div style="font-weight: bold;">👤 ${user.username}</div>
-                    <div style="flex: 1 1 auto;">
-                        💻 MAC: ${user.mac}　
-                        🟢 登录：<span style="color:green">${formatDateTime(user.loginTime)}</span>　
-                        🔴 注销：<span style="color:red">${formatDateTime(user.logoffTime)}</span>
-                    </div>
-                    <div style="flex-shrink: 0;">
-                        <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn"
-                                data-mac="${user.mac}"
-                                data-username="${user.username}"
-                                data-logintime="${user.loginTime}">
-                            🧠 查看AI分析
-                        </button>
-                    </div>
+            <div class="layui-card-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; line-height: 1.8; gap: 8px;">
+                <div style="font-weight: bold;">👤 ${user.username}</div>
+                <div style="flex: 1 1 auto;">
+                    💻 MAC: ${user.mac}　
+                    🟢 登录：<span style="color:green">${formatDateTime(user.loginTime)}</span>　
+                    🔴 注销：<span style="color:red">${formatDateTime(user.logoffTime)}</span>
                 </div>
-                <div class="layui-card-body">
-                    <ul class="layui-timeline">`;
+                <div style="flex-shrink: 0;">
+                    <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn"
+                            data-mac="${user.mac}"
+                            data-username="${user.username}"
+                            data-logintime="${user.loginTime}">
+                        🧠 查看AI分析
+                    </button>
+                </div>
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">`;
 
-                user.actions.forEach(action => {
+                // ✅ 如果没有任何行为，显示提示
+                if (!user.actions || user.actions.length === 0) {
                     userHTML += `<li class="layui-timeline-item">
+                <div class="layui-timeline-content layui-text">
+                    <p style="color: #999;">该用户在该时间段内无任何操作记录</p>
+                </div>
+            </li>`;
+                } else {
+                    user.actions.forEach(action => {
+                        userHTML += `<li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
                     <div class="layui-timeline-content layui-text">
                         <h3 class="layui-timeline-title">${action.timestamp}</h3>
                         <p><strong>${action.action}</strong>（事件ID: ${action.eventId}）<br>${action.details || '暂无详情'}</p>
                     </div>
                 </li>`;
-                });
+                    });
+                }
 
                 userHTML += `</ul></div></div>`;
                 html += userHTML;
             });
+
             $('#timeline-container').html(html);
         }
+
 
         let page = 1;
         let limit = 5;

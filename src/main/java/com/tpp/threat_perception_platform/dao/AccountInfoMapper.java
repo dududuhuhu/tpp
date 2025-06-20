@@ -30,5 +30,7 @@ public interface AccountInfoMapper {
     List<String> selectAllNamesByMac(String macAddress);
 
     AccountInfo selectByNameAndMac(String username, String mac);
+
+    AccountInfo selectBySidAndMac(String sid, String mac);
 }
 

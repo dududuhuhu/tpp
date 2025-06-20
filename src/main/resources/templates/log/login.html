@@ -146,44 +146,56 @@
             });
         }
 
-        // 渲染时间轴
         function renderTimeline(data) {
             let html = '';
             const grouped = {};
+            // 过滤掉没有任何风险信息的记录
+            const filtered = data.filter(item =>
+                item.isRiskUser === 1 || item.isRiskTime === 1 || item.isRiskUser===0|| item.isRiskTime===0
+            );
 
-            data.forEach(item => {
+
+
+            // 没有任何符合条件的记录
+            if (filtered.length === 0) {
+                $('#timeline-container').html('<div class="no-data">⚠ 没有匹配的记录</div>');
+                return;
+            }
+
+            // 按 MAC 分组
+            filtered.forEach(item => {
                 if (!grouped[item.mac]) grouped[item.mac] = [];
                 grouped[item.mac].push(item);
             });
 
             for (let mac in grouped) {
                 html += `<div class="layui-card">
-                    <div class="layui-card-header">
-                        💻 MAC 地址：<strong>${mac}</strong>
-                    </div>
-                    <div class="layui-card-body">
-                        <ul class="layui-timeline">`;
+            <div class="layui-card-header">
+                💻 MAC 地址：<strong>${mac}</strong>
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">`;
 
                 grouped[mac].forEach(item => {
                     html += `<li class="layui-timeline-item">
-                        <i class="layui-icon layui-timeline-axis"></i>
-                        <div class="layui-timeline-content layui-text">
-                            <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
-                            <p>
-                                👤 用户：<strong>${item.username}</strong><br>
-                                ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
-                                ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
-                                ${(!item.isRiskUser && !item.isRiskTime) ? '✅ 正常登录' : ''}
-                            </p>
-                        </div>
-                    </li>`;
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                    <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
+                    <p>
+                        👤 用户：<strong>${item.username}</strong><br>
+                        ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                        ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                    </p>
+                </div>
+            </li>`;
                 });
 
                 html += `</ul></div></div>`;
             }
 
-            $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
+            $('#timeline-container').html(html);
         }
+
 
         // 分页渲染
         function renderPagination() {

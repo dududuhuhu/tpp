@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,13 +35,19 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
      */
     @Override
     public ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk) {
+
+        Date date = new Timestamp(System.currentTimeMillis());
         // 先查询是否已存在
         WeakpasswordRisk db = weakpasswordRiskMapper.selectByMacAndUsername(weakpasswordRisk.getMac(),weakpasswordRisk.getUsername());
         if (db != null) {
-            return new ResponseResult<>(1003, "该弱密码风险记录已存在！");
+            // 重新更新时间
+            db.setUpdatedTime(date);
+            weakpasswordRiskMapper.updateByPrimaryKeySelective(db);
+            return new ResponseResult<>(1003, "该弱密码风险记录已存在，更新时间！");
         }
-        weakpasswordRisk.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        weakpasswordRisk.setUpdatedTime(date);
 
+        // 更新账号信息的风险标识
         String username = weakpasswordRisk.getUsername();
         String mac = weakpasswordRisk.getMac();
         AccountInfo db_account = accountInfoMapper.selectByNameAndMac(username,mac);

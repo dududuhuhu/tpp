@@ -116,44 +116,40 @@
 
             let html = '';
             data.forEach(entry => {
-                if (!entry.actions || entry.actions.length === 0) {
-                    return;  // ✅ 跳过空 action 的 MAC 卡片
-                }
-
+                console.log("entry:",entry)
                 let card = `<div class="layui-card">
-            <div class="layui-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    💻 MAC: <strong>${entry.mac}</strong>
-                </div>
-                <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${entry.mac}" style="margin-left: 10px;">
-                    🧠 查看AI分析
-                </button>
-            </div>
-            <div class="layui-card-body">
-                <ul class="layui-timeline">`;
+                    <div class="layui-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            💻 MAC: <strong>${entry.mac}</strong>
+                        </div>
+                        <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${entry.mac}" style="margin-left: 10px;">
+                            🧠 查看AI分析
+                        </button>
+                    </div>
 
+                    <div class="layui-card-body">
+                        <ul class="layui-timeline">`;
                 entry.actions.forEach(action => {
+                    console.log("action:",action)
                     card += `<li class="layui-timeline-item">
-                <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
-                <div class="layui-timeline-content layui-text">
-                    <h3 class="layui-timeline-title">${action.timestamp}</h3>
-                    <p>
-                        事件ID: ${action.event_id}<br>
-                        👤 被操作用户: ${action.target_user}<br>
-                        👮 操作用户: ${action.operator_user}<br>
-                        <strong>${action.action}</strong><br>
-                    </p>
-                </div>
-            </li>`;
+                        <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">${action.timestamp}</h3>
+                            <p>
+                                事件ID: ${action.event_id}<br>
+                                👤 被操作用户: ${action.target_user}<br>
+                                👮 操作用户: ${action.operator_user}<br>
+                                 <strong>${action.action}</strong><br>
+                            </p>
+                        </div>
+                    </li>`;
                 });
-
                 card += `</ul></div></div>`;
                 html += card;
             });
 
-            $('#timeline-container').html(html || '<p class="no-data">暂无账号变更日志</p>');
+            $('#timeline-container').html(html);
         }
-
 
         function getMaxCreateTime(data) {
             if (!Array.isArray(data)) return null;
@@ -285,8 +281,7 @@
                         layer.open({
                             type: 1,
                             title: 'AI 风险分析报告',
-                            area: ['100%', '100%'],     // 最大化尺寸
-                            offset: '0px',
+                            area: ['780px', '650px'],
                             shadeClose: true,
                             content: `<div style="max-height: 580px; overflow-y: auto;">${html}</div>`,
                             success: function () {

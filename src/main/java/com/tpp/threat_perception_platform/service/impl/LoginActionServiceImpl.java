@@ -54,12 +54,17 @@ public class LoginActionServiceImpl implements LoginActionService {
      * @return
      */
     @Override
-    public List<LogParam> getLoginLogsWithActions(LogParam params){
+    public List<LogParam> getLoginLogsWithActions(LogParam params) {
         List<LoginLog> loginLogs = loginLogMapper.findAll(params);
-
         List<LogParam> result = new ArrayList<>();
+
         for (LoginLog log : loginLogs) {
             List<LoginAction> actions = loginActionMapper.selectByLoginLogId(log.getId());
+
+            // ✅ 只保留有 actions 的记录
+            if (actions == null || actions.isEmpty()) {
+                continue; // 跳过
+            }
 
             LogParam param = new LogParam();
             param.setMac(log.getMac());
@@ -68,13 +73,14 @@ public class LoginActionServiceImpl implements LoginActionService {
             param.setLogoffTime(log.getLogoffTime());
             param.setIsRiskUser(log.getIsRiskUser());
             param.setIsRiskTime(log.getIsRiskTime());
-            param.setActions(convertToActionParam(actions)); // 你可能要手动转换 LoginAction → Action
+            param.setActions(convertToActionParam(actions));
 
             result.add(param);
         }
 
         return result;
     }
+
 
     private List<LogParam.Action> convertToActionParam(List<LoginAction> actions) {
         List<LogParam.Action> result = new ArrayList<>();

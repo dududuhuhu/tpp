@@ -61,6 +61,12 @@
         where mac=#{mac}
         and name=#{username}
     </select>
+    <select id="selectBySidAndMac" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        select *
+        from account_info
+        where sid=#{sid}
+        and mac=#{mac}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from account_info

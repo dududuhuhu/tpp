@@ -173,47 +173,26 @@ public class RabbitSysInfoConsumer {
     }
 
     @RabbitListener(queues = "account_queue")
-    public void receiveAccount(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+    public void receiveAccount(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received message: " + message);
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-
-        // 简单规则库：只检测 name = guest，不区分大小写
-        Map<String, List<String>> ruleMap = new HashMap<>();
-        ruleMap.put("name", Arrays.asList("guest"));
 
         try {
             List<AccountInfo> accountList = JSON.parseArray(message, AccountInfo.class);
             boolean allSuccess = true;
 
+            // 设置创建时间、更新时间
+            Date now = new Date();
+
             for (AccountInfo account : accountList) {
-                boolean isHarmful = false;
-                String harmfulKey = null;
-
-                for (Map.Entry<String, List<String>> entry : ruleMap.entrySet()) {
-                    String field = entry.getKey();
-                    List<String> harmfulValues = entry.getValue();
-
-                    try {
-                        Field declaredField = AccountInfo.class.getDeclaredField(field);
-                        declaredField.setAccessible(true);
-                        Object value = declaredField.get(account);
-
-                        if (value != null && harmfulValues.stream().anyMatch(v -> v.equalsIgnoreCase(value.toString()))) {
-                            isHarmful = true;
-                            harmfulKey = field;
-                            break;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                account.setIsHarmful(isHarmful ? 1 : 0);
-                account.setHarmfulKey(isHarmful ? harmfulKey : null);
+//                // 直接设置isHarmful为false
+//                account.setIsHarmful(0); // 假设isHarmful字段是int类型，0表示false
+//                account.setHarmfulKey(null); // 清空harmfulKey字段
 
                 try {
-                    int res = accountInfoService.analyzeAndSaveAccountInfo(account);
+                    // AI辅助判断账户风险性
+                    int res = accountInfoService.analyzeAndSaveAccountInfo(account,now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save account: " + account);
@@ -419,7 +398,7 @@ public class RabbitSysInfoConsumer {
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
                 ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
-                System.out.println("Save result: " + result.getMsg());
+                System.out.println("Save weakpasswordsRisk result: " + result.getMsg());
             }
 
             // 手动 ack
