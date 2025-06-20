@@ -70,6 +70,10 @@ class KeyPair:
         elif self.pub is not None:
             self.serialize()
             return self.pem_pub
+        elif self.pri is not None:
+            self.pub = self.pri.public_key()
+            self.serialize()
+            return self.pem_pub
         else:
             raise RuntimeError("Private key absent.")
     

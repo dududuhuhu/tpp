@@ -3,15 +3,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
+import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.*;
+import com.tpp.threat_perception_platform.response.AgentResponse;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
+import com.tpp.threat_perception_platform.utils.SignKeyPair;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +27,7 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
@@ -64,13 +72,97 @@ public class RabbitSysInfoConsumer {
     @Autowired
     private LoginActionService loginActionService;
 
+    @Autowired
+    private VerifierService verifierService;
+
+    @Autowired
+    private RabbitService rabbitService;
+
+    <T> T validateAndParseObject(String message, Class<T> clazz) {
+        try {
+            AgentMessageParam agentMessageParam = JSON.parseObject(message, AgentMessageParam.class);
+            if (!agentMessageParam.check() || !verifierService.verifySign(agentMessageParam.getMac(), agentMessageParam.getMac() + agentMessageParam.getMessage(), agentMessageParam.getSig())) {
+                return null;
+            }
+
+            return JSON.parseObject(agentMessageParam.getMessage(), clazz);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    <T> List<T> validateAndParseList(String message, Class<T> clazz) {
+        try {
+            AgentMessageParam agentMessageParam = JSON.parseObject(message, AgentMessageParam.class);
+            if (!agentMessageParam.check() || !verifierService.verifySign(agentMessageParam.getMac(), agentMessageParam.getMac() + agentMessageParam.getMessage(), agentMessageParam.getSig())) {
+                return null;
+            }
+
+            return JSON.parseArray(agentMessageParam.getMessage(), clazz);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    JSONArray validateAndParseJsonArray(String message) {
+        try {
+            AgentMessageParam agentMessageParam = JSON.parseObject(message, AgentMessageParam.class);
+            if (!agentMessageParam.check() || !verifierService.verifySign(agentMessageParam.getMac(), agentMessageParam.getMac() + agentMessageParam.getMessage(), agentMessageParam.getSig())) {
+                return null;
+            }
+            return JSON.parseArray(agentMessageParam.getMessage());
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
     @RabbitListener(queues = "sysinfo_queue")
     public void receive(String message, @Headers Map<String,Object> headers,
                         Channel channel) throws IOException {
         System.out.println("Received message: " + message);
         try {
             // 将数据存储到数据库
-            Host host = JSON.parseObject(message, Host.class);
+            AgentMessageParam agentMessageParam = JSON.parseObject(message, AgentMessageParam.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Integer status = 0;
+            try {
+                if (!agentMessageParam.check()) return;
+                SignKeyPair keyPair = new SignKeyPair();
+                JsonNode node = mapper.readTree(agentMessageParam.getMessage());
+                if (!node.has("pub")) return;
+                String pemPublicKey = node.get("pub").asText();
+                keyPair.loadPublicKey(pemPublicKey);
+                byte[] _message = (agentMessageParam.getMac() + agentMessageParam.getMessage()).getBytes(StandardCharsets.UTF_8);
+                byte[] _sig = SignKeyPair.translateStrToBytes(agentMessageParam.getSig());
+                if (!keyPair.verify(_message, _sig)) return;
+                else {
+                    if (!verifierService.validateAndAddUserPemPublicKey(agentMessageParam.getMac(), pemPublicKey)) status = 0;
+                    else status = 1;
+                }
+            }
+            catch (JsonMappingException e) {
+                status = 0;
+            }
+            catch (Exception e) {
+                status = 0;
+            }
+            finally {
+                if (status == 0) {
+                    Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+                    // ACK
+                    channel.basicAck(deliveryTag,false);                }
+            }
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("status", status);
+            String ret_message = mapper.writeValueAsString(map);
+            rabbitService.sendMessage("agent_" + agentMessageParam.getMac().replaceAll(":", "") + "_exchange", agentMessageParam.getMac().replaceAll(":", ""), ret_message);
+
+            Host host = JSON.parseObject(agentMessageParam.getMessage(), Host.class);
             // 存储到数据库
             int res = hostService.saveHost(host);
             if (res > 0){
@@ -94,7 +186,12 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received message: " + message);
         // 反序列化数据
         try {
-            Host host = JSON.parseObject(message, Host.class);
+            Host host = validateAndParseObject(message, Host.class);
+            if (host == null) {
+                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag,false);
+                return;
+            }
 
             int res = hostService.updateHostByMacAddress(host);
             if (res > 0){
@@ -120,7 +217,11 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received AppInfo message: " + message);
         try {
             // 反序列化 JSON → AppInfo 对象
-            List<AppInfo> appInfoList = JSON.parseArray(message, AppInfo.class);
+            // List<AppInfo> appInfoList = JSON.parseArray(message, AppInfo.class);
+            List<AppInfo> appInfoList = validateAndParseList(message, AppInfo.class);
+            if (appInfoList == null) {
+                return;
+            }
 
             // 循环保存每一个 AppInfo
             for (AppInfo appInfo : appInfoList) {
@@ -128,14 +229,11 @@ public class RabbitSysInfoConsumer {
                 System.out.println("Save result: " + result.getMsg());
             }
 
-            // 手动 ack
-            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-            channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to process AppInfo message: " + message);
-
-            // 即使出错，也 ack，避免消息积压
+        }
+        finally {
             Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
             channel.basicAck(deliveryTag, false);
         }
@@ -147,7 +245,13 @@ public class RabbitSysInfoConsumer {
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
         try {
-            List<ProcessInfo> processInfoList = JSON.parseArray(message, ProcessInfo.class);
+            // List<ProcessInfo> processInfoList = JSON.parseArray(message, ProcessInfo.class);
+            List<ProcessInfo> processInfoList = validateAndParseList(message, ProcessInfo.class);
+            // 验证失败直接确认，返回
+            if (processInfoList == null) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             boolean allSuccess = true;
             for (ProcessInfo processInfo : processInfoList) {
@@ -183,7 +287,12 @@ public class RabbitSysInfoConsumer {
         ruleMap.put("name", Arrays.asList("guest"));
 
         try {
-            List<AccountInfo> accountList = JSON.parseArray(message, AccountInfo.class);
+            // List<AccountInfo> accountList = JSON.parseArray(message, AccountInfo.class);
+            List<AccountInfo> accountList = validateAndParseList(message, AccountInfo.class);
+            if (accountList == null) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
             boolean allSuccess = true;
 
             for (AccountInfo account : accountList) {
@@ -248,7 +357,12 @@ public class RabbitSysInfoConsumer {
 
         try {
             // 解析 JSON 数组
-            JSONArray jsonArray = JSON.parseArray(message);
+            // JSONArray jsonArray = JSON.parseArray(message);
+            JSONArray jsonArray = validateAndParseJsonArray(message);
+            if (jsonArray == null) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
             if (jsonArray.isEmpty()) {
                 throw new JSONException("Received empty JSON array");
             }
@@ -286,7 +400,11 @@ public class RabbitSysInfoConsumer {
 
         try {
             // 解析消息为参数列表
-            List<ApplicationRisk> paramList = JSON.parseArray(message, ApplicationRisk.class);
+            // List<ApplicationRisk> paramList = JSON.parseArray(message, ApplicationRisk.class);
+            List<ApplicationRisk> paramList = validateAndParseList(message, ApplicationRisk.class);
+            if (paramList == null) {
+                return;
+            }
 
             for (ApplicationRisk param : paramList) {
                 try {
@@ -334,7 +452,9 @@ public class RabbitSysInfoConsumer {
 
         try {
             // 解析消息为参数列表
-            List<SystemRisk> paramList = JSON.parseArray(message, SystemRisk.class);
+            // List<SystemRisk> paramList = JSON.parseArray(message, SystemRisk.class);
+            List<SystemRisk> paramList = validateAndParseList(message, SystemRisk.class);
+            if (paramList == null) return;
 
             for (SystemRisk param : paramList) {
                 try {
@@ -380,7 +500,13 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received hotfix message: " + message);
         try {
             // 反序列化 JSON → 对象
-            List<Hotfix> hotfixList = JSON.parseArray(message, Hotfix.class);
+            // List<Hotfix> hotfixList = JSON.parseArray(message, Hotfix.class);
+            List<Hotfix> hotfixList = validateAndParseList(message, Hotfix.class);
+            if (hotfixList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             // 循环保存每一个
             for (Hotfix hotfix : hotfixList) {
@@ -414,7 +540,13 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received weakpassword message: " + message);
         try {
             // 反序列化 JSON → 对象
-            List<WeakpasswordRisk> weakpasswordRiskList = JSON.parseArray(message, WeakpasswordRisk.class);
+            // List<WeakpasswordRisk> weakpasswordRiskList = JSON.parseArray(message, WeakpasswordRisk.class);
+            List<WeakpasswordRisk> weakpasswordRiskList = validateAndParseList(message, WeakpasswordRisk.class);
+            if (weakpasswordRiskList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
@@ -440,7 +572,13 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received vulnerability message: " + message);
         try {
             // 反序列化 JSON → 对象
-            List<VulnerabilityRisk> vulnerabilityRiskList = JSON.parseArray(message, VulnerabilityRisk.class);
+            // List<VulnerabilityRisk> vulnerabilityRiskList = JSON.parseArray(message, VulnerabilityRisk.class);
+            List<VulnerabilityRisk> vulnerabilityRiskList = validateAndParseList(message, VulnerabilityRisk.class);
+            if (vulnerabilityRiskList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             // 循环保存每一个
             for (VulnerabilityRisk vulnerabilityRisk: vulnerabilityRiskList) {
@@ -468,7 +606,12 @@ public class RabbitSysInfoConsumer {
 
         try {
             // 反序列化 JSON 到 LogParam 对象（包含 mac 和 actions）
-            LogParam param = JSON.parseObject(message, LogParam.class);
+            // LogParam param = JSON.parseObject(message, LogParam.class);
+            LogParam param = validateAndParseObject(message, LogParam.class);
+            if (param == null) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             if (param.getMac() == null || param.getActions() == null || param.getActions().isEmpty()) {
                 System.err.println("Invalid account change message: missing mac or actions");
@@ -497,7 +640,12 @@ public class RabbitSysInfoConsumer {
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
-            List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
+            // List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
+            List<LogParam> logParams = validateAndParseList(message, LogParam.class);
+            if (logParams == null) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
 
             for (LogParam param : logParams) {
                 // 构造 LoginLog

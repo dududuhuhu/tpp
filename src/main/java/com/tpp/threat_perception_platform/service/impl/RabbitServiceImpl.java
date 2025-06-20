@@ -1,7 +1,10 @@
 package com.tpp.threat_perception_platform.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
+import com.tpp.threat_perception_platform.response.AgentResponse;
 import com.tpp.threat_perception_platform.service.RabbitService;
+import com.tpp.threat_perception_platform.service.VerifierService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,9 @@ public class RabbitServiceImpl implements RabbitService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private VerifierService verifierService;
 
     /**
      * 创建队列
@@ -38,7 +44,8 @@ public class RabbitServiceImpl implements RabbitService {
      */
     @Override
     public void sendMessage(String exchange, String routingKey, String message) {
-        rabbitTemplate.convertAndSend(exchange,routingKey,message);
+        AgentResponse response = new AgentResponse(message, verifierService.signMessage(message));
+        rabbitTemplate.convertAndSend(exchange,routingKey, JSON.toJSONString(response));
     }
 
 

@@ -9,6 +9,7 @@ from pika.exchange_type import ExchangeType
 
 from utils import logger as LOGGER
 from mq.service import Service
+from utils.crypto.src.asymmetric import SignKeyPair
 
 
 class Consumer(Service):
@@ -39,12 +40,14 @@ class Consumer(Service):
         def set_callback(self, callback):
             self._callback = callback
 
-    def __init__(self, exchange, amqp_url, exchange_type=ExchangeType.direct):
+    def __init__(self, exchange, amqp_url, verify_key_pair:SignKeyPair, exchange_type=ExchangeType.direct):
         super().__init__(exchange, amqp_url, exchange_type)
 
         self._routing_infos:list[Consumer.RoutingInfo] = []
         
         self._prefetch_count = 1
+
+        self._verify_key_pair = verify_key_pair
 
     def add_queue_key_pairs(self, routingInfos:list[RoutingInfo]):
         for routingInfo in routingInfos:

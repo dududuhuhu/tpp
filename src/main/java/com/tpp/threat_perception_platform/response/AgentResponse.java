@@ -6,12 +6,10 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgentResponse {
-    private Integer code;
     private String message;
     private String sig;
 
-    public AgentResponse(Integer code, String message, String sig) {
-        this.code = code;
+    public AgentResponse(String message, String sig) {
         this.message = message;
         this.sig = sig;
     }

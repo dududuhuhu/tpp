@@ -2,28 +2,21 @@ from service.configure import *
 from mq.consumer import Consumer
 from mq.publisher import Publisher
 from service import *
-from work.HeartCheck import HeartCheck
-from system.SystemInfo import SystemInfo
-from mq.RabbitMQ import RabbitMQ
+# from work.HeartCheck import HeartCheck
+# from system.SystemInfo import SystemInfo
+# from mq.RabbitMQ import RabbitMQ
+from service.loginService import LoginService
+from time import sleep
 
 def login():
-    print("Agent 启动..................")
-    print("Agent 开始获取系统信息..................")
-    # 实例化这个类
-    sys_info = SystemInfo()
-    sys_info_data = sys_info.get_info()
-    # 实例化MQ
-    print("Agent 开始同步系统信息..................")
-    rabbitmq = RabbitMQ()
-    rabbitmq.produce_sysinfo(sys_info_data)
-    print("Agent 同步系统信息结束..................")
-    print("Agent 发送心跳的维持信息.................")
-    # 怎么去获取MAC地址
-    mac_address = sys_info.get_mac_address()
-    # 实例化心跳检测的类
-    heart_check = HeartCheck(mac_address,rabbitmq)
-    # 启动多线程
-    heart_check.start()
+    agent_key_pair = SignKeyPair()
+    agent_key_pair.load_pri(USER_PEM_PRI)
+    l = LoginService(server_pub_key=SERVER_PEM_PUB, amqp_url=get_amqp_url(HOST, PORT, USERNAME, PASSWORD, VHOST), \
+                    login_exchange='sysinfo_exchange', login_routing_key='sysinfo', login_recv_exchange=f'agent_{MAC.replace(":", "")}_exchange', login_recv_queue=f'agent_{MAC.replace(":", "")}_queue', \
+                    login_recv_routing_key=MAC.replace(":",""), heartbeat_exchange='sysinfo', heartbeat_queue='status_queue', heartbeat_routing_key='status', \
+                    agent_key_pair=agent_key_pair)
+    l.start()
+    return l
 
 def startup():
     for routing_info in CONSUMER_ROUTING:
@@ -33,14 +26,15 @@ def startup():
     default_consumer.start()
     default_publisher.start()
 
-def join():
+def join(l):
     default_consumer.join()
     default_publisher.join()
+    l.join()
 
 def main():
-    login()
+    l = login()
     startup()
-    join()
+    join(l)
 
 if __name__ == "__main__":
     main()
