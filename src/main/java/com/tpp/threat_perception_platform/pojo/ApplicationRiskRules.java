@@ -65,7 +65,7 @@ public class ApplicationRiskRules {
     /**
      * 规则状态
      */
-    private String status;
+    private Object status;
 
     /**
      * 创建时间
@@ -76,6 +76,11 @@ public class ApplicationRiskRules {
      * 更新时间
      */
     private Date updatedAt;
+
+    /**
+     * 主机操作系统类型
+     */
+    private String platform;
 
     /**
      * 主键ID
@@ -234,14 +239,14 @@ public class ApplicationRiskRules {
     /**
      * 规则状态
      */
-    public String getStatus() {
+    public Object getStatus() {
         return status;
     }
 
     /**
      * 规则状态
      */
-    public void setStatus(String status) {
+    public void setStatus(Object status) {
         this.status = status;
     }
 
@@ -273,6 +278,20 @@ public class ApplicationRiskRules {
         this.updatedAt = updatedAt;
     }
 
+    /**
+     * 主机操作系统类型
+     */
+    public String getPlatform() {
+        return platform;
+    }
+
+    /**
+     * 主机操作系统类型
+     */
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -298,7 +317,8 @@ public class ApplicationRiskRules {
             && (this.getRemediationAdvice() == null ? other.getRemediationAdvice() == null : this.getRemediationAdvice().equals(other.getRemediationAdvice()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
             && (this.getCreatedAt() == null ? other.getCreatedAt() == null : this.getCreatedAt().equals(other.getCreatedAt()))
-            && (this.getUpdatedAt() == null ? other.getUpdatedAt() == null : this.getUpdatedAt().equals(other.getUpdatedAt()));
+            && (this.getUpdatedAt() == null ? other.getUpdatedAt() == null : this.getUpdatedAt().equals(other.getUpdatedAt()))
+            && (this.getPlatform() == null ? other.getPlatform() == null : this.getPlatform().equals(other.getPlatform()));
     }
 
     @Override
@@ -319,6 +339,7 @@ public class ApplicationRiskRules {
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreatedAt() == null) ? 0 : getCreatedAt().hashCode());
         result = prime * result + ((getUpdatedAt() == null) ? 0 : getUpdatedAt().hashCode());
+        result = prime * result + ((getPlatform() == null) ? 0 : getPlatform().hashCode());
         return result;
     }
 
@@ -342,6 +363,7 @@ public class ApplicationRiskRules {
         sb.append(", status=").append(status);
         sb.append(", createdAt=").append(createdAt);
         sb.append(", updatedAt=").append(updatedAt);
+        sb.append(", platform=").append(platform);
         sb.append("]");
         return sb.toString();
     }

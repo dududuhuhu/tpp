@@ -14,11 +14,12 @@
             <result property="rulePayload" column="rule_payload" />
             <result property="remediationAdvice" column="remediation_advice" />
             <result property="isActive" column="is_active" />
+            <result property="platform" column="platform" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,risk_name,risk_level,risk_type,detection_method,rule_path,
-        rule_payload,remediation_advice,is_active
+        rule_payload,remediation_advice,is_active,platform
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -27,6 +28,7 @@
         from system_risk_rules
         where  id = #{id} 
     </select>
+
     <select id="selectAllRules" resultType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
         select
         <include refid="Base_Column_List" />
@@ -78,9 +80,9 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules" useGeneratedKeys="true">
         insert into system_risk_rules
         ( id,risk_name,risk_level,risk_type,detection_method,rule_path,
-        rule_payload,remediation_advice,is_active)
+        rule_payload,remediation_advice,is_active,platform)
         values (#{id},#{riskName},#{riskLevel},#{riskType},#{detectionMethod},#{rulePath},
-        #{rulePayload},#{remediationAdvice},#{isActive})
+        #{rulePayload},#{remediationAdvice},#{isActive},#{platform})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules" useGeneratedKeys="true">
         insert into system_risk_rules
@@ -94,6 +96,7 @@
                 <if test="rulePayload != null">rule_payload,</if>
                 <if test="remediationAdvice != null">remediation_advice,</if>
                 <if test="isActive != null">is_active,</if>
+                <if test="platform != null">platform,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="id != null">#{id},</if>
@@ -105,6 +108,7 @@
                 <if test="rulePayload != null">#{rulePayload},</if>
                 <if test="remediationAdvice != null">#{remediationAdvice},</if>
                 <if test="isActive != null">#{isActive},</if>
+                <if test="platform != null">#{platform},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.SystemRiskRules">
@@ -134,6 +138,9 @@
                 <if test="isActive != null">
                     is_active = #{isActive},
                 </if>
+                <if test="platform != null">
+                    platform = #{platform},
+                </if>
         </set>
         where   id = #{id} 
     </update>
@@ -147,7 +154,8 @@
             rule_path =  #{rulePath},
             rule_payload =  #{rulePayload},
             remediation_advice =  #{remediationAdvice},
-            is_active =  #{isActive}
+            is_active =  #{isActive},
+            platform =  #{platform}
         where   id = #{id} 
     </update>
 </mapper>

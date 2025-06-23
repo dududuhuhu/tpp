@@ -1,15 +1,14 @@
 package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.param.MyParam;
-import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
 import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
 
 import java.util.List;
 
 /**
-* @author dawn
+* @author 34617
 * @description 针对表【system_risk_rules(系统风险检测规则表)】的数据库操作Mapper
-* @createDate 2025-06-14 21:44:28
+* @createDate 2025-06-23 15:01:45
 * @Entity com.tpp.threat_perception_platform.pojo.SystemRiskRules
 */
 public interface SystemRiskRulesMapper {
@@ -33,4 +32,5 @@ public interface SystemRiskRulesMapper {
     List<SystemRiskRules> findRulesBySearchTypeAndKeywords(MyParam param);
 
     List<SystemRiskRules> findAll();
+
 }
