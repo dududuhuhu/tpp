@@ -52,6 +52,7 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
         String mac = weakpasswordRisk.getMac();
         AccountInfo db_account = accountInfoMapper.selectByNameAndMac(username,mac);
         db_account.setIsHarmful(1);
+        db_account.setHarmfulKey("弱密码风险");
         accountInfoMapper.updateByPrimaryKeySelective(db_account);
 
         // 添加

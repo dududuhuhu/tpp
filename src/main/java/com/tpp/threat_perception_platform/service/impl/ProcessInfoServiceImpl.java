@@ -21,7 +21,7 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
     private ProcessInfoMapper processInfoMapper;
 
     @Override
-    public ResponseResult save(ProcessInfo processInfo) {
+    public ResponseResult save(ProcessInfo processInfo,Timestamp now) {
         if (processInfo == null || processInfo.getMac() == null || processInfo.getMac().isEmpty()) {
             return new ResponseResult(1001, "MAC地址不能为空");
         }
@@ -32,12 +32,20 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
         // 检查是否存在重复记录
         ProcessInfo exist = processInfoMapper.selectByMacAndPid(processInfo.getMac(), processInfo.getPid());
         if (exist != null) {
-            return new ResponseResult(1003, "该进程已存在");
+            // 只更新时间
+            exist.setCollectTime(now);
+            int updated = processInfoMapper.updateByPrimaryKey(exist);
+            if (updated > 0) {
+                return new ResponseResult(0, "进程已存在，更新时间成功");
+            } else {
+                return new ResponseResult(1005, "更新时间失败");
+            }
         }
 
-        processInfo.setCollectTime(new Timestamp(System.currentTimeMillis()));
-        int result = processInfoMapper.insert(processInfo);
-        if (result > 0) {
+        // 新插入
+        processInfo.setCollectTime(now);
+        int inserted = processInfoMapper.insert(processInfo);
+        if (inserted > 0) {
             return new ResponseResult(0, "保存成功");
         } else {
             return new ResponseResult(1004, "保存失败");

@@ -8,6 +8,7 @@ import com.tpp.threat_perception_platform.pojo.AppInfo;
 import com.tpp.threat_perception_platform.pojo.ProcessInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.AppInfoService;
+import kotlin.time.TimeMark;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,18 +40,38 @@ public class AppInfoServiceImpl implements AppInfoService {
      * 保存 AppInfo
      */
     @Override
-    public ResponseResult saveApp(AppInfo appInfo) {
-        // 先查询是否已存在（根据 mac + display_name 判断是否重复）
-        AppInfo db_app = appInfoMapper.selectByMacAndDisplayName(appInfo.getMac(), appInfo.getDisplayName());
-        if (db_app != null) {
-            return new ResponseResult<>(1003, "该软件记录已存在！");
+    public ResponseResult saveApp(AppInfo appInfo, Timestamp now) {
+        if (appInfo == null || appInfo.getMac() == null || appInfo.getMac().isEmpty()) {
+            return new ResponseResult<>(1001, "MAC地址不能为空");
+        }
+        if (appInfo.getDisplayName() == null || appInfo.getDisplayName().isEmpty()) {
+            return new ResponseResult<>(1002, "软件名称不能为空");
         }
 
-        // 添加
-        appInfo.setCollectTime(new Timestamp(System.currentTimeMillis()));
-        appInfoMapper.insertSelective(appInfo);
-        return new ResponseResult<>(0, "添加成功！");
+
+        AppInfo db_app = appInfoMapper.selectByMacAndDisplayName(appInfo.getMac(), appInfo.getDisplayName());
+
+        if (db_app != null) {
+            // 软件存在，更新时间字段
+            db_app.setCollectTime(now);
+            int updateResult = appInfoMapper.updateByPrimaryKeySelective(db_app);
+            if (updateResult > 0) {
+                return new ResponseResult<>(0, "软件记录已存在，更新时间成功");
+            } else {
+                return new ResponseResult<>(1005, "更新时间失败");
+            }
+        } else {
+            // 软件不存在，插入新记录
+            appInfo.setCollectTime(now);
+            int insertResult = appInfoMapper.insertSelective(appInfo);
+            if (insertResult > 0) {
+                return new ResponseResult<>(0, "添加成功");
+            } else {
+                return new ResponseResult<>(1004, "添加失败");
+            }
+        }
     }
+
 
     /**
      * 更新 AppInfo

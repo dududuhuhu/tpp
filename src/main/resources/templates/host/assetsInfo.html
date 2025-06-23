@@ -229,18 +229,24 @@
                         {type: 'checkbox', fixed: 'left'},
                         {field: 'id', title: 'ID', width: 55},
                         {field: 'mac', title: 'MAC地址', width: 150},
-                        {field: 'name', title: '主机名', width: 150},
+                        {field: 'name', title: '主机名', width: 160},
                         {field: 'sid', title: 'SID', width: 180},
-                        {field: 'sidType', title: 'SID类型', width: 100},
-                        {field: 'status', title: '状态', width: 100},
-                        {field: 'disabled', title: '禁用', width: 80, templet: function(d) { return d.disabled === 1 ? '是' : '否'; }},
-                        {field: 'lockout', title: '锁定', width: 80, templet: function(d) { return d.lockout === 1 ? '是' : '否'; }},
-                        {field: 'passwordChangeable', title: '可改密码', width: 100, templet: function(d) { return d.passwordChangeable === 1 ? '是' : '否'; }},
-                        {field: 'passwordExpires', title: '密码过期', width: 100, templet: function(d) { return d.passwordExpires === 1 ? '是' : '否'; }},
-                        {field: 'passwordRequired', title: '密码必填', width: 100, templet: function(d) { return d.passwordRequired === 1 ? '是' : '否'; }},
+                        {field: 'sidType', title: 'SID类型', width: 82},
+                        {field: 'status', title: '状态', width: 95,templet:function (d){
+                            if(d.status==="OK"){
+                                return "<button class='layui-btn layui-btn-normal layui-btn-xs'>OK</button>";
+                            }else{
+                                return "<button class='layui-btn layui-btn-danger layui-btn-xs'>Degraded</button>";
+                            }
+                        }},
+                        {field: 'disabled', title: '禁用', width: 65, templet: function(d) { return d.disabled === 1 ? '<button class=\'layui-btn layui-btn-danger layui-btn-xs\'>是</button>' : '<button class=\'layui-btn layui-btn-normal layui-btn-xs\'>否</button>'; }},
+                        {field: 'lockout', title: '锁定', width: 65, templet: function(d) { return d.lockout === 1 ? '<button class=\'layui-btn layui-btn-danger layui-btn-xs\'>是</button>' : '<button class=\'layui-btn layui-btn-normal layui-btn-xs\'>否</button>'; }},
+                        {field: 'passwordChangeable', title: '可改密码', width: 86, templet: function(d) { return d.passwordChangeable === 1 ? '<button class=\'layui-btn layui-btn-danger layui-btn-xs\'>是</button>' : '<button class=\'layui-btn layui-btn-normal layui-btn-xs\'>否</button>'; }},
+                        {field: 'passwordExpires', title: '密码过期', width: 86, templet: function(d) { return d.passwordExpires === 1 ? '<button class=\'layui-btn layui-btn-danger layui-btn-xs\'>是</button>' : '<button class=\'layui-btn layui-btn-normal layui-btn-xs\'>否</button>'; }},
+                        {field: 'passwordRequired', title: '密码必填', width: 86, templet: function(d) { return d.passwordRequired === 1 ? '<button class=\'layui-btn layui-btn-danger layui-btn-xs\'>是</button>' : '<button class=\'layui-btn layui-btn-normal layui-btn-xs\'>否</button>'; }},
                         {field: 'createdAt', title: '创建时间', width: 160, templet: function(d) { return formatDate(d.createdAt); }},
                         {field: 'updatedAt', title: '更新时间', width: 160, templet: function(d) { return d.updatedAt ? formatDate(d.updatedAt) : formatDate(d.createdAt); }},
-                        {field: 'isHarmful', title: '是否风险', width: 150, templet: function(d) {
+                        {field: 'isHarmful', title: '是否风险', width: 87, templet: function(d) {
                                 if (d.isHarmful === 1) {
                                     return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
                                 } else {
@@ -260,7 +266,7 @@
                         {field:'protocol', title:'协议', width:80},
                         {field:'state', title:'状态', width:80},
                         {field:'version', title:'版本', width:80},
-                        {field:'extrainfo', title:'额外信息', width:80},
+                        {field:'extrainfo', title:'额外信息', width:100},
                     ]
                 ];
             } else if (url.includes('/host/processInfo')) {
@@ -270,12 +276,12 @@
                         {field: 'id', title: 'ID', width: 55},
                         {field: 'mac', title: 'MAC地址', width: 150},
                         {field: 'pid',title:'进程ID',width: 80},
-                        {field: 'ppid',title:'子进程ID',width: 80},
-                        {field: 'name',title:'进程名字',width: 80},
-                        {field: 'cmd',title:'命令行',width: 80},
-                        {field: 'priority', title: '优先权', width: 120},
-                        {field: 'description', title: '描述', width: 120},
-                        {field: 'collectTime', title: '探测时间', width: 120, templet: function (d) {
+                        {field: 'ppid',title:'子进程ID',width: 87},
+                        {field: 'name',title:'进程名字',width: 160},
+                        {field: 'cmd',title:'命令行',width: 72},
+                        {field: 'priority', title: '优先权', width: 73},
+                        {field: 'description', title: '描述', width: 160},
+                        {field: 'collectTime', title: '探测时间', width: 155, templet: function (d) {
                                 return formatDate(d.collectTime);
                             }}
                     ]
@@ -286,10 +292,10 @@
                         {type: 'checkbox', fixed: 'left'},
                         {field: 'id', title: 'ID', width: 55},
                         {field: 'mac', title: 'MAC地址', width: 150},
-                        {field: 'displayName', title: '应用名字', width: 120},
-                        {field: 'installLocation', title: '安装地址', width: 130},
-                        {field: 'uninstallString', title: '卸载地址', width: 120},
-                        {field: 'collectTime', title: '探测时间', width: 120, templet: function (d) {
+                        {field: 'displayName', title: '应用名字', width: 200},
+                        {field: 'installLocation', title: '安装地址', width: 150},
+                        {field: 'uninstallString', title: '卸载地址', width: 150},
+                        {field: 'collectTime', title: '探测时间', width: 155, templet: function (d) {
                                 return formatDate(d.collectTime);
                             }}
                     ]

@@ -34,7 +34,6 @@
         SELECT *
         FROM process_info
         WHERE mac = #{mac}
-          AND collect_time = (SELECT MAX(collect_time) FROM process_info WHERE mac=#{mac})
           AND pid = #{pid}
     </select>
 

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Component
@@ -223,9 +224,10 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个 AppInfo
             for (AppInfo appInfo : appInfoList) {
-                ResponseResult result = appInfoService.saveApp(appInfo);
+                ResponseResult result = appInfoService.saveApp(appInfo,now);
                 System.out.println("Save result: " + result.getMsg());
             }
 
@@ -253,9 +255,10 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             boolean allSuccess = true;
             for (ProcessInfo processInfo : processInfoList) {
-                ResponseResult result = processInfoService.save(processInfo);
+                ResponseResult result = processInfoService.save(processInfo,now);
                 if (result.getCode() != 0) {
                     allSuccess = false;
                     // 这里可以选择日志记录具体失败的 processInfo
@@ -287,6 +290,7 @@ public class RabbitSysInfoConsumer {
             List<AccountInfo> accountList = validateAndParseList(message, AccountInfo.class);
             if (accountList == null) {
                 channel.basicAck(deliveryTag, false);
+                System.out.println("账号序列为空！");
                 return;
             }
             boolean allSuccess = true;
@@ -329,7 +333,7 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "service_queue")
     public void receiveService(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
-        System.out.println("Received message: " + message);
+        System.out.println("Received service message: " + message);
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG); // 提前获取 deliveryTag
         boolean isAcked = false;
@@ -340,9 +344,11 @@ public class RabbitSysInfoConsumer {
             JSONArray jsonArray = validateAndParseJsonArray(message);
             if (jsonArray == null) {
                 channel.basicAck(deliveryTag, false);
+                System.out.println("签名验证失败！");
                 return;
             }
             if (jsonArray.isEmpty()) {
+                System.out.println("服务队列为空！");
                 throw new JSONException("Received empty JSON array");
             }
 

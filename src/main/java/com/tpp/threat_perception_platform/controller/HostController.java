@@ -66,10 +66,7 @@ public class HostController {
     // 获取账号信息
     @PostMapping("/host/accountInfo")
     public ResponseResult accountInfo(@RequestBody MyParam param) {
-        //        输出检查
         ResponseResult result = accountInfoService.accountList(param);
-//        输出result
-//        System.out.println(result);
         return result;
     }
 

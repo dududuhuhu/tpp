@@ -7,7 +7,7 @@ from work import AssetsDetect
 
 class RabbitMQ:
     def __init__(self):
-        self.__host = '192.168.138.166'
+        self.__host = '192.168.192.128'
         # self.__host = '10.100.1.136'
         self.__port = '4568'
         self.__user = 'admin'

@@ -1,5 +1,7 @@
 package com.tpp.threat_perception_platform.pojo;
 
+import java.util.Date;
+
 /**
  * 
  * @TableName service_info
@@ -49,6 +51,8 @@ public class ServiceInfo {
      * 
      */
     private String extrainfo;
+
+    private Date detectTime;
 
     /**
      * 
@@ -232,5 +236,13 @@ public class ServiceInfo {
         sb.append(", extrainfo=").append(extrainfo);
         sb.append("]");
         return sb.toString();
+    }
+
+    public Date getDetectTime() {
+        return detectTime;
+    }
+
+    public void setDetectTime(Date detectTime) {
+        this.detectTime = detectTime;
     }
 }
