@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.BaselineHardeningMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="name" column="name" />
+            <result property="result" column="result" />
+            <result property="updatedTime" column="updated_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,name,result,updated_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_hardening
+        where  id = #{id} 
+    </select>
+    <select id="selectByMacAndName" resultType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_hardening
+        where mac = #{mac} and name = #{name}
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_hardening
+        where updated_time = (SELECT MAX(updated_time) FROM baseline_hardening)
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from baseline_hardening
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening" useGeneratedKeys="true">
+        insert into baseline_hardening
+        ( id,mac,name,result,updated_time)
+        values (#{id},#{mac},#{name},#{result},#{updatedTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening" useGeneratedKeys="true">
+        insert into baseline_hardening
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="name != null">name,</if>
+                <if test="result != null">result,</if>
+                <if test="updatedTime != null">updated_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="name != null">#{name},</if>
+                <if test="result != null">#{result},</if>
+                <if test="updatedTime != null">#{updatedTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+        update baseline_hardening
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="name != null">
+                    name = #{name},
+                </if>
+                <if test="result != null">
+                    result = #{result},
+                </if>
+                <if test="updatedTime != null">
+                    updated_time = #{updatedTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+        update baseline_hardening
+        set 
+            mac =  #{mac},
+            name =  #{name},
+            result =  #{result},
+            updated_time =  #{updatedTime}
+        where   id = #{id} 
+    </update>
+</mapper>

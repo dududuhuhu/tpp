@@ -2,19 +2,16 @@ package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.rabbitmq.client.Channel;
 
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
-import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
+import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.LogParam;
-import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.*;
-import com.tpp.threat_perception_platform.response.AgentResponse;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
@@ -77,6 +74,12 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private RabbitService rabbitService;
+
+    @Autowired
+    private BaselineDetectService baselineDetectService;
+
+    @Autowired
+    private BaselineHardeningService baselineHardeningService;
 
     <T> T validateAndParseObject(String message, Class<T> clazz) {
         try {
@@ -723,6 +726,110 @@ public class RabbitSysInfoConsumer {
             e.printStackTrace();
             System.err.println("Failed to process login logs: " + message);
             // 出错也 ack，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    // 基线检查
+    @RabbitListener(queues = "baselineDetect_queue")
+    public void receiveBaselineDetect(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received BaselineDetect message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
+            List<BaselineDetect> baselineDetectList = JSON.parseArray(message, BaselineDetect.class);
+            if (baselineDetectList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 循环保存每一个
+            for (BaselineDetect baselineDetect: baselineDetectList) {
+                ResponseResult result = baselineDetectService.saveBaselineDetect(baselineDetect);
+                System.out.println("Save result: " + result.getMsg());
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+
+            // test
+            // ✅ 调用 baselineDetectList 展示分页列表
+            // 假设我们取第一条数据的 mac 作为参数（实际也可从原始 param 中构造）
+            if (!baselineDetectList.isEmpty()) {
+                String mac = baselineDetectList.get(0).getMac();
+
+                // 构造分页查询参数对象
+                BaselineDetectParam param = new BaselineDetectParam();
+                param.setMac(mac);
+                param.setPage(1);   // 默认第一页
+                param.setLimit(10); // 默认每页10条，可根据需要设置
+
+                // 调用服务层查询方法
+                ResponseResult pageResult = baselineDetectService.baselineDetectList(param);
+
+                // 打印分页结果（实际可返回给前端或日志系统）
+                System.out.println("分页查询结果：" + pageResult.getData());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "baselineHardening_queue")
+    public void receiveBaselineHardening(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received BaselineHardening message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
+            List<BaselineHardening> baselineHardeningList = JSON.parseArray(message, BaselineHardening.class);
+            if (baselineHardeningList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 循环保存每一个
+            for (BaselineHardening baselineHardening: baselineHardeningList) {
+                ResponseResult result = baselineHardeningService.saveBaselineHardening(baselineHardening);
+                System.out.println("Save result: " + result.getMsg());
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+
+            // test
+            // 假设我们取第一条数据的 mac 作为参数（实际也可从原始 param 中构造）
+            if (!baselineHardeningList.isEmpty()) {
+                String mac = baselineHardeningList.get(0).getMac();
+
+                // 构造分页查询参数对象
+                BaselineDetectParam param = new BaselineDetectParam();
+                param.setMac(mac);
+                param.setPage(1);   // 默认第一页
+                param.setLimit(10); // 默认每页10条，可根据需要设置
+
+                // 调用服务层查询方法
+                ResponseResult pageResult = baselineHardeningService.baselineHardeningList(param);
+
+                // 打印分页结果（实际可返回给前端或日志系统）
+                System.out.println("分页查询结果：" + pageResult.getData());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
             channel.basicAck(deliveryTag, false);
         }
     }

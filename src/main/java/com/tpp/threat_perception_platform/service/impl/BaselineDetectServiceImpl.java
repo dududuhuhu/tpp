@@ -1,86 +1,81 @@
 package com.tpp.threat_perception_platform.service.impl;
 
-import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.exception.ApiException;
-import com.alibaba.dashscope.exception.InputRequiredException;
-import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.tpp.threat_perception_platform.dao.AccountInfoMapper;
+import com.tpp.threat_perception_platform.dao.BaselineDetectMapper;
 import com.tpp.threat_perception_platform.dao.HostMapper;
-import com.tpp.threat_perception_platform.dao.LoginLogMapper;
-import com.tpp.threat_perception_platform.param.LogParam;
+import com.tpp.threat_perception_platform.param.BaselineDetectParam;
+import com.tpp.threat_perception_platform.pojo.BaselineDetect;
 import com.tpp.threat_perception_platform.pojo.Host;
-import com.tpp.threat_perception_platform.pojo.LoginLog;
 import com.tpp.threat_perception_platform.response.ResponseResult;
-import com.tpp.threat_perception_platform.service.LoginLogService;
+import com.tpp.threat_perception_platform.service.BaselineDetectService;
 import com.tpp.threat_perception_platform.service.RabbitService;
-import com.tpp.threat_perception_platform.utils.AIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class LoginLogServiceImpl implements LoginLogService {
+public class BaselineDetectServiceImpl implements BaselineDetectService {
 
     @Autowired
-    private LoginLogMapper loginLogMapper;
+    private BaselineDetectMapper baselineDetectMapper;
 
     @Autowired
     private HostMapper hostMapper;
-    @Autowired
-    private AccountInfoMapper accountInfoMapper;
+
     @Autowired
     private RabbitService rabbitService;
 
     /**
      * 保存
-     * @param loginLog
-     * @return
      */
     @Override
-    public ResponseResult saveLoginLog(LoginLog loginLog) {
+    public ResponseResult saveBaselineDetect(BaselineDetect baselineDetect) {
         // 先查询是否已存在
-        LoginLog db = loginLogMapper.selectByMacAndUsernameAndLoginTime(loginLog.getMac(), loginLog.getUsername(),loginLog.getLoginTime());
-        if (db != null) {
-            // 存在但更新
-            loginLog.setId(db.getId());
-            loginLogMapper.updateByMacAndUsernameAndLoginTime(loginLog);
-            // 强制更新某字段，让 ON UPDATE 生效
-            db.setIsRiskUser(db.getIsRiskUser()); // 即使值不变，强制设置
-            loginLogMapper.updateByPrimaryKey(db);
-            return new ResponseResult<>(1003, "该记录已存在！");
-        }
-
+        BaselineDetect db = baselineDetectMapper.selectByMacAndName(baselineDetect.getMac(), baselineDetect.getName());
         // 添加
-        loginLogMapper.insert(loginLog);
+        baselineDetect.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        if (db != null) {
+            // 若已存在，更新字段（只更新 updated_time 或者所有字段）
+            // 方式 1：只更新 updated_time
+            // db.setUpdatedTime(now);
+            // baselineDetectMapper.updateUpdatedTimeById(db);
+
+            // 方式 2：更新所有字段（推荐）
+            baselineDetect.setId(db.getId()); // 设置主键，用于 where 条件
+            baselineDetectMapper.updateByPrimaryKey(baselineDetect);
+
+            return new ResponseResult<>(0, "记录已存在，已更新时间戳");
+        }
+        baselineDetectMapper.insert(baselineDetect);
         return new ResponseResult<>(0, "添加成功！");
     }
 
     /**
-     * 查询
-     * @return
+     * 查询列表（分页）
      */
     @Override
-    public ResponseResult loginLogList(LogParam param){
+    public ResponseResult baselineDetectList(BaselineDetectParam param) {
+        String mac= param.getMac();
+        System.out.println("mac:"+mac);
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
-        List<LoginLog> loginLogList = loginLogMapper.findAll(param);
+        List<BaselineDetect> baselineDetectList = baselineDetectMapper.findAll();
         // 构架pageInfo
-        PageInfo<LoginLog> pageInfo = new PageInfo<>(loginLogList);
+        PageInfo<BaselineDetect> pageInfo = new PageInfo<>(baselineDetectList);
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
 
     @Override
-    public ResponseResult loginLogDiscovery() {
-        String type="loginLog";
+    public ResponseResult baselineDetectDiscovery() {
+        String type="baselineDetect";
         List<Host> db_hostList = hostMapper.findAll();
         if(db_hostList.isEmpty()){
             return new ResponseResult<>(1003,"无主机在线！");
@@ -90,9 +85,9 @@ public class LoginLogServiceImpl implements LoginLogService {
             if (host != null && host.getUpdateTime() != null && new Date().getTime() - host.getUpdateTime().getTime() < 4000)
             {
                 Map<String, Object> map = new HashMap<>();
-                map.put("type", "loginLog");
-                List<String> names = accountInfoMapper.selectAllNamesByMac(host.getMacAddress());
-                map.put("username",names);
+                map.put("type", "baselineDetect");
+//                List<String> names = accountInfoMapper.selectAllNamesByMac(host.getMacAddress());
+//                map.put("username",names);
                 String json = JSON.toJSONString(map);  // 结果是 {"type":"auditLog"}
                 // 组装队列的名字
                 String routingKey=host.getMacAddress().replace(":","");
@@ -101,5 +96,4 @@ public class LoginLogServiceImpl implements LoginLogService {
         }
         return new ResponseResult(0, "开始同步，请稍后查看！");
     }
-
 }

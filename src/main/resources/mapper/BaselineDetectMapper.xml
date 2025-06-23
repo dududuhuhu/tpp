@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.BaselineDetectMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="name" column="name" />
+            <result property="result" column="result" />
+            <result property="currentValue" column="current_value" />
+            <result property="recommendedValue" column="recommended_value" />
+            <result property="description" column="description" />
+            <result property="updatedTime" column="updated_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,name,result,current_value,recommended_value,
+        description,updated_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_detect
+        where  id = #{id} 
+    </select>
+    <select id="selectByMacAndName" resultType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_detect
+        where mac = #{mac} and name = #{name}
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_detect
+        where updated_time = (SELECT MAX(updated_time) FROM baseline_detect)
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from baseline_detect
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineDetect" useGeneratedKeys="true">
+        insert into baseline_detect
+        ( id,mac,name,result,current_value,recommended_value,
+        description,updated_time)
+        values (#{id},#{mac},#{name},#{result},#{currentValue},#{recommendedValue},
+        #{description},#{updatedTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineDetect" useGeneratedKeys="true">
+        insert into baseline_detect
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="name != null">name,</if>
+                <if test="result != null">result,</if>
+                <if test="currentValue != null">current_value,</if>
+                <if test="recommendedValue != null">recommended_value,</if>
+                <if test="description != null">description,</if>
+                <if test="updatedTime != null">updated_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="name != null">#{name},</if>
+                <if test="result != null">#{result},</if>
+                <if test="currentValue != null">#{currentValue},</if>
+                <if test="recommendedValue != null">#{recommendedValue},</if>
+                <if test="description != null">#{description},</if>
+                <if test="updatedTime != null">#{updatedTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        update baseline_detect
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="name != null">
+                    name = #{name},
+                </if>
+                <if test="result != null">
+                    result = #{result},
+                </if>
+                <if test="currentValue != null">
+                    current_value = #{currentValue},
+                </if>
+                <if test="recommendedValue != null">
+                    recommended_value = #{recommendedValue},
+                </if>
+                <if test="description != null">
+                    description = #{description},
+                </if>
+                <if test="updatedTime != null">
+                    updated_time = #{updatedTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        update baseline_detect
+        set 
+            mac =  #{mac},
+            name =  #{name},
+            result =  #{result},
+            current_value =  #{currentValue},
+            recommended_value =  #{recommendedValue},
+            description =  #{description},
+            updated_time =  #{updatedTime}
+        where   id = #{id} 
+    </update>
+</mapper>
