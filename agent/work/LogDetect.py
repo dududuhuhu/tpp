@@ -14,7 +14,7 @@ def to_beijing_time(utc_str):
 class AuditLogDetector:
     def __init__(self, data: dict):
         self.path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-        self.start_time = datetime.now() - timedelta(hours=24)
+        self.start_time = datetime.now() - timedelta(days=7)
         self.end_time = datetime.now()
 
     def detect(self):
@@ -82,9 +82,9 @@ class AuditLogDetector:
 class LoginLogDetector:
     def __init__(self, data: dict):
         self.path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-        self.start_time = datetime.now() - timedelta(hours=24)
+        self.start_time = datetime.now() - timedelta(days=3)
         self.end_time = datetime.now()
-        self.suspicious_users = data.get('suspicious_users', ["test1", "guest", "hacker", "backdoor"])
+        self.suspicious_users = data.get('suspicious_users', ["dawn", "test", "test_log", "test_audit"])
         self.risk_hours = [0, 1, 2, 3, 4]  # 0点～4点为高风险时间段
 
     def detect(self):
@@ -155,7 +155,7 @@ import win32security
 class AccountChangeLogDetector:
     def __init__(self, data: dict = None):
         self.path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-        self.start_time = datetime.now() - timedelta(hours=24)
+        self.start_time = datetime.now() - timedelta(days=3)
         self.end_time = datetime.now()
 
         # 支持分析的事件 ID 与初始简要描述

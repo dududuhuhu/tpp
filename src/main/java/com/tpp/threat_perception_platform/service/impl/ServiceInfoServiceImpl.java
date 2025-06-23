@@ -4,9 +4,11 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.ServiceInfoMapper;
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.pojo.AccountInfo;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.pojo.ServiceInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
@@ -15,6 +17,7 @@ import com.tpp.threat_perception_platform.utils.AIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -157,7 +160,6 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
     @Override
     public ResponseResult selectByHostId(Long hostId) {
         List<com.tpp.threat_perception_platform.pojo.ServiceInfo> serviceList = serviceInfoMapper.selectByHostId(hostId);
-        if (!serviceList.isEmpty()) serviceInfoMapper.deleteByHostId(hostId);
         return new ResponseResult<>(0, serviceList);
     }
 
@@ -167,8 +169,14 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
         Long id = hostMapper.selectByMacAddress(mac).getId();
         PageHelper.startPage(param.getPage(), param.getLimit());
 
-        List<com.tpp.threat_perception_platform.pojo.ServiceInfo> serviceList = serviceInfoMapper.selectByHostId(Long.valueOf(id));
-        if (!serviceList.isEmpty()) serviceInfoMapper.deleteByHostId(Long.valueOf(id));
-        return new ResponseResult<>(0, serviceList);
+        // 查询方法会被分页插件拦截
+        List<ServiceInfo> serviceList = serviceInfoMapper.selectByHostId(Long.valueOf(id));
+
+        // PageHelper 会自动分页并计算 total
+        PageInfo<ServiceInfo> pageInfo = new PageInfo<>(serviceList);
+
+        // 正确返回 total 和当前页数据
+        return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
 }

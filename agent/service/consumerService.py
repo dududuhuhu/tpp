@@ -11,6 +11,7 @@ from work.VulnerabilityDetect import VulnerabilityDetect
 from work.AssetsDetect import *
 from threading import Thread
 from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
+from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
 
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
@@ -21,8 +22,11 @@ def wrapper(routing_key, detector, publisher, need_publish):
 def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
     try:
         print(body.decode('utf-8'))
-        data = json.loads(body.decode('utf-8'))
-        print(f"Received message: {data}")
+        _body = json.loads(body.decode('utf-8'))
+        if not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig'])):
+            return
+
+        data = json.loads(_body['message'])
         detector = None
         routing_key = data['type']
         if data['type'] == 'hotfix':

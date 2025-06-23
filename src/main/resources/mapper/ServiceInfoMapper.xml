@@ -14,11 +14,12 @@
             <result property="product" column="product" />
             <result property="version" column="version" />
             <result property="extrainfo" column="extrainfo" />
+            <result property="detectTime" column="detect_time" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,host_id,port,name,state,protocol,
-        product,version,extrainfo
+        product,version,extrainfo,detect_time
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -28,11 +29,20 @@
         where  id = #{id} 
     </select>
     <select id="selectByHostId" resultType="com.tpp.threat_perception_platform.pojo.ServiceInfo">
-        select
+        SELECT
         <include refid="Base_Column_List" />
-        from service_info
-        where host_id = #{hostId}
+        FROM
+        service_info
+        WHERE
+        host_id = #{hostId}
+        AND detect_time = (
+        SELECT MAX(detect_time)
+        FROM service_info
+        WHERE host_id = #{hostId}
+        )
+        ORDER BY id
     </select>
+
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from service_info
@@ -49,7 +59,7 @@
         values
             (#{id}, #{hostId}, #{port}, #{name}, #{state}, #{protocol},
              #{product}, #{version}, #{extrainfo},
-             #{isHarmful}, #{harmfulKey})
+             #{isHarmful}, #{harmfulKey},#{detectTime})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo" useGeneratedKeys="true">
@@ -64,6 +74,7 @@
                 <if test="product != null">product,</if>
                 <if test="version != null">version,</if>
                 <if test="extrainfo != null">extrainfo,</if>
+                <if test="detectTime !=null">detect_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="id != null">#{id},</if>
@@ -75,20 +86,26 @@
                 <if test="product != null">#{product},</if>
                 <if test="version != null">#{version},</if>
                 <if test="extrainfo != null">#{extrainfo},</if>
+                <if test="detectTime != null">#{detectTime},</if>
         </trim>
     </insert>
     <insert id="insertBatch">
-        insert into service_info (host_id, name, port, protocol, state, version)
+        insert into service_info (
+        host_id, name, port, protocol, state, version, detect_time
+        )
         values
         <foreach collection="list" item="service" separator=",">
-            (#{hostId}, #{service.name}, #{service.port}, #{service.protocol}, #{service.state}, #{service.version})
+            (#{service.hostId}, #{service.name}, #{service.port}, #{service.protocol},
+            #{service.state}, #{service.version}, #{service.detectTime})
         </foreach>
         on duplicate key update
         name = values(name),
         protocol = values(protocol),
         state = values(state),
-        version = values(version)
+        version = values(version),
+        detect_time = values(detect_time)
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo">
         update service_info
         <set>
@@ -116,6 +133,9 @@
                 <if test="extrainfo != null">
                     extrainfo = #{extrainfo},
                 </if>
+                <if test="detectTime!=null">
+                    detect_time=#{detectTime},
+                </if>
         </set>
         where   id = #{id} 
     </update>
@@ -129,7 +149,8 @@
             protocol =  #{protocol},
             product =  #{product},
             version =  #{version},
-            extrainfo =  #{extrainfo}
+            extrainfo =  #{extrainfo},
+            detect_time = #{detectTime}
         where   id = #{id} 
     </update>
 

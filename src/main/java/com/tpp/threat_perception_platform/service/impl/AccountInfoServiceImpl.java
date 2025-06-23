@@ -96,24 +96,28 @@ public class AccountInfoServiceImpl implements AccountInfoService {
                 accountInfo.getPasswordRequired()
         );
 
-        try {
-            // 调用 AI 分析
-            GenerationResult result = AIUtils.callWithMessage(prompt);
-            String content = result.getOutput().getChoices().get(0).getMessage().getContent();
+            try {
+                // 调用 AI 分析
+                GenerationResult result = AIUtils.callWithMessage(prompt);
+                String content = result.getOutput().getChoices().get(0).getMessage().getContent();
 
-            content = content.replaceAll("(?i)```json", "")
-                    .replaceAll("```", "")
-                    .trim();
+                // 清理可能的多余标记
+                content = content.replaceAll("(?i)```json", "")
+                        .replaceAll("```", "")
+                        .trim();
 
-            JSONObject jsonObject = JSON.parseObject(content);
+                // 解析 JSON
+                JSONObject jsonObject = JSON.parseObject(content);
 
-            accountInfo.setIsHarmful(jsonObject.getInteger("is_harmful"));
-            accountInfo.setHarmfulKey(jsonObject.getString("harmful_key"));
+                // 设置 AccountInfo 字段
+                accountInfo.setIsHarmful(jsonObject.getInteger("is_harmful"));
+                accountInfo.setHarmfulKey(jsonObject.getString("harmful_key"));
 
-        } catch (Exception e) {
-            accountInfo.setIsHarmful(0);
-            accountInfo.setHarmfulKey("AI分析失败: " + e.getMessage());
-        }
+            } catch (Exception e) {
+                // 如果 AI 调用失败，默认安全
+                accountInfo.setIsHarmful(0);
+                accountInfo.setHarmfulKey("AI分析失败: " + e.getMessage());
+            }
 
         Date now = new Date();
         accountInfo.setCreatedAt(now);

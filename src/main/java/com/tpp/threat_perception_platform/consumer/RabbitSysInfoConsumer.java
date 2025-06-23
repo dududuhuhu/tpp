@@ -2,19 +2,16 @@ package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.rabbitmq.client.Channel;
 
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
-import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
+import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.LogParam;
-import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.*;
-import com.tpp.threat_perception_platform.response.AgentResponse;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.*;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Component
@@ -77,6 +75,12 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private RabbitService rabbitService;
+
+    @Autowired
+    private BaselineDetectService baselineDetectService;
+
+    @Autowired
+    private BaselineHardeningService baselineHardeningService;
 
     <T> T validateAndParseObject(String message, Class<T> clazz) {
         try {
@@ -219,6 +223,8 @@ public class RabbitSysInfoConsumer {
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
+            // 反序列化 JSON → AppInfo 对象
+            // List<AppInfo> appInfoList = JSON.parseArray(message, AppInfo.class);
             List<AppInfo> appInfoList = validateAndParseList(message, AppInfo.class);
             if (appInfoList == null) {
                 channel.basicAck(deliveryTag, false);
@@ -226,6 +232,8 @@ public class RabbitSysInfoConsumer {
             }
             boolean allSuccess = true;
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            // 循环保存每一个 AppInfo
             for (AppInfo appInfo : appInfoList) {
                 // 设置默认风险状态
                 appInfo.setIsHarmful(0);
@@ -265,12 +273,15 @@ public class RabbitSysInfoConsumer {
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
+            // List<ProcessInfo> processInfoList = JSON.parseArray(message, ProcessInfo.class);
             List<ProcessInfo> processInfoList = validateAndParseList(message, ProcessInfo.class);
+            // 验证失败直接确认，返回
             if (processInfoList == null) {
                 channel.basicAck(deliveryTag, false);
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             boolean allSuccess = true;
 
             for (ProcessInfo processInfo : processInfoList) {
@@ -307,52 +318,32 @@ public class RabbitSysInfoConsumer {
 
 
     @RabbitListener(queues = "account_queue")
-    public void receiveAccount(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+    public void receiveAccount(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received message: " + message);
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-
-        // 简单规则库：只检测 name = guest，不区分大小写
-        Map<String, List<String>> ruleMap = new HashMap<>();
-        ruleMap.put("name", Arrays.asList("guest"));
 
         try {
             // List<AccountInfo> accountList = JSON.parseArray(message, AccountInfo.class);
             List<AccountInfo> accountList = validateAndParseList(message, AccountInfo.class);
             if (accountList == null) {
                 channel.basicAck(deliveryTag, false);
+                System.out.println("账号序列为空！");
                 return;
             }
             boolean allSuccess = true;
 
+            // 设置创建时间、更新时间
+            Date now = new Date();
+
             for (AccountInfo account : accountList) {
-                boolean isHarmful = false;
-                String harmfulKey = null;
-
-                for (Map.Entry<String, List<String>> entry : ruleMap.entrySet()) {
-                    String field = entry.getKey();
-                    List<String> harmfulValues = entry.getValue();
-
-                    try {
-                        Field declaredField = AccountInfo.class.getDeclaredField(field);
-                        declaredField.setAccessible(true);
-                        Object value = declaredField.get(account);
-
-                        if (value != null && harmfulValues.stream().anyMatch(v -> v.equalsIgnoreCase(value.toString()))) {
-                            isHarmful = true;
-                            harmfulKey = field;
-                            break;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                account.setIsHarmful(isHarmful ? 1 : 0);
-                account.setHarmfulKey(isHarmful ? harmfulKey : null);
+//                // 直接设置isHarmful为false
+//                account.setIsHarmful(0); // 假设isHarmful字段是int类型，0表示false
+//                account.setHarmfulKey(null); // 清空harmfulKey字段
 
                 try {
-                    int res = accountInfoService.analyzeAndSaveAccountInfo(account);
+                    // AI辅助判断账户风险性
+                    int res = accountInfoService.analyzeAndSaveAccountInfo(account,now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save account: " + account);
@@ -388,6 +379,7 @@ public class RabbitSysInfoConsumer {
             List<ServiceInfo> serviceList = validateAndParseList(message, ServiceInfo.class);
             if (serviceList == null) {
                 channel.basicAck(deliveryTag, false);
+                System.out.println("签名验证失败！");
                 return;
             }
 
@@ -582,7 +574,7 @@ public class RabbitSysInfoConsumer {
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
                 ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
-                System.out.println("Save result: " + result.getMsg());
+                System.out.println("Save weakpasswordsRisk result: " + result.getMsg());
             }
 
             // 手动 ack
@@ -754,6 +746,110 @@ public class RabbitSysInfoConsumer {
             e.printStackTrace();
             System.err.println("Failed to process login logs: " + message);
             // 出错也 ack，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    // 基线检查
+    @RabbitListener(queues = "baselineDetect_queue")
+    public void receiveBaselineDetect(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received BaselineDetect message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
+            List<BaselineDetect> baselineDetectList = JSON.parseArray(message, BaselineDetect.class);
+            if (baselineDetectList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 循环保存每一个
+            for (BaselineDetect baselineDetect: baselineDetectList) {
+                ResponseResult result = baselineDetectService.saveBaselineDetect(baselineDetect);
+                System.out.println("Save result: " + result.getMsg());
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+
+            // test
+            // ✅ 调用 baselineDetectList 展示分页列表
+            // 假设我们取第一条数据的 mac 作为参数（实际也可从原始 param 中构造）
+            if (!baselineDetectList.isEmpty()) {
+                String mac = baselineDetectList.get(0).getMac();
+
+                // 构造分页查询参数对象
+                BaselineDetectParam param = new BaselineDetectParam();
+                param.setMac(mac);
+                param.setPage(1);   // 默认第一页
+                param.setLimit(10); // 默认每页10条，可根据需要设置
+
+                // 调用服务层查询方法
+                ResponseResult pageResult = baselineDetectService.baselineDetectList(param);
+
+                // 打印分页结果（实际可返回给前端或日志系统）
+                System.out.println("分页查询结果：" + pageResult.getData());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
+    @RabbitListener(queues = "baselineHardening_queue")
+    public void receiveBaselineHardening(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+        System.out.println("Received BaselineHardening message: " + message);
+        try {
+            // 反序列化 JSON → 对象
+            // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
+            List<BaselineHardening> baselineHardeningList = JSON.parseArray(message, BaselineHardening.class);
+            if (baselineHardeningList == null) {
+                Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 循环保存每一个
+            for (BaselineHardening baselineHardening: baselineHardeningList) {
+                ResponseResult result = baselineHardeningService.saveBaselineHardening(baselineHardening);
+                System.out.println("Save result: " + result.getMsg());
+            }
+
+            // 手动 ack
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            channel.basicAck(deliveryTag, false);
+
+            // test
+            // 假设我们取第一条数据的 mac 作为参数（实际也可从原始 param 中构造）
+            if (!baselineHardeningList.isEmpty()) {
+                String mac = baselineHardeningList.get(0).getMac();
+
+                // 构造分页查询参数对象
+                BaselineDetectParam param = new BaselineDetectParam();
+                param.setMac(mac);
+                param.setPage(1);   // 默认第一页
+                param.setLimit(10); // 默认每页10条，可根据需要设置
+
+                // 调用服务层查询方法
+                ResponseResult pageResult = baselineHardeningService.baselineHardeningList(param);
+
+                // 打印分页结果（实际可返回给前端或日志系统）
+                System.out.println("分页查询结果：" + pageResult.getData());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process hotfix message: " + message);
+
+            // 即使出错，也 ack，避免消息积压
+            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
             channel.basicAck(deliveryTag, false);
         }
     }

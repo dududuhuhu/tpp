@@ -2,6 +2,8 @@ package com.tpp.threat_perception_platform.pojo;
 
 import java.util.Objects;
 
+import java.util.Date;
+
 /**
  * 
  * @TableName service_info
@@ -118,6 +120,8 @@ public class ServiceInfo {
      */
     private String harmfulKey;
 
+
+    private Date detectTime;
 
     /**
      * 
@@ -244,5 +248,14 @@ public class ServiceInfo {
     public void setExtrainfo(String extrainfo) {
         this.extrainfo = extrainfo;
     }
+
+    public Date getDetectTime() {
+        return detectTime;
+    }
+
+    public void setDetectTime(Date detectTime) {
+        this.detectTime = detectTime;
+    }
+}
 
 }

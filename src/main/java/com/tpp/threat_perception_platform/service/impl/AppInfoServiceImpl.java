@@ -136,7 +136,6 @@ public class AppInfoServiceImpl implements AppInfoService {
         }
     }
 
-
     /**
      * 更新 AppInfo
      */

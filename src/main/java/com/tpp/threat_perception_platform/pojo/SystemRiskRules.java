@@ -51,6 +51,11 @@ public class SystemRiskRules {
     private Integer isActive;
 
     /**
+     * 主机操作系统类型
+     */
+    private String platform;
+
+    /**
      * 主键
      */
     public Integer getId() {
@@ -176,6 +181,20 @@ public class SystemRiskRules {
         this.isActive = isActive;
     }
 
+    /**
+     * 主机操作系统类型
+     */
+    public String getPlatform() {
+        return platform;
+    }
+
+    /**
+     * 主机操作系统类型
+     */
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -196,7 +215,8 @@ public class SystemRiskRules {
             && (this.getRulePath() == null ? other.getRulePath() == null : this.getRulePath().equals(other.getRulePath()))
             && (this.getRulePayload() == null ? other.getRulePayload() == null : this.getRulePayload().equals(other.getRulePayload()))
             && (this.getRemediationAdvice() == null ? other.getRemediationAdvice() == null : this.getRemediationAdvice().equals(other.getRemediationAdvice()))
-            && (this.getIsActive() == null ? other.getIsActive() == null : this.getIsActive().equals(other.getIsActive()));
+            && (this.getIsActive() == null ? other.getIsActive() == null : this.getIsActive().equals(other.getIsActive()))
+            && (this.getPlatform() == null ? other.getPlatform() == null : this.getPlatform().equals(other.getPlatform()));
     }
 
     @Override
@@ -212,6 +232,7 @@ public class SystemRiskRules {
         result = prime * result + ((getRulePayload() == null) ? 0 : getRulePayload().hashCode());
         result = prime * result + ((getRemediationAdvice() == null) ? 0 : getRemediationAdvice().hashCode());
         result = prime * result + ((getIsActive() == null) ? 0 : getIsActive().hashCode());
+        result = prime * result + ((getPlatform() == null) ? 0 : getPlatform().hashCode());
         return result;
     }
 
@@ -230,6 +251,7 @@ public class SystemRiskRules {
         sb.append(", rulePayload=").append(rulePayload);
         sb.append(", remediationAdvice=").append(remediationAdvice);
         sb.append(", isActive=").append(isActive);
+        sb.append(", platform=").append(platform);
         sb.append("]");
         return sb.toString();
     }

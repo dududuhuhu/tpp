@@ -5,6 +5,8 @@ import com.tpp.threat_perception_platform.pojo.AccountInfo;
 import com.tpp.threat_perception_platform.pojo.ProcessInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.sql.Timestamp;
+
 public interface ProcessInfoService {
     public int analyzeAndSaveProcessInfo(ProcessInfo processInfo);
 

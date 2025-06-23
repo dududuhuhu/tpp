@@ -5,12 +5,13 @@ import com.tpp.threat_perception_platform.pojo.AccountInfo;
 import com.tpp.threat_perception_platform.pojo.AppInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.sql.Timestamp;
+
 public interface AppInfoService {
 
     public ResponseResult appList(MyParam param);
 
-
-
+    public ResponseResult saveApp(AppInfo appInfo);
 
     public ResponseResult editApp(AppInfo appInfo);
 
