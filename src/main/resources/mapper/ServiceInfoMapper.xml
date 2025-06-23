@@ -43,11 +43,15 @@
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo" useGeneratedKeys="true">
         insert into service_info
-        ( id,host_id,port,name,state,protocol,
-        product,version,extrainfo)
-        values (#{id},#{hostId},#{port},#{name},#{state},#{protocol},
-        #{product},#{version},#{extrainfo})
+        (id, host_id, port, name, state, protocol,
+         product, version, extrainfo,
+         is_harmful, harmful_key)
+        values
+            (#{id}, #{hostId}, #{port}, #{name}, #{state}, #{protocol},
+             #{product}, #{version}, #{extrainfo},
+             #{isHarmful}, #{harmfulKey})
     </insert>
+
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo" useGeneratedKeys="true">
         insert into service_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -128,4 +132,14 @@
             extrainfo =  #{extrainfo}
         where   id = #{id} 
     </update>
+
+    <select id="selectByHostIdAndPortAndProtocol" resultType="com.tpp.threat_perception_platform.pojo.ServiceInfo">
+        SELECT *
+        FROM service_info
+        WHERE host_id = #{hostId}
+          AND port = #{port}
+          AND protocol = #{protocol}
+            LIMIT 1
+    </select>
+
 </mapper>

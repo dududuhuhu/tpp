@@ -1,5 +1,7 @@
 package com.tpp.threat_perception_platform.pojo;
 
+import java.util.Objects;
+
 /**
  * 
  * @TableName service_info
@@ -13,7 +15,8 @@ public class ServiceInfo {
     /**
      * 
      */
-    private Integer hostId;
+    private Long hostId;
+
 
     /**
      * 
@@ -50,6 +53,72 @@ public class ServiceInfo {
      */
     private String extrainfo;
 
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
+    private String mac;
+
+    public Integer getIsHarmful() {
+        return isHarmful;
+    }
+
+    public void setIsHarmful(Integer isHarmful) {
+        this.isHarmful = isHarmful;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ServiceInfo that)) return false;
+        return Objects.equals(id, that.id) && Objects.equals(hostId, that.hostId) && Objects.equals(port, that.port) && Objects.equals(name, that.name) && Objects.equals(state, that.state) && Objects.equals(protocol, that.protocol) && Objects.equals(product, that.product) && Objects.equals(version, that.version) && Objects.equals(extrainfo, that.extrainfo) && Objects.equals(isHarmful, that.isHarmful) && Objects.equals(harmfulKey, that.harmfulKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, hostId, port, name, state, protocol, product, version, extrainfo, isHarmful, harmfulKey);
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceInfo{" +
+                "id=" + id +
+                ", hostId=" + hostId +
+                ", port=" + port +
+                ", name='" + name + '\'' +
+                ", state='" + state + '\'' +
+                ", protocol='" + protocol + '\'' +
+                ", product='" + product + '\'' +
+                ", version='" + version + '\'' +
+                ", extrainfo='" + extrainfo + '\'' +
+                ", isHarmful=" + isHarmful +
+                ", harmfulKey='" + harmfulKey + '\'' +
+                '}';
+    }
+
+    /**
+     *
+     */
+    private Integer isHarmful;
+
+    public String getHarmfulKey() {
+        return harmfulKey;
+    }
+
+    public void setHarmfulKey(String harmfulKey) {
+        this.harmfulKey = harmfulKey;
+    }
+
+    /**
+     *
+     */
+    private String harmfulKey;
+
+
     /**
      * 
      */
@@ -67,14 +136,14 @@ public class ServiceInfo {
     /**
      * 
      */
-    public Integer getHostId() {
+    public Long getHostId() {
         return hostId;
     }
 
     /**
      * 
      */
-    public void setHostId(Integer hostId) {
+    public void setHostId(Long hostId) {
         this.hostId = hostId;
     }
 
@@ -176,61 +245,4 @@ public class ServiceInfo {
         this.extrainfo = extrainfo;
     }
 
-    @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        ServiceInfo other = (ServiceInfo) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getHostId() == null ? other.getHostId() == null : this.getHostId().equals(other.getHostId()))
-            && (this.getPort() == null ? other.getPort() == null : this.getPort().equals(other.getPort()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getState() == null ? other.getState() == null : this.getState().equals(other.getState()))
-            && (this.getProtocol() == null ? other.getProtocol() == null : this.getProtocol().equals(other.getProtocol()))
-            && (this.getProduct() == null ? other.getProduct() == null : this.getProduct().equals(other.getProduct()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getExtrainfo() == null ? other.getExtrainfo() == null : this.getExtrainfo().equals(other.getExtrainfo()));
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getHostId() == null) ? 0 : getHostId().hashCode());
-        result = prime * result + ((getPort() == null) ? 0 : getPort().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getState() == null) ? 0 : getState().hashCode());
-        result = prime * result + ((getProtocol() == null) ? 0 : getProtocol().hashCode());
-        result = prime * result + ((getProduct() == null) ? 0 : getProduct().hashCode());
-        result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
-        result = prime * result + ((getExtrainfo() == null) ? 0 : getExtrainfo().hashCode());
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", hostId=").append(hostId);
-        sb.append(", port=").append(port);
-        sb.append(", name=").append(name);
-        sb.append(", state=").append(state);
-        sb.append(", protocol=").append(protocol);
-        sb.append(", product=").append(product);
-        sb.append(", version=").append(version);
-        sb.append(", extrainfo=").append(extrainfo);
-        sb.append("]");
-        return sb.toString();
-    }
 }

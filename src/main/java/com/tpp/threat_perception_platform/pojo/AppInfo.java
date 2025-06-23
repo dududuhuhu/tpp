@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.pojo;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 
@@ -16,6 +17,18 @@ public class AppInfo {
      * 
      */
     private String mac;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AppInfo appInfo)) return false;
+        return Objects.equals(id, appInfo.id) && Objects.equals(mac, appInfo.mac) && Objects.equals(displayName, appInfo.displayName) && Objects.equals(installLocation, appInfo.installLocation) && Objects.equals(uninstallString, appInfo.uninstallString) && Objects.equals(collectTime, appInfo.collectTime) && Objects.equals(isHarmful, appInfo.isHarmful) && Objects.equals(harmfulKey, appInfo.harmfulKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, mac, displayName, installLocation, uninstallString, collectTime, isHarmful, harmfulKey);
+    }
 
     /**
      * 
@@ -36,6 +49,46 @@ public class AppInfo {
      * 
      */
     private Date collectTime;
+
+    public Integer getIsHarmful() {
+        return isHarmful;
+    }
+
+    public void setIsHarmful(Integer isHarmful) {
+        this.isHarmful = isHarmful;
+    }
+
+    /**
+     *
+     */
+    private Integer isHarmful;
+
+    public String getHarmfulKey() {
+        return harmfulKey;
+    }
+
+    public void setHarmfulKey(String harmfulKey) {
+        this.harmfulKey = harmfulKey;
+    }
+
+    @Override
+    public String toString() {
+        return "AppInfo{" +
+                "id=" + id +
+                ", mac='" + mac + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", installLocation='" + installLocation + '\'' +
+                ", uninstallString='" + uninstallString + '\'' +
+                ", collectTime=" + collectTime +
+                ", isHarmful=" + isHarmful +
+                ", harmfulKey='" + harmfulKey + '\'' +
+                '}';
+    }
+
+    /**
+     *
+     */
+    private String harmfulKey;
 
     /**
      * 
@@ -121,52 +174,4 @@ public class AppInfo {
         this.collectTime = collectTime;
     }
 
-    @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        AppInfo other = (AppInfo) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getMac() == null ? other.getMac() == null : this.getMac().equals(other.getMac()))
-            && (this.getDisplayName() == null ? other.getDisplayName() == null : this.getDisplayName().equals(other.getDisplayName()))
-            && (this.getInstallLocation() == null ? other.getInstallLocation() == null : this.getInstallLocation().equals(other.getInstallLocation()))
-            && (this.getUninstallString() == null ? other.getUninstallString() == null : this.getUninstallString().equals(other.getUninstallString()))
-            && (this.getCollectTime() == null ? other.getCollectTime() == null : this.getCollectTime().equals(other.getCollectTime()));
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getMac() == null) ? 0 : getMac().hashCode());
-        result = prime * result + ((getDisplayName() == null) ? 0 : getDisplayName().hashCode());
-        result = prime * result + ((getInstallLocation() == null) ? 0 : getInstallLocation().hashCode());
-        result = prime * result + ((getUninstallString() == null) ? 0 : getUninstallString().hashCode());
-        result = prime * result + ((getCollectTime() == null) ? 0 : getCollectTime().hashCode());
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", mac=").append(mac);
-        sb.append(", displayName=").append(displayName);
-        sb.append(", installLocation=").append(installLocation);
-        sb.append(", uninstallString=").append(uninstallString);
-        sb.append(", collectTime=").append(collectTime);
-        sb.append("]");
-        return sb.toString();
-    }
 }

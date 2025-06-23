@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.pojo;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 
@@ -51,6 +52,62 @@ public class ProcessInfo {
      * 
      */
     private Date collectTime;
+
+    public Integer getIsHarmful() {
+        return isHarmful;
+    }
+
+    public void setIsHarmful(Integer isHarmful) {
+        this.isHarmful = isHarmful;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProcessInfo that)) return false;
+        return Objects.equals(id, that.id) && Objects.equals(mac, that.mac) && Objects.equals(pid, that.pid) && Objects.equals(ppid, that.ppid) && Objects.equals(name, that.name) && Objects.equals(cmd, that.cmd) && Objects.equals(priority, that.priority) && Objects.equals(description, that.description) && Objects.equals(collectTime, that.collectTime) && Objects.equals(isHarmful, that.isHarmful) && Objects.equals(harmfulKey, that.harmfulKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, mac, pid, ppid, name, cmd, priority, description, collectTime, isHarmful, harmfulKey);
+    }
+
+    /**
+     *
+     */
+    private Integer isHarmful;
+
+    public String getHarmfulKey() {
+        return harmfulKey;
+    }
+
+    public void setHarmfulKey(String harmfulKey) {
+        this.harmfulKey = harmfulKey;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessInfo{" +
+                "id=" + id +
+                ", mac='" + mac + '\'' +
+                ", pid=" + pid +
+                ", ppid=" + ppid +
+                ", name='" + name + '\'' +
+                ", cmd='" + cmd + '\'' +
+                ", priority=" + priority +
+                ", description='" + description + '\'' +
+                ", collectTime=" + collectTime +
+                ", isHarmful=" + isHarmful +
+                ", harmfulKey='" + harmfulKey + '\'' +
+                '}';
+    }
+
+    /**
+     *
+     */
+    private String harmfulKey;
+
 
     /**
      * 
@@ -178,61 +235,4 @@ public class ProcessInfo {
         this.collectTime = collectTime;
     }
 
-    @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        ProcessInfo other = (ProcessInfo) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getMac() == null ? other.getMac() == null : this.getMac().equals(other.getMac()))
-            && (this.getPid() == null ? other.getPid() == null : this.getPid().equals(other.getPid()))
-            && (this.getPpid() == null ? other.getPpid() == null : this.getPpid().equals(other.getPpid()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getCmd() == null ? other.getCmd() == null : this.getCmd().equals(other.getCmd()))
-            && (this.getPriority() == null ? other.getPriority() == null : this.getPriority().equals(other.getPriority()))
-            && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
-            && (this.getCollectTime() == null ? other.getCollectTime() == null : this.getCollectTime().equals(other.getCollectTime()));
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getMac() == null) ? 0 : getMac().hashCode());
-        result = prime * result + ((getPid() == null) ? 0 : getPid().hashCode());
-        result = prime * result + ((getPpid() == null) ? 0 : getPpid().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getCmd() == null) ? 0 : getCmd().hashCode());
-        result = prime * result + ((getPriority() == null) ? 0 : getPriority().hashCode());
-        result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
-        result = prime * result + ((getCollectTime() == null) ? 0 : getCollectTime().hashCode());
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", mac=").append(mac);
-        sb.append(", pid=").append(pid);
-        sb.append(", ppid=").append(ppid);
-        sb.append(", name=").append(name);
-        sb.append(", cmd=").append(cmd);
-        sb.append(", priority=").append(priority);
-        sb.append(", description=").append(description);
-        sb.append(", collectTime=").append(collectTime);
-        sb.append("]");
-        return sb.toString();
-    }
 }

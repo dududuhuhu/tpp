@@ -45,35 +45,41 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo" useGeneratedKeys="true">
         insert into process_info
         ( id,mac,pid,ppid,name,cmd,
-        priority,description,collect_time)
+          priority,description,collect_time,is_harmful,harmful_key)
         values (#{id},#{mac},#{pid},#{ppid},#{name},#{cmd},
-        #{priority},#{description},#{collectTime})
+                #{priority},#{description},#{collectTime},#{isHarmful},#{harmfulKey})
     </insert>
+
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo" useGeneratedKeys="true">
         insert into process_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="id != null">id,</if>
-                <if test="mac != null">mac,</if>
-                <if test="pid != null">pid,</if>
-                <if test="ppid != null">ppid,</if>
-                <if test="name != null">name,</if>
-                <if test="cmd != null">cmd,</if>
-                <if test="priority != null">priority,</if>
-                <if test="description != null">description,</if>
-                <if test="collectTime != null">collect_time,</if>
+            <if test="id != null">id,</if>
+            <if test="mac != null">mac,</if>
+            <if test="pid != null">pid,</if>
+            <if test="ppid != null">ppid,</if>
+            <if test="name != null">name,</if>
+            <if test="cmd != null">cmd,</if>
+            <if test="priority != null">priority,</if>
+            <if test="description != null">description,</if>
+            <if test="collectTime != null">collect_time,</if>
+            <if test="isHarmful != null">is_harmful,</if>
+            <if test="harmfulKey != null">harmful_key,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="id != null">#{id},</if>
-                <if test="mac != null">#{mac},</if>
-                <if test="pid != null">#{pid},</if>
-                <if test="ppid != null">#{ppid},</if>
-                <if test="name != null">#{name},</if>
-                <if test="cmd != null">#{cmd},</if>
-                <if test="priority != null">#{priority},</if>
-                <if test="description != null">#{description},</if>
-                <if test="collectTime != null">#{collectTime},</if>
+            <if test="id != null">#{id},</if>
+            <if test="mac != null">#{mac},</if>
+            <if test="pid != null">#{pid},</if>
+            <if test="ppid != null">#{ppid},</if>
+            <if test="name != null">#{name},</if>
+            <if test="cmd != null">#{cmd},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="description != null">#{description},</if>
+            <if test="collectTime != null">#{collectTime},</if>
+            <if test="isHarmful != null">#{isHarmful},</if>
+            <if test="harmfulKey != null">#{harmfulKey},</if>
         </trim>
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
         update process_info
         <set>

@@ -213,29 +213,48 @@ public class RabbitSysInfoConsumer {
      * 监听队列 app_info_queue，自动处理消息
      */
     @RabbitListener(queues = "app_queue")
-    public void receiveAppInfo(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+    public void receiveAppInfo(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
         System.out.println("Received AppInfo message: " + message);
+
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
         try {
-            // 反序列化 JSON → AppInfo 对象
-            // List<AppInfo> appInfoList = JSON.parseArray(message, AppInfo.class);
             List<AppInfo> appInfoList = validateAndParseList(message, AppInfo.class);
             if (appInfoList == null) {
+                channel.basicAck(deliveryTag, false);
                 return;
             }
+            boolean allSuccess = true;
 
-            // 循环保存每一个 AppInfo
             for (AppInfo appInfo : appInfoList) {
-                ResponseResult result = appInfoService.saveApp(appInfo);
-                System.out.println("Save result: " + result.getMsg());
+                // 设置默认风险状态
+                appInfo.setIsHarmful(0);
+                appInfo.setHarmfulKey(null);
+
+                try {
+                    int res = appInfoService.analyzeAndSaveAppInfo(appInfo);
+                    if (res <= 0) {
+                        allSuccess = false;
+                        System.err.println("Failed to save appInfo: " + appInfo);
+                    }
+                } catch (Exception e) {
+                    allSuccess = false;
+                    e.printStackTrace();
+                }
+            }
+
+            if (allSuccess) {
+                channel.basicAck(deliveryTag, false);
+                System.out.println("AppInfo message processed successfully and ACKed");
+            } else {
+                channel.basicNack(deliveryTag, false, true);
+                System.err.println("Some appInfo failed to save, message NACKed and requeued");
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Failed to process AppInfo message: " + message);
-        }
-        finally {
-            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
-            channel.basicAck(deliveryTag, false);
+            System.err.println("Error processing appInfo message: " + e.getMessage());
+            channel.basicNack(deliveryTag, false, true);
+            throw e;
         }
     }
 
@@ -244,37 +263,48 @@ public class RabbitSysInfoConsumer {
         System.out.println("Received process info message: " + message);
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
         try {
-            // List<ProcessInfo> processInfoList = JSON.parseArray(message, ProcessInfo.class);
             List<ProcessInfo> processInfoList = validateAndParseList(message, ProcessInfo.class);
-            // 验证失败直接确认，返回
             if (processInfoList == null) {
                 channel.basicAck(deliveryTag, false);
                 return;
             }
 
             boolean allSuccess = true;
+
             for (ProcessInfo processInfo : processInfoList) {
-                ResponseResult result = processInfoService.save(processInfo);
-                if (result.getCode() != 0) {
+                // 设置默认风险状态
+                processInfo.setIsHarmful(0);
+                processInfo.setHarmfulKey(null);
+
+                try {
+                    int res = processInfoService.analyzeAndSaveProcessInfo(processInfo);
+                    if (res <= 0) {
+                        allSuccess = false;
+                        System.err.println("Failed to save processInfo: " + processInfo);
+                    }
+                } catch (Exception e) {
                     allSuccess = false;
-                    // 这里可以选择日志记录具体失败的 processInfo
-                    System.err.println("Failed to save processInfo: " + processInfo);
+                    e.printStackTrace();
                 }
             }
 
             if (allSuccess) {
                 channel.basicAck(deliveryTag, false);
+                System.out.println("ProcessInfo message processed successfully and ACKed");
             } else {
-                // 部分失败，视业务是否重试，先丢弃消息不重回队列
-                channel.basicNack(deliveryTag, false, false);
+                channel.basicNack(deliveryTag, false, true);
+                System.err.println("Some processInfo failed to save, message NACKed and requeued");
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            channel.basicNack(deliveryTag, false, false);
+            System.err.println("Error processing processInfo message: " + e.getMessage());
+            channel.basicNack(deliveryTag, false, true);
+            throw e;
         }
     }
+
 
     @RabbitListener(queues = "account_queue")
     public void receiveAccount(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
@@ -350,43 +380,44 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "service_queue")
     public void receiveService(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
-        System.out.println("Received message: " + message);
+        System.out.println("Received service message: " + message);
 
-        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG); // 提前获取 deliveryTag
-        boolean isAcked = false;
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
-            // 解析 JSON 数组
-            // JSONArray jsonArray = JSON.parseArray(message);
-            JSONArray jsonArray = validateAndParseJsonArray(message);
-            if (jsonArray == null) {
+            List<ServiceInfo> serviceList = validateAndParseList(message, ServiceInfo.class);
+            if (serviceList == null) {
                 channel.basicAck(deliveryTag, false);
                 return;
             }
-            if (jsonArray.isEmpty()) {
-                throw new JSONException("Received empty JSON array");
+
+            boolean allSuccess = true;
+
+            for (ServiceInfo service : serviceList) {
+                try {
+                    int res = serviceInfoService.analyzeAndSaveServiceInfo(service);
+                    if (res <= 0) {
+                        allSuccess = false;
+                        System.err.println("Failed to save service: " + service);
+                    }
+                } catch (Exception e) {
+                    allSuccess = false;
+                    e.printStackTrace();
+                }
             }
 
-            // 提取 macAddress 和 services
-            String macAddress = jsonArray.getJSONObject(0).getString("mac"); // 假设每个 JSON 对象都有 "mac" 字段
-            List<ServiceInfo> services = jsonArray.toJavaList(ServiceInfo.class);
-
-            System.out.println("macAddress: " + macAddress);
-            System.out.println("services: " + services);
-
-            serviceInfoService.saveService(macAddress, services);
-            isAcked = true; // 标记消息已成功处理
-        } catch (JSONException e) {
-            System.err.println("JSONException: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Exception: " + e.getMessage());
-        } finally {
-            if (!isAcked) {
-                System.out.println("Message processing failed. Rejecting message with delivery tag: " + deliveryTag);
-                channel.basicNack(deliveryTag, false, true); // 拒绝消息并重新入队
+            if (allSuccess) {
+                channel.basicAck(deliveryTag, false);
+                System.out.println("Service message processed successfully and ACKed");
             } else {
-                channel.basicAck(deliveryTag, false); // 确认消息
+                channel.basicNack(deliveryTag, false, true);
+                System.err.println("Some services failed to save, message NACKed and requeued");
             }
+
+        } catch (Exception e) {
+            System.err.println("Error processing service message: " + e.getMessage());
+            channel.basicNack(deliveryTag, false, true);
+            throw e;
         }
     }
 
