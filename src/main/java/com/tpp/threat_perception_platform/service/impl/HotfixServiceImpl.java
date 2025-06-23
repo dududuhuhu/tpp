@@ -46,13 +46,15 @@ public class HotfixServiceImpl implements HotfixService {
     @Override
     public ResponseResult saveHotfix(Hotfix hotfix) {
         // 先查询是否已存在（根据 mac + hotfixId 判断是否重复）
-        Hotfix db_app = hotfixMapper.selectByMacAndHotfixId(hotfix.getMac(), hotfix.getHotfixId());
-        if (db_app != null) {
+        Hotfix db = hotfixMapper.selectByMacAndHotfixId(hotfix.getMac(), hotfix.getHotfixId());
+        if (db != null) {
+            // 若已存在，更新字段（只更新 updated_time 或者所有字段）
+            hotfix.setId(db.getId()); // 设置主键，用于 where 条件
+            hotfixMapper.updateByPrimaryKey(hotfix);
             return new ResponseResult<>(1003, "该补丁记录已存在！");
         }
 
         // 添加
-
         hotfixMapper.insertSelective(hotfix);
         return new ResponseResult<>(0, "添加成功！");
     }
