@@ -10,6 +10,7 @@ import com.rabbitmq.client.Channel;
 
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
@@ -496,15 +497,18 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (Hotfix hotfix : hotfixList) {
-                ResponseResult result = hotfixService.saveHotfix(hotfix);
+                ResponseResult result = hotfixService.saveHotfix(hotfix,now);
                 System.out.println("Save result: " + result.getMsg());
                 // test: 提取危险补丁并输出
                 if (!hotfixList.isEmpty()) {
                     String mac = hotfix.getMac();
-                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(mac);
-                    List<DangerousHotfix> dangerousList = response.getData();
+                    HotfixParam param=null;
+                    param.setMacAddress(mac);
+//                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(param);
+//                    List<DangerousHotfix> dangerousList = response.getData();
                 } else {
                     System.out.println("未收到任何 Hotfix 数据，跳过危险补丁检测");
                 }

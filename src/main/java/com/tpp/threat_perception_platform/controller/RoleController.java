@@ -17,7 +17,6 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-
     @PostMapping("/role/list")
     public ResponseResult roleList(MyParam param) {
         return roleService.roleList(param);

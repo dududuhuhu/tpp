@@ -1,7 +1,10 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.HotfixMapper;
 import com.tpp.threat_perception_platform.dao.WinCveDbMapper;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.pojo.Hotfix;
 import com.tpp.threat_perception_platform.pojo.WinCveDb;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
@@ -10,6 +13,7 @@ import com.tpp.threat_perception_platform.service.HotfixService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,15 +48,16 @@ public class HotfixServiceImpl implements HotfixService {
      * 保存
      */
     @Override
-    public ResponseResult saveHotfix(Hotfix hotfix) {
+    public ResponseResult saveHotfix(Hotfix hotfix, Timestamp now) {
         // 先查询是否已存在（根据 mac + hotfixId 判断是否重复）
         Hotfix db_app = hotfixMapper.selectByMacAndHotfixId(hotfix.getMac(), hotfix.getHotfixId());
         if (db_app != null) {
+            db_app.setUpdatedTime(now);
+            hotfixMapper.updateByPrimaryKey(db_app);
             return new ResponseResult<>(1003, "该补丁记录已存在！");
         }
-
         // 添加
-
+        hotfix.setUpdatedTime(now);
         hotfixMapper.insertSelective(hotfix);
         return new ResponseResult<>(0, "添加成功！");
     }
@@ -66,25 +71,34 @@ public class HotfixServiceImpl implements HotfixService {
 //        return new ResponseResult<>(0, "更新成功！");
 //    }
 
-    @Override
-    public ResponseResult<List<DangerousHotfix>> getDangerousPatches(String mac) {
-        // 默认返回前100条
-        return getDangerousPatch(1, 100);
-    }
+//    @Override
+//    public ResponseResult<List<DangerousHotfix>> getDangerousPatches(String mac) {
+//        // 默认返回前100条
+//        return getDangerousPatch(1, 100);
+//    }
 
     @Override
-    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(Integer page, Integer limit) {
-        List<Hotfix> allHotfixes = hotfixMapper.findAll();
+    public ResponseResult<List<DangerousHotfix>> getDangerousPatch(HotfixParam param) {
+        int page = param.getPage() != null ? param.getPage() : 1;
+        int limit = param.getLimit() != null ? param.getLimit() : 10;
+
+        PageHelper.startPage(page, limit); // 启动分页
+        System.out.println("hotfixparam:"+param);
+
+        // === 查询补丁列表 ===
+        List<Hotfix> allHotfixes;
+        if (param.getMacAddress() != null && !param.getMacAddress().isEmpty()) {
+            allHotfixes = hotfixMapper.findByMac(param.getMacAddress());
+        } else {
+            allHotfixes = hotfixMapper.findAll();
+        }
+        System.out.println("allHotfixes:"+allHotfixes);
+
         List<DangerousHotfix> result = new ArrayList<>();
-
-        System.out.println("开始探测危险补丁：");
         for (Hotfix hotfix : allHotfixes) {
             String hotfixId = hotfix.getHotfixId();
-            System.out.println(hotfixId);
             List<WinCveDb> matchedCves = winCveDbMapper.findByHotfixId(hotfixId);
-
             for (WinCveDb cve : matchedCves) {
-                System.out.println(cve);
                 DangerousHotfix vo = new DangerousHotfix();
                 vo.setMacAddress(hotfix.getMac());
                 vo.setHotfixId(hotfixId);
@@ -94,15 +108,10 @@ public class HotfixServiceImpl implements HotfixService {
             }
         }
 
-        // 手动分页
-        int fromIndex = (page - 1) * limit;
-        int toIndex = Math.min(fromIndex + limit, result.size());
-        List<DangerousHotfix> pageList = (fromIndex >= result.size()) ? new ArrayList<>() : result.subList(fromIndex, toIndex);
+        // PageInfo 包装分页信息（注意：分页的是 result）
+        PageInfo<DangerousHotfix> pageInfo = new PageInfo<>(result);
 
-        System.out.println("=== 危险补丁分页列表 ===");
-        pageList.forEach(System.out::println);
-
-        return new ResponseResult<>((long) result.size(), pageList);
+        return new ResponseResult<>(pageInfo.getTotal(),pageInfo.getList());
     }
 
 }

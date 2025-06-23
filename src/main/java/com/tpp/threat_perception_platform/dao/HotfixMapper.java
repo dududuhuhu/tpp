@@ -29,4 +29,6 @@ public interface HotfixMapper {
     Hotfix selectByMacAndHotfixId(String mac, String hotfixId);
 
     List<String> getHotfixIdsByMac(String mac);
+
+    List<Hotfix> findByMac(String macAddress);
 }

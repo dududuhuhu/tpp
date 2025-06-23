@@ -28,7 +28,13 @@
         where  id = #{id} 
     </select>
     <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
-        SELECT * FROM process_info WHERE mac = #{mac} ORDER BY collect_time DESC
+        SELECT *
+        FROM process_info
+        WHERE mac = #{mac}
+          AND collect_time = (
+            SELECT MAX(collect_time) FROM process_info WHERE mac = #{mac}
+        )
+        ORDER BY pid
     </select>
     <select id="selectByMacAndPid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
         SELECT *

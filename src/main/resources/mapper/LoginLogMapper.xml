@@ -37,8 +37,6 @@
         select
         <include refid="Base_Column_List" />
         from login_log
-        where create_time = (SELECT MAX(create_time) FROM login_log)
-        FROM login_log
         <where>
             <if test="mac != null and mac != ''">
                 AND mac = #{mac}

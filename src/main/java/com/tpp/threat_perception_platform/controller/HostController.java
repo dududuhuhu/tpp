@@ -40,7 +40,6 @@ public class HostController {
     private VulnerabilityService vulnerabilityService;
     @Autowired
     private ApplicationRiskService applicationRiskService;
-
     @Autowired
     private SystemRiskService systemRiskService;
 
@@ -48,12 +47,10 @@ public class HostController {
     public ResponseResult hostList(MyParam param){
         return hostService.hostList(param);
     }
-
     @PostMapping("/host/delete")
     public ResponseResult hostDelete(@RequestParam("ids[]") Integer[] ids){
         return hostService.deleteHost(ids);
     }
-
     @PostMapping("/host/save")
     public int hostSave(@RequestBody Host host){
         return hostService.saveHost(host);
@@ -63,42 +60,31 @@ public class HostController {
         return hostService.editHost(host);
     }
 
+
+
     // 获取账号信息
     @PostMapping("/host/accountInfo")
     public ResponseResult accountInfo(@RequestBody MyParam param) {
         ResponseResult result = accountInfoService.accountList(param);
         return result;
     }
-
     // 获取服务信息
     @PostMapping("/host/serviceInfo")
     public ResponseResult serviceInfo(@RequestBody MyParam param) {
-        System.out.println(param);
         return serviceInfoService.retrieveAssetsService(param);
     }
-
     // 获取进程信息
     @PostMapping("/host/processInfo")
     public ResponseResult processInfo(@RequestBody MyParam param) {
         // 打印接收到的参数
-        System.out.println(param);
-        System.out.println("macAddress: " + param.getMacAddress());
-        System.out.println("page: " + param.getPage());
-        System.out.println("limit: " + param.getLimit());
         return processInfoService.processInfoList(param);
     }
-
     // 获取应用信息
     @PostMapping("/host/appInfo")
     public ResponseResult appInfo(@RequestBody MyParam param ) {
-        System.out.println(param);
-        // 打印接收到的参数
-        System.out.println("macAddress: " + param.getMacAddress());
-        System.out.println("page: " + param.getPage());
-        System.out.println("limit: " + param.getLimit());
-
         return appInfoService.appList(param);
     }
+
 
     /**
      * 资产探测
@@ -112,13 +98,13 @@ public class HostController {
 
     @PostMapping("/host/appRiskDiscovery")
     public ResponseResult appRiskDiscovery(@RequestBody ApplicationRiskParam param){
-        System.out.println(param);
+//        System.out.println(param);
         return hostService.appRiskDiscovery(param);
     }
 
     @PostMapping("/host/systemRiskDiscovery")
     public ResponseResult systemRiskDiscovery(@RequestBody SystemRiskParam param){
-        System.out.println(param);
+//        System.out.println(param);
         return hostService.systemRiskDiscovery(param);
     }
 
@@ -147,9 +133,10 @@ public class HostController {
      */
     @PostMapping("/host/dangerousHotfixRisk")
     public ResponseResult<List<DangerousHotfix>> getDangerousPatches(@RequestBody HotfixParam param) {
-        System.out.println("param:"+param);
-        System.out.println("param.mac:"+param.getMacAddress());
-        return hotfixService.getDangerousPatch(param.getPage(), param.getLimit());
+        System.out.println("param.macAddress: " + param.getMacAddress());
+        System.out.println("param.page: " + param.getPage());
+        System.out.println("param.limit: " + param.getLimit());
+        return hotfixService.getDangerousPatch(param);
     }
 
     /**

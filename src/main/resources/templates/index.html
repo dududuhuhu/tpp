@@ -115,10 +115,7 @@
                 <i class="layui-icon layui-icon-list"></i>
                 <a lay-href="/page/host/list">主机列表</a>
               </dd>
-              <dd>
-                <i class="layui-icon layui-icon-table"></i>
-                <a lay-href="hospital_info_mangement/doctor/list.html">资产类型</a>
-              </dd>
+
             </dl>
           </li>
           <!--风险发现管理-->
@@ -285,6 +282,30 @@
 
 
         })
+
+        // 获取权限路径
+        const pathList = JSON.parse(localStorage.getItem("accessiblePathList") || "[]");
+        console.log("pathList:",pathList);
+        const isAdmin = pathList.includes("/");
+
+        // 允许访问的具体路径集合
+        const allowedUserPaths = ['/user/login', '/user/logout'];
+
+        // 判断是否有基础数据权限（角色、权限管理等路径）
+        const hasBaseDataPermission = isAdmin || pathList.some(path =>
+                path.startsWith("/role/") || path.startsWith("/access/")
+        );
+
+        // 判断当前用户是否有权限访问/user相关页面（只允许特定两个路径）
+        const hasUserPagePermission = isAdmin || allowedUserPaths.some(allowedPath =>
+                pathList.includes(allowedPath)
+        );
+
+        // 根据权限隐藏菜单
+        if (!hasBaseDataPermission) {
+          $('li[data-name="procurement"]').remove();  // 隐藏基础数据菜单
+        }
+
       })
     })
 </script>

@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.AccChgReportService;
@@ -39,11 +40,17 @@ public class ReportController {
         return loginActionService.loginActionReportList(param);
     }
 
-
     @PostMapping("audit/result")
     public ResponseResult Auditreport(@RequestBody LogParam param) {
         System.out.println("param:"+param);
         System.out.println("report:"+loginActionService.loginActionReportList(param));
         return loginActionService.loginActionReportList(param);
     }
+    @PostMapping("/hotfix/analyze")
+    public ResponseResult analyzeHotfix(@RequestBody HotfixParam param) {
+        String mac=param.getMacAddress();
+        System.out.println("mac:"+mac);
+        return new ResponseResult(0,"success");
+    }
+
 }
