@@ -21,4 +21,5 @@ public interface HotfixService {
 
     public ResponseResult<List<DangerousHotfix>> getDangerousPatch(Integer page, Integer limit);
 
+    ResponseResult analyzeAndSaveHotfixRiskReport(List<DangerousHotfix> hotfixes, String mac);
 }
