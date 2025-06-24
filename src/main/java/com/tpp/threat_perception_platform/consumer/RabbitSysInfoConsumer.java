@@ -11,6 +11,7 @@ import com.rabbitmq.client.Channel;
 
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.LogRulesMapper;
+import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
@@ -54,6 +55,10 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private ApplicationRiskService applicationRiskService;
+
+    @Autowired
+    private ApplicationRiskRulesMapper applicationRiskRulesMapper;
+
 
 
     @Autowired
@@ -435,50 +440,60 @@ public class RabbitSysInfoConsumer {
         boolean allSuccess = true;
 
         try {
-            // 解析消息为参数列表
-            // List<ApplicationRisk> paramList = JSON.parseArray(message, ApplicationRisk.class);
+            // 解析消息为 ApplicationRisk 简化版列表（只含 ruleId 和 mac）
             List<ApplicationRisk> paramList = validateAndParseList(message, ApplicationRisk.class);
-            if (paramList == null) {
+            if (paramList == null || paramList.isEmpty()) {
+                System.err.println("No valid risk params found in message.");
+                channel.basicAck(deliveryTag, false);
                 return;
             }
 
             for (ApplicationRisk param : paramList) {
                 try {
-                    // 转换并赋值检测时间
                     ApplicationRisk appRisk = new ApplicationRisk();
                     BeanUtils.copyProperties(param, appRisk);
                     appRisk.setDetectionTime(new Date());
-                    appRisk.setMac(param.getMac());
-                    // 保存到数据库
+
+                    // 查 risk_name
+                    String riskName = applicationRiskRulesMapper.selectRiskNameById(param.getRuleId());
+                    if (riskName == null || riskName.trim().isEmpty()) {
+                        riskName = "未知风险";
+                    }
+                    appRisk.setRiskName(riskName);
+
+                    // 保存
                     ResponseResult result = applicationRiskService.saveAppRisk(appRisk);
-                    System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
-                            param, result.getCode(), result.getMsg());
+                    System.out.printf("Risk detection result: ruleId=%d, mac=%s, code=%d, msg=%s%n",
+                            param.getRuleId(), param.getMac(), result.getCode(), result.getMsg());
 
                     if (result.getCode() != 0) {
                         allSuccess = false;
-                        System.err.printf("Failed to save risk info for param: %s%n", param);
+                        System.err.printf("Failed to save risk info for ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
                     }
+
                 } catch (Exception e) {
                     allSuccess = false;
-                    System.err.printf("Exception while saving risk info for param %s:%n", param);
+                    System.err.printf("Exception while saving risk info: ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
                     e.printStackTrace();
                 }
             }
+
         } catch (Exception e) {
             allSuccess = false;
             System.err.println("Exception while processing risk message:");
             e.printStackTrace();
+
         } finally {
             if (allSuccess) {
                 channel.basicAck(deliveryTag, false);
-                System.out.println("All risk messages processed successfully, ACKed.");
+                System.out.println("All ApplicationRisk messages processed successfully, ACKed.");
             } else {
-                // 出错时决定是否重试，这里设为重试
                 channel.basicNack(deliveryTag, false, true);
-                System.err.println("Some risk messages failed, message NACKed and requeued.");
+                System.err.println("Some ApplicationRisk messages failed, message NACKed and requeued.");
             }
         }
     }
+
 
     @RabbitListener(queues = "systemRisk_queue")
     public void receiveSystemRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {

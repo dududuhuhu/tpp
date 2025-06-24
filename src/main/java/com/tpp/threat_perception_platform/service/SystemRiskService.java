@@ -24,4 +24,12 @@ public interface SystemRiskService {
     ResponseResult getRiskCount(SystemRiskParam param);
 
     Integer countSystemRisks();
+    /**
+     * 根据mac分析应用风险记录并生成AI报告
+     * @param mac 主机MAC地址
+     * @return 响应结果，包含报告内容
+     */
+    ResponseResult analyzeAndSaveSystemRiskReport(String mac);
+
+
 }

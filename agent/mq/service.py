@@ -125,10 +125,6 @@ class Service(Thread):
                                  callback=cb)
 
     def _on_bindok(self, frame, userdata):
-        # self._bind_count += 1
-        # if self._bind_count < len(self._queue_key_pairs):
-        #     return
-        # self._start_publishing()
         queue_name = userdata
         logger.info("Queue %s bound to exchange %s", queue_name, self._exchange)
         self._queue_key_pairs[queue_name] = (self._queue_key_pairs[queue_name][0], True)
@@ -136,6 +132,15 @@ class Service(Thread):
             if not bound:
                 return
         self._app_on_bindok(frame, userdata)
+    
+    def timed_task_schedule(self, interval, callback):
+        """
+        Schedule a task to run periodically.
+        :param interval: Time interval in seconds.
+        :param callback: The function to call.
+        """
+        if self._channel and self._channel.is_open:
+            self._connection.ioloop.call_later(interval, callback)
     
     def _app_on_bindok(self, frame, userdata):
         pass
