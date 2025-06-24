@@ -10,11 +10,13 @@
             <result property="displayName" column="display_name" />
             <result property="installLocation" column="install_location" />
             <result property="uninstallString" column="uninstall_string" />
+            <result property="isHarmful" column="is_harmful" />
+            <result property="harmfulKey" column="harmful_key" />
             <result property="collectTime" column="collect_time" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,mac,display_name,install_location,uninstall_string,collect_time
+        id,mac,display_name,install_location,uninstall_string,is_harmful,harmful_key,collect_time
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

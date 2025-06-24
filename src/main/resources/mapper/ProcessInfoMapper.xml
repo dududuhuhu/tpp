@@ -13,12 +13,14 @@
             <result property="cmd" column="cmd" />
             <result property="priority" column="priority" />
             <result property="description" column="description" />
+            <result property="isHarmful" column="is_harmful" />
+            <result property="harmfulKey" column="harmful_key" />
             <result property="collectTime" column="collect_time" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,mac,pid,ppid,name,cmd,
-        priority,description,collect_time
+        priority,description,is_harmful,harmful_key,collect_time
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -34,7 +36,7 @@
           AND collect_time = (
             SELECT MAX(collect_time) FROM process_info WHERE mac = #{mac}
         )
-        ORDER BY pid
+        ORDER BY is_harmful DESC
     </select>
     <select id="selectByMacAndPpid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo" parameterType="map">
         SELECT *

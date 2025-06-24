@@ -267,6 +267,14 @@
                         {field:'state', title:'状态', width:80},
                         {field:'version', title:'版本', width:80},
                         {field:'extrainfo', title:'额外信息', width:100},
+                        {field: 'isHarmful', title: '是否风险', width: 87, templet: function(d) {
+                                if (d.isHarmful === 1) {
+                                    return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
+                                } else {
+                                    return "<button class='layui-btn layui-btn-normal layui-btn-xs'>否</button>";
+                                }
+                            }},
+                        {field: 'harmfulKey', title: '风险原因', width: 180}
                     ]
                 ];
             } else if (url.includes('/host/processInfo')) {
@@ -281,6 +289,14 @@
                         {field: 'cmd',title:'命令行',width: 72},
                         {field: 'priority', title: '优先权', width: 73},
                         {field: 'description', title: '描述', width: 160},
+                        {field: 'isHarmful', title: '是否风险', width: 87, templet: function(d) {
+                                if (d.isHarmful === 1) {
+                                    return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
+                                } else {
+                                    return "<button class='layui-btn layui-btn-normal layui-btn-xs'>否</button>";
+                                }
+                            }},
+                        {field: 'harmfulKey', title: '风险原因', width: 180},
                         {field: 'collectTime', title: '探测时间', width: 155, templet: function (d) {
                                 return formatDate(d.collectTime);
                             }}
@@ -295,6 +311,14 @@
                         {field: 'displayName', title: '应用名字', width: 200},
                         {field: 'installLocation', title: '安装地址', width: 150},
                         {field: 'uninstallString', title: '卸载地址', width: 150},
+                        {field: 'isHarmful', title: '是否风险', width: 87, templet: function(d) {
+                                if (d.isHarmful === 1) {
+                                    return "<button class='layui-btn layui-btn-danger layui-btn-xs'>是</button>";
+                                } else {
+                                    return "<button class='layui-btn layui-btn-normal layui-btn-xs'>否</button>";
+                                }
+                            }},
+                        {field: 'harmfulKey', title: '风险原因', width: 180},
                         {field: 'collectTime', title: '探测时间', width: 155, templet: function (d) {
                                 return formatDate(d.collectTime);
                             }}

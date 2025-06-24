@@ -386,6 +386,8 @@ public class RabbitSysInfoConsumer {
 
             boolean allSuccess = true;
 
+            // 设置创建时间、更新时间
+            Date now = new Date();
             for (ServiceInfo service : serviceList) {
                 try {
                     int res = serviceInfoService.analyzeAndSaveServiceInfo(service);
@@ -857,5 +859,35 @@ public class RabbitSysInfoConsumer {
             channel.basicAck(deliveryTag, false);
         }
     }
+
+//    @RabbitListener(queues = "inTimeRequest_queue")
+//    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers,
+//                              Channel channel) throws IOException {
+//        System.out.println("Received inTime Request message: " + message);
+//        // 反序列化数据
+//        try {
+//            Host host = validateAndParseObject(message, Host.class);
+//            if (host == null) {
+//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//                channel.basicAck(deliveryTag,false);
+//                return;
+//            }
+//
+//            int res = hostService.updateHostByMacAddress(host);
+//            if (res > 0){
+//
+//                // 手动 ACK, 先获取 deliveryTag
+//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//                // ACK
+//                channel.basicAck(deliveryTag,false);
+//            }
+//        } catch (IOException e) {
+//            // 手动 ACK, 先获取 deliveryTag
+//            Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//            // ACK
+//            channel.basicAck(deliveryTag,false);
+//        }
+//
+//    }
 
 }

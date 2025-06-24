@@ -120,7 +120,7 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
 
         if (existing != null) {
             processInfo.setId(existing.getId());
-            return processInfoMapper.updateByPrimaryKeySelective(processInfo);
+            return processInfoMapper.updateByPrimaryKey(processInfo);
         } else {
             return processInfoMapper.insert(processInfo);
         }
