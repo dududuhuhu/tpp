@@ -434,6 +434,7 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             for (ApplicationRisk param : paramList) {
                 try {
                     // 转换并赋值检测时间
@@ -442,7 +443,7 @@ public class RabbitSysInfoConsumer {
                     appRisk.setDetectionTime(new Date());
                     appRisk.setMac(param.getMac());
                     // 保存到数据库
-                    ResponseResult result = applicationRiskService.saveAppRisk(appRisk);
+                    ResponseResult result = applicationRiskService.saveAppRisk(appRisk, now);
                     System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
                             param, result.getCode(), result.getMsg());
 
@@ -484,6 +485,7 @@ public class RabbitSysInfoConsumer {
             List<SystemRisk> paramList = validateAndParseList(message, SystemRisk.class);
             if (paramList == null) return;
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             for (SystemRisk param : paramList) {
                 try {
                     // 创建新对象并赋值检测时间
@@ -492,7 +494,7 @@ public class RabbitSysInfoConsumer {
                     systemRisk.setUpdatedAt(new Date());
 
                     // 保存到数据库
-                    ResponseResult result = systemRiskService.saveSystemRisk(systemRisk);
+                    ResponseResult result = systemRiskService.saveSystemRisk(systemRisk, now);
                     System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
                             param, result.getCode(), result.getMsg());
 
@@ -579,9 +581,10 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
-                ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
+                ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk, now);
                 System.out.println("Save weakpasswordsRisk result: " + result.getMsg());
             }
 
@@ -611,9 +614,10 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (VulnerabilityRisk vulnerabilityRisk: vulnerabilityRiskList) {
-                ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk);
+                ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk, now);
                 System.out.println("Save result: " + result.getMsg());
             }
 

@@ -11,7 +11,7 @@ import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskAiReport;
-import com.tpp.threat_perception_platform.pojo.User;
+import com.tpp.threat_perception_platform.pojo.SystemRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.ApplicationRiskService;
 import com.tpp.threat_perception_platform.utils.AIUtils;
@@ -19,8 +19,6 @@ import com.tpp.threat_perception_platform.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -50,11 +48,26 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
     }
 
     @Override
-    public ResponseResult saveAppRisk(ApplicationRisk appRisk) {
+    public ResponseResult saveAppRisk(ApplicationRisk appRisk, Timestamp now) {
         try {
-            appRisk.setDetectionTime(appRisk.getDetectionTime() != null ? appRisk.getDetectionTime() : new Date());
+            // 先查询是否已存在
+            ApplicationRisk db = applicationRiskMapper.selectByMacAndRuleId(appRisk.getMac(),appRisk.getRuleId());
 
-            int insertResult = applicationRiskMapper.insertSelective(appRisk);
+            appRisk.setDetectionTime(now);
+
+            // 设置创建时间，如果为空
+            if (appRisk.getCreatedAt() == null) {
+                appRisk.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            }
+
+            if (db != null) {
+                // 若已存在，更新字段（只更新 updated_time 或者所有字段）
+                appRisk.setId(db.getId()); // 设置主键，用于 where 条件
+                applicationRiskMapper.updateByPrimaryKey(appRisk);
+                return new ResponseResult<>(1003, "该记录已存在！");
+            }
+
+            int insertResult = applicationRiskMapper.insert(appRisk);
             System.out.println("插入结果: " + insertResult);
             return new ResponseResult<>(0, "插入成功");
         } catch (Exception e) {

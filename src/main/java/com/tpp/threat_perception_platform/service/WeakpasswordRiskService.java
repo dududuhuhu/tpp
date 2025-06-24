@@ -5,11 +5,13 @@ import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface WeakpasswordRiskService {
 
-    public ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk);
+
+    ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk, Timestamp now);
 
     public ResponseResult weakpasswordList(WeakpasswordParam param);
 }

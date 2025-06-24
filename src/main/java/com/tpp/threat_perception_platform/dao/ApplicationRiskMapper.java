@@ -57,4 +57,6 @@ public interface ApplicationRiskMapper {
 
 
     Integer countApp();
+
+    ApplicationRisk selectByMacAndRuleId(String mac, Integer ruleId);
 }

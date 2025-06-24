@@ -6,10 +6,12 @@ import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.SystemRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.sql.Timestamp;
+
 public interface SystemRiskService {
     ResponseResult systemRiskList(SystemRiskParam param);
 
-    ResponseResult saveSystemRisk(SystemRisk systemRisk);
+    ResponseResult saveSystemRisk(SystemRisk systemRisk, Timestamp now);
 
     ResponseResult editSystemRisk(SystemRisk systemRisk);
 

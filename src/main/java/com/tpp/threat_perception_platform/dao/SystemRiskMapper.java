@@ -42,4 +42,6 @@ public interface SystemRiskMapper {
     Map<String, Integer> groupCountByRiskType(SystemRiskParam param);
 
     Integer countSys();
+
+    SystemRisk selectByMacAndRuleId(String mac, Integer ruleId);
 }
