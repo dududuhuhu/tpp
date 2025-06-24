@@ -56,11 +56,11 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo" useGeneratedKeys="true">
         insert into service_info
         (id, host_id, port, name, state, protocol,
-         product, version, extrainfo,
+         product, version, extrainfo,detect_time,
          is_harmful, harmful_key)
         values
             (#{id}, #{hostId}, #{port}, #{name}, #{state}, #{protocol},
-             #{product}, #{version}, #{extrainfo},
+             #{product}, #{version}, #{extrainfo}, #{detectTime},
              #{isHarmful}, #{harmfulKey})
     </insert>
 
