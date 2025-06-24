@@ -15,10 +15,12 @@ class TimedService:
         调用定时任务函数，并在需要时发布消息。
         """
         if self._routing_key:
-            self._publisher.publish_message(
-                routing_key=self._routing_key,
-                message=self._func(),
-            )
+            message = self._func()
+            if message is not None:
+                self._publisher.publish_message(
+                    routing_key=self._routing_key,
+                    message=message,
+                )
         else:
             self._func()
         self._publisher.timed_task_schedule(self._interval, self)

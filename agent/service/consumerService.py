@@ -1,19 +1,30 @@
 import json
 import uuid
-
+import platform
 from mq.consumer import Consumer
 from mq.publisher import Publisher
 
-TEST = 1
-if TEST == 0:
+from work.ApplicationRiskDetect import ApplicationRiskDetect
+from work.VulnerabilityDetect import VulnerabilityDetect
+PLATFORM = platform.system()
+# platform specific imports
+if PLATFORM == "Linux":
+    from linux.hotfixDetect import HotfixDetectLinux as HotfixDetector
+    from linux.passwordDetect import WeakPasswordDetect as SMBWeakPasswordScanner
+    from linux.systemRiskDetect import SystemRiskDetectLinux as SystemRiskDetect
+    from linux.assetsDetect import AcountDetectorLinux as AcountDetector, AppDetectorLinux as AppDetector, \
+        ProcessDetectorLinux as ProcessDetector, ServiceDetectorLinux as ServiceDetector
+    from linux.logDetector import AuditLogDetector, AccountChangeLogDetector, LoginLogDetector
+elif PLATFORM == "Windows":
     from work.HotfixDetect import HotfixDetector
-    from work.ApplicationRiskDetect import ApplicationRiskDetect
     from work.PasswordDetect import SMBWeakPasswordScanner
     from work.SystemRiskDetect import SystemRiskDetect
-    from work.VulnerabilityDetect import VulnerabilityDetect
     from work.AssetsDetect import *
-    from threading import Thread
-    from ..Logs.logs import audit_user_activity, analyze_login_logs,audit_account_changes
+    from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
+else:
+    print("Unsupported platform. Please set PLATFORM to 'Linux' or 'Windows'.")
+    exit(-1)
+from threading import Thread
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
 
 def wrapper(routing_key, detector, publisher, need_publish):
@@ -22,115 +33,60 @@ def wrapper(routing_key, detector, publisher, need_publish):
     else:
         detector.detect()
 
-if TEST == 0:
-    def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
-        try:
-            print(body.decode('utf-8'))
-            _body = json.loads(body.decode('utf-8'))
-            if (not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig']))):
-                return
+def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
+    try:
+        print(body.decode('utf-8'))
+        _body = json.loads(body.decode('utf-8'))
+        if not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig'])):
+            return
 
-            data = json.loads(_body['message'])
-            print(f"Received message: {data}")
+        data = json.loads(_body['message'])
+        detector = None
+        routing_key = data['type']
+        if data['type'] == 'hotfix':
+            detector = HotfixDetector(data)
+        elif data['type'] == 'applicationRisk':
+            detector = ApplicationRiskDetect(data)
+        elif data['type'] == 'password':
+            detector = SMBWeakPasswordScanner(data)
+        elif data['type'] == 'systemRisk':
+            detector = SystemRiskDetect(data)
+        elif data['type'] == 'vulnerability':
+            detector = VulnerabilityDetect(data)
+        elif data['type'] == 'assets':
+            if data['account'] == 1:
+                detector = AcountDetector(data)
+                t = Thread(target=wrapper, args=('account', detector, publisher, True))
+                t.start()
+            if data['service'] == 1:
+                detector = ServiceDetector(data)
+                t = Thread(target=wrapper, args=('service', detector, publisher, True))
+                t.start()
+            if data['process'] == 1:
+                detector = ProcessDetector(data)
+                t = Thread(target=wrapper, args=('process', detector, publisher, True))
+                t.start()
+            if data['app'] == 1:
+                detector = AppDetector(data)
+                t = Thread(target=wrapper, args=('app', detector, publisher, True))
+                t.start()
             detector = None
-            routing_key = data['type']
-            if data['type'] == 'hotfix':
-                detector = HotfixDetector(data)
-            elif data['type'] == 'applicationRisk':
-                detector = ApplicationRiskDetect(data)
-            elif data['type'] == 'password':
-                detector = SMBWeakPasswordScanner(data)
-            elif data['type'] == 'systemRisk':
-                detector = SystemRiskDetect(data)
-            elif data['type'] == 'vulnerability':
-                detector = VulnerabilityDetect(data)
-            elif data['type'] == 'assets':
-                if data['account'] == 1:
-                    detector = AcountDetector(data)
-                    t = Thread(target=wrapper, args=('account', detector, publisher, True))
-                    t.start()
-                if data['service'] == 1:
-                    detector = ServiceDetector(data)
-                    t = Thread(target=wrapper, args=('service', detector, publisher, True))
-                    t.start()
-                if data['process'] == 1:
-                    detector = ProcessDetector(data)
-                    t = Thread(target=wrapper, args=('process', detector, publisher, True))
-                    t.start()
-                if data['app'] == 1:
-                    detector = AppDetector(data)
-                    t = Thread(target=wrapper, args=('app', detector, publisher, True))
-                    t.start()
-                detector = None
-            #     需要更新消费队列
-            elif data['type'] == 'auditLog':
-                from datetime import datetime, timedelta
+        #     需要更新消费队列
+        elif data['type'] == 'auditLog':
+             detector = AuditLogDetector(data)
+        elif data['type'] == 'loginLog':
+            detector = LoginLogDetector(data)
+        elif data['type'] == 'accountChangeLog':
+            detector = AccountChangeLogDetector(data)
+        else:
+            print(f"Unknown message type: {data['type']}")
+        if detector:
+            t = Thread(target=wrapper, args=(routing_key, detector, publisher, True))
+            t.start()
 
-                end_time = datetime.now()
-                start_time = end_time - timedelta(hours=24)
-                path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-                suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-                # 审计日志
-                detector = audit_user_activity(path, start_time, end_time)
-                detector['mac']=data['macAddress']
-                t = Thread(target=wrapper, args=('auditLog', detector, publisher, True))
-                t.start()
-            elif data['type'] == 'loginLog':
-                from datetime import datetime, timedelta
-
-                end_time = datetime.now()
-                start_time = end_time - timedelta(hours=24)
-                path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-                suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-                # 审计日志
-                detector = analyze_login_logs(path, suspicious_users=suspicious_accounts, start_time=start_time,
-                           end_time=end_time)
-                detector['mac']=data['macAddress']
-                t = Thread(target=wrapper, args=('loginLog', detector, publisher, True))
-                t.start()
-            elif data['type'] == 'accountChangLog':
-                from datetime import datetime, timedelta
-
-                end_time = datetime.now()
-                start_time = end_time - timedelta(hours=24)
-                path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
-                suspicious_accounts = ["test1", "guest", "hacker", "backdoor"]
-                # 审计日志
-                detector = audit_account_changes(path, start_time, end_time)
-                detector['mac']=data['macAddress']
-                t = Thread(target=wrapper, args=('accountChangLog', detector, publisher, True))
-                t.start()
-            else:
-                print(f"Unknown message type: {data['type']}")
-            if detector:
-                t = Thread(target=wrapper, args=(routing_key, detector, publisher, True))
-                t.start()
-
-        except json.JSONDecodeError as e:
-            print(f"Failed to decode JSON: {e}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        finally:
-            consumer.acknowledge_message(basic_deliver.delivery_tag)
-else:
-    def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
-        try:
-            print(f'body is {body.decode('utf-8')}')
-            _body = json.loads(body.decode('utf-8'))
-            if (not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig']))):
-                return
-
-            data = json.loads(_body['message'])
-            detector = None
-            routing_key = data['type']
-            print(f"Received message: {data}, Routing key: {routing_key}")
-            if detector:
-                t = Thread(target=wrapper, args=(routing_key, detector, publisher, True))
-                t.start()
-
-        except json.JSONDecodeError as e:
-            print(f"Failed to decode JSON: {e}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        finally:
-            consumer.acknowledge_message(basic_deliver.delivery_tag)
+    except json.JSONDecodeError as e:
+        print(f"Failed to decode JSON: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        consumer.acknowledge_message(basic_deliver.delivery_tag)
