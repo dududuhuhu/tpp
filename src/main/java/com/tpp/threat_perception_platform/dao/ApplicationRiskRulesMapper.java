@@ -4,6 +4,7 @@ import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
 import org.springframework.data.repository.query.Param;
 
+
 import java.util.List;
 
 /**
@@ -35,5 +36,9 @@ public interface ApplicationRiskRulesMapper {
     List<ApplicationRiskRules> findRulesBySearchTypeAndKeywords(MyParam param);
 
     List<ApplicationRiskRules> findAll();
+
+    // ApplicationRiskRulesMapper.java
+    String selectRiskNameById(@Param("id") Integer id);
+
 
 }

@@ -169,6 +169,14 @@
         GROUP BY risk_level
     </select>
 
+    <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.SystemRisk" parameterType="string">
+        SELECT *
+        FROM system_risk
+        WHERE mac = #{mac}
+        ORDER BY created_at DESC
+    </select>
+
+
     <select id="groupCountByRiskType" resultType="map">
         SELECT risk_type AS `key`, COUNT(*) AS `value` FROM system_risk
         <where>

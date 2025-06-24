@@ -292,6 +292,14 @@
         ORDER BY detection_time DESC
     </select>
 
+    <select id="selectByRuleIdAndMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        SELECT *
+        FROM application_risk
+        WHERE rule_id = #{ruleId} AND mac = #{mac}
+            LIMIT 1
+    </select>
+
+
 
 
 
