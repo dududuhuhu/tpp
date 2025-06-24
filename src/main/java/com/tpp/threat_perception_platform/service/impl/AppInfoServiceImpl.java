@@ -130,7 +130,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
         if (existing != null) {
             appInfo.setId(existing.getId());
-            return appInfoMapper.updateByPrimaryKeySelective(appInfo);
+            return appInfoMapper.updateByPrimaryKey(appInfo);
         } else {
             return appInfoMapper.insert(appInfo);
         }

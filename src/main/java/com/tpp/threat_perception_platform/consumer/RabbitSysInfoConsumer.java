@@ -285,6 +285,8 @@ public class RabbitSysInfoConsumer {
     @RabbitListener(queues = "process_queue")
     public void receiveProcess(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received process info message: " + message);
+        System.out.println("Headers: " + headers);
+        System.out.println("deliveryTag: " + headers.get(AmqpHeaders.DELIVERY_TAG));
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
@@ -405,7 +407,7 @@ public class RabbitSysInfoConsumer {
             Date now = new Date();
             for (ServiceInfo service : serviceList) {
                 try {
-                    int res = serviceInfoService.analyzeAndSaveServiceInfo(service);
+                    int res = serviceInfoService.analyzeAndSaveServiceInfo(service, now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save service: " + service);
