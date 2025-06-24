@@ -60,7 +60,7 @@ public interface ApplicationRiskMapper {
      * @param mac MAC 地址
      * @return 匹配的风险记录
      */
-    ApplicationRisk selectByRuleIdAndMac(Integer ruleId, String mac);
+    ApplicationRisk selectByMacAndRuleId(String mac, Integer ruleId);
 
 
 

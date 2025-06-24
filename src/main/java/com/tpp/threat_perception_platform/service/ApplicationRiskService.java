@@ -4,11 +4,13 @@ import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.sql.Timestamp;
+
 public interface ApplicationRiskService {
 
     ResponseResult appRiskList(ApplicationRiskParam param);
 
-    ResponseResult saveAppRisk(ApplicationRisk appRisk);
+    ResponseResult saveAppRisk(ApplicationRisk appRisk, Timestamp now);
 
     ResponseResult editAppRisk(ApplicationRisk appRisk);
 

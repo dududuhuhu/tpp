@@ -33,4 +33,5 @@ public interface SystemRiskRulesMapper {
 
     List<SystemRiskRules> findAll();
 
+    void delete(Integer[] ids);
 }

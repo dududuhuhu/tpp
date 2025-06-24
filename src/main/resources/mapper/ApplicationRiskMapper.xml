@@ -270,6 +270,27 @@
     </select>
     <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
         SELECT
+        ar.id,
+        ar.rule_id,
+        ar.mac,
+        arr.risk_name,
+        arr.risk_type,
+        arr.risk_level,
+        arr.target_service AS targetHost,          <!-- 别名改成targetHost -->
+        arr.risk_desc AS riskDetail,               <!-- 别名改成riskDetail -->
+        arr.remediation_advice,
+        ar.detection_time
+        FROM application_risk ar
+        LEFT JOIN application_risk_rules arr ON ar.rule_id = arr.id
+        WHERE ar.mac = #{mac}
+        ORDER BY ar.detection_time DESC
+    </select>
+
+    <select id="countApp" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM application_risk
+    </select>
+    <select id="selectByMacAndRuleId" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        SELECT
             id,
             rule_id,
             mac,
@@ -287,19 +308,9 @@
             status,
             created_at
         FROM application_risk
-        WHERE mac = #{mac}
-        ORDER BY detection_time DESC
+        WHERE mac = #{mac} and rule_id = #{ruleId}
     </select>
 
-    <select id="countApp" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM application_risk
-    </select>
-    <select id="selectByRuleIdAndMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
-        SELECT *
-        FROM application_risk
-        WHERE rule_id = #{ruleId} AND mac = #{mac}
-            LIMIT 1
-    </select>
 
 
 

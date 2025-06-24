@@ -64,6 +64,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/page/**").anonymous();
                     auth.requestMatchers("/").anonymous();
                     // CSS/JS/IMG/LIB/FONTS放行
+                    auth.requestMatchers("/static/**").anonymous();
                     auth.requestMatchers("/css/**").anonymous();
                     auth.requestMatchers("/js/**").anonymous();
                     auth.requestMatchers("/img/**").anonymous();
