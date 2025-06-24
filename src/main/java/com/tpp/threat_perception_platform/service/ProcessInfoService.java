@@ -6,9 +6,10 @@ import com.tpp.threat_perception_platform.pojo.ProcessInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public interface ProcessInfoService {
-    public int analyzeAndSaveProcessInfo(ProcessInfo processInfo);
+    public int analyzeAndSaveProcessInfo(ProcessInfo processInfo, Date now);
 
     ResponseResult getByMac(String mac);
 

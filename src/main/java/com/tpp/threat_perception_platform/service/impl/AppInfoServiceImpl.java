@@ -44,7 +44,7 @@ public class AppInfoServiceImpl implements AppInfoService {
      */
 
     @Override
-    public int analyzeAndSaveAppInfo(AppInfo appInfo) {
+    public int analyzeAndSaveAppInfo(AppInfo appInfo, Date now) {
         // 先查数据库，依据 mac + displayName 唯一定位（可根据业务调整唯一条件）
         AppInfo existing = appInfoMapper.selectByMacAndDisplayName(appInfo.getMac(), appInfo.getDisplayName());
 
@@ -125,8 +125,8 @@ public class AppInfoServiceImpl implements AppInfoService {
             appInfo.setHarmfulKey(existing.getHarmfulKey());
         }
 
-        // 更新时间设为当前时间
-        appInfo.setCollectTime(new Date());
+        // 设置统一传入的时间
+        appInfo.setCollectTime(now);
 
         if (existing != null) {
             appInfo.setId(existing.getId());

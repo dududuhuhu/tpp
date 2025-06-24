@@ -26,6 +26,8 @@ public interface ProcessInfoMapper {
 
     List<ProcessInfo> selectByMac(String mac);
 
+    ProcessInfo selectByMacAndPpid(String mac, Integer ppid);
+
     ProcessInfo selectByMacAndPid(String mac, Integer pid);
 
 }

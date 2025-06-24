@@ -30,12 +30,20 @@
     <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
         SELECT * FROM process_info WHERE mac = #{mac} ORDER BY collect_time DESC
     </select>
-    <select id="selectByMacAndPid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo">
+    <select id="selectByMacAndPpid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo" parameterType="map">
+        SELECT *
+        FROM process_info
+        WHERE mac = #{mac}
+          AND ppid = #{ppid}
+    </select>
+
+    <select id="selectByMacAndPid" resultType="com.tpp.threat_perception_platform.pojo.ProcessInfo" parameterType="map">
         SELECT *
         FROM process_info
         WHERE mac = #{mac}
           AND pid = #{pid}
     </select>
+
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from process_info

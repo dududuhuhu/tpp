@@ -26,29 +26,20 @@ public class AccountInfoServiceImpl implements AccountInfoService {
     private AccountInfoMapper accountInfoMapper;
 
     @Override
-    public int analyzeAndSaveAccountInfo(AccountInfo accountInfo) {
-        // 先查询数据库是否存在该账号，假设唯一键是 mac + name
-        AccountInfo existing = accountInfoMapper.selectByMacAndName(accountInfo.getMac(), accountInfo.getName());
+    public int analyzeAndSaveAccountInfo(AccountInfo accountInfo, Date now) {
+        // 查询数据库是否存在
+        AccountInfo existing = accountInfoMapper.selectBySidAndMac(accountInfo.getMac(), accountInfo.getSid());
 
         if (existing != null) {
-            // 判断关键字段是否有变化（可根据实际情况添加更多字段）
-            boolean isChanged = false;
-            if (!Objects.equals(existing.getFullName(), accountInfo.getFullName()) ||
-                    !Objects.equals(existing.getSid(), accountInfo.getSid()) ||
-                    !Objects.equals(existing.getSidType(), accountInfo.getSidType()) ||
-                    !Objects.equals(existing.getStatus(), accountInfo.getStatus()) ||
+            boolean isChanged = !Objects.equals(existing.getStatus(), accountInfo.getStatus()) ||
                     !Objects.equals(existing.getDisabled(), accountInfo.getDisabled()) ||
                     !Objects.equals(existing.getLockout(), accountInfo.getLockout()) ||
-                    !Objects.equals(existing.getPasswordChangeable(), accountInfo.getPasswordChangeable()) ||
                     !Objects.equals(existing.getPasswordExpires(), accountInfo.getPasswordExpires()) ||
-                    !Objects.equals(existing.getPasswordRequired(), accountInfo.getPasswordRequired())) {
-                isChanged = true;
-            }
+                    !Objects.equals(existing.getPasswordRequired(), accountInfo.getPasswordRequired());
 
             if (!isChanged && existing.getIsHarmful() != null && existing.getHarmfulKey() != null) {
-                // 数据无变化且已有AI分析结果，跳过AI调用，返回成功码
                 System.out.println("Account info unchanged, skip AI analysis.");
-                return 1;  // 表示无更新
+                return 1;
             }
         }
 
@@ -96,41 +87,36 @@ public class AccountInfoServiceImpl implements AccountInfoService {
                 accountInfo.getPasswordRequired()
         );
 
-            try {
-                // 调用 AI 分析
-                GenerationResult result = AIUtils.callWithMessage(prompt);
-                String content = result.getOutput().getChoices().get(0).getMessage().getContent();
+        try {
+            GenerationResult result = AIUtils.callWithMessage(prompt);
+            String content = result.getOutput().getChoices().get(0).getMessage().getContent();
 
-                // 清理可能的多余标记
-                content = content.replaceAll("(?i)```json", "")
-                        .replaceAll("```", "")
-                        .trim();
+            content = content.replaceAll("(?i)```json", "")
+                    .replaceAll("```", "")
+                    .trim();
 
-                // 解析 JSON
-                JSONObject jsonObject = JSON.parseObject(content);
+            JSONObject jsonObject = JSON.parseObject(content);
+            accountInfo.setIsHarmful(jsonObject.getInteger("is_harmful"));
+            accountInfo.setHarmfulKey(jsonObject.getString("harmful_key"));
+        } catch (Exception e) {
+            accountInfo.setIsHarmful(0);
+            accountInfo.setHarmfulKey("AI分析失败: " + e.getMessage());
+        }
 
-                // 设置 AccountInfo 字段
-                accountInfo.setIsHarmful(jsonObject.getInteger("is_harmful"));
-                accountInfo.setHarmfulKey(jsonObject.getString("harmful_key"));
-
-            } catch (Exception e) {
-                // 如果 AI 调用失败，默认安全
-                accountInfo.setIsHarmful(0);
-                accountInfo.setHarmfulKey("AI分析失败: " + e.getMessage());
-            }
-
-        Date now = new Date();
         accountInfo.setCreatedAt(now);
         accountInfo.setUpdatedAt(now);
 
         if (existing != null) {
-            // 更新记录
             accountInfo.setId(existing.getId());
+            accountInfo.setCreatedAt(existing.getCreatedAt()); // 保留原创建时间
+            accountInfo.setUpdatedAt(now);
             return accountInfoMapper.updateByPrimaryKeySelective(accountInfo);
         } else {
-            // 新增记录
+            accountInfo.setCreatedAt(now);
+            accountInfo.setUpdatedAt(now);
             return accountInfoMapper.insertSelective(accountInfo);
         }
+
     }
 
     @Override

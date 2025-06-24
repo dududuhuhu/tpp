@@ -59,7 +59,7 @@
         values
             (#{id}, #{hostId}, #{port}, #{name}, #{state}, #{protocol},
              #{product}, #{version}, #{extrainfo},
-             #{isHarmful}, #{harmfulKey},#{detectTime})
+             #{isHarmful}, #{harmfulKey})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ServiceInfo" useGeneratedKeys="true">

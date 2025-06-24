@@ -240,7 +240,7 @@ public class RabbitSysInfoConsumer {
                 appInfo.setHarmfulKey(null);
 
                 try {
-                    int res = appInfoService.analyzeAndSaveAppInfo(appInfo);
+                    int res = appInfoService.analyzeAndSaveAppInfo(appInfo,now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save appInfo: " + appInfo);
@@ -290,7 +290,7 @@ public class RabbitSysInfoConsumer {
                 processInfo.setHarmfulKey(null);
 
                 try {
-                    int res = processInfoService.analyzeAndSaveProcessInfo(processInfo);
+                    int res = processInfoService.analyzeAndSaveProcessInfo(processInfo,now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save processInfo: " + processInfo);
