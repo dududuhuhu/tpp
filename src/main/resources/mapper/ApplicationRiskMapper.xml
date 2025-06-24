@@ -269,6 +269,30 @@
         GROUP BY risk_type
     </select>
 
+    <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        SELECT
+            id,
+            rule_id,
+            mac,
+            risk_name,
+            risk_type,
+            risk_level,
+            target_host,
+            target_url,
+            detection_time,
+            is_risky,
+            risk_detail,
+            response_content,
+            error_message,
+            remediation_advice,
+            status,
+            created_at
+        FROM application_risk
+        WHERE mac = #{mac}
+        ORDER BY detection_time DESC
+    </select>
+
+
 
 
 

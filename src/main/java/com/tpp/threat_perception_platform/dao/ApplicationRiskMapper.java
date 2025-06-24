@@ -47,6 +47,14 @@ public interface ApplicationRiskMapper {
     @MapKey("key")
     Map<String, Integer> groupCountByRiskType(ApplicationRiskParam param);
 
+    /**
+     * 根据 MAC 地址查询该主机的全部应用风险记录
+     * @param mac 主机 MAC 地址
+     * @return 风险记录列表
+     */
+    List<ApplicationRisk> selectByMac(String mac);
+
+
 
 
 
