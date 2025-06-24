@@ -34,9 +34,9 @@
         where mac = #{mac} and username = #{username} and login_time = #{loginTime}
     </select>
     <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
-        SELECT
+        select
         <include refid="Base_Column_List" />
-        FROM login_log
+        from login_log
         <where>
             <if test="mac != null and mac != ''">
                 AND mac = #{mac}
@@ -65,6 +65,21 @@
             </if>
         </where>
         ORDER BY login_time DESC
+    </select>
+    <select id="getLoginAbnormalStats" resultType="java.util.Map">
+        SELECT '风险用户登录' AS name, COUNT(*) AS value
+        FROM login_log
+        WHERE is_risk_user = 1
+
+        UNION ALL
+
+        SELECT '非正常时间登录' AS name, COUNT(*) AS value
+        FROM login_log
+        WHERE is_risk_time = 1
+
+        UNION ALL
+
+        SELECT '正常登录' AS name, 0 AS value
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -135,7 +150,7 @@
             username =  #{username},
             login_time =  #{loginTime},
             logoff_time =  #{logoffTime},
-            create_time =  #{createTime},
+            create_time =  NOW(),
             is_risk_user =  #{isRiskUser},
             is_risk_time =  #{isRiskTime}
         where   id = #{id} 

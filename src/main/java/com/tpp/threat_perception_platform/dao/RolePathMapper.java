@@ -1,12 +1,16 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.RolePath;
+import com.tpp.threat_perception_platform.pojo.User;
+
+import java.util.List;
 
 /**
-* @author lup
+* @author dawn
 * @description 针对表【role_path】的数据库操作Mapper
-* @createDate 2025-06-18 15:13:25
-* @Entity com.tpp.threat_perception_platform.pojo.Role.RolePath
+* @createDate 2025-06-23 09:32:50
+* @Entity com.tpp.threat_perception_platform.pojo.RolePath
 */
 public interface RolePathMapper {
 
@@ -22,4 +26,7 @@ public interface RolePathMapper {
 
     int updateByPrimaryKey(RolePath record);
 
+    List<RolePath> findAll(MyParam param);
+
+    void delete(Integer[] ids);
 }

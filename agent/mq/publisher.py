@@ -122,7 +122,7 @@ class Publisher(Service):
 
             body = {
                 "mac":self._mac,
-                "messege":message,
+                "message":message,
                 "sig":translate_bytes_to_str(self._sign_key_pair.sign((self._mac + message).encode('utf-8')))
             }
 

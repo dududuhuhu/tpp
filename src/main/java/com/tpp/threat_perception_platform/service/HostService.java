@@ -11,6 +11,9 @@ import com.tpp.threat_perception_platform.param.WeakpasswordParam;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.util.List;
+import java.util.Map;
+
 public interface HostService {
 
 
@@ -72,4 +75,8 @@ public interface HostService {
     ResponseResult weakpasswordDiscovery(WeakpasswordParam param);
 
     ResponseResult vulnerabilityDiscovery(VulnerabilityParam param);
+
+    Integer countHosts();
+
+    List<Map<String, Object>> getHostSystemStats();
 }

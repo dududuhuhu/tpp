@@ -19,12 +19,13 @@
             <result property="status" column="status" />
             <result property="createdAt" column="created_at" />
             <result property="updatedAt" column="updated_at" />
+            <result property="platform" column="platform" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,risk_name,risk_desc,risk_level,risk_type,target_service,
         detection_method,detection_path,detection_payload,risk_flag,remediation_advice,
-        status,created_at,updated_at
+        status,created_at,updated_at,platform
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -33,6 +34,7 @@
         from application_risk_rules
         where  id = #{id} 
     </select>
+
     <select id="selectAllRules" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
         select
         <include refid="Base_Column_List" />
@@ -90,10 +92,10 @@
         insert into application_risk_rules
         ( id,risk_name,risk_desc,risk_level,risk_type,target_service,
         detection_method,detection_path,detection_payload,risk_flag,remediation_advice,
-        status,created_at,updated_at)
+        status,created_at,updated_at,platform)
         values (#{id},#{riskName},#{riskDesc},#{riskLevel},#{riskType},#{targetService},
         #{detectionMethod},#{detectionPath},#{detectionPayload},#{riskFlag},#{remediationAdvice},
-        #{status},#{createdAt},#{updatedAt})
+        #{status},#{createdAt},#{updatedAt},#{platform})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules" useGeneratedKeys="true">
         insert into application_risk_rules
@@ -112,6 +114,7 @@
                 <if test="status != null">status,</if>
                 <if test="createdAt != null">created_at,</if>
                 <if test="updatedAt != null">updated_at,</if>
+                <if test="platform != null">platform,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="id != null">#{id},</if>
@@ -128,6 +131,7 @@
                 <if test="status != null">#{status},</if>
                 <if test="createdAt != null">#{createdAt},</if>
                 <if test="updatedAt != null">#{updatedAt},</if>
+                <if test="platform != null">#{platform},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.ApplicationRiskRules">
@@ -172,6 +176,9 @@
                 <if test="updatedAt != null">
                     updated_at = #{updatedAt},
                 </if>
+                <if test="platform != null">
+                    platform = #{platform},
+                </if>
         </set>
         where   id = #{id} 
     </update>
@@ -190,7 +197,14 @@
             remediation_advice =  #{remediationAdvice},
             status =  #{status},
             created_at =  #{createdAt},
-            updated_at =  #{updatedAt}
+            updated_at =  #{updatedAt},
+            platform =  #{platform}
         where   id = #{id} 
     </update>
+
+    <!-- ApplicationRiskRulesMapper.xml -->
+    <select id="selectRiskNameById" parameterType="int" resultType="string">
+        SELECT risk_name FROM application_risk_rules WHERE id = #{id}
+    </select>
+
 </mapper>

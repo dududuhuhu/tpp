@@ -39,6 +39,13 @@
         FROM hotfix
         WHERE mac = #{mac}
     </select>
+    <select id="findByMac" resultType="com.tpp.threat_perception_platform.pojo.Hotfix">
+        SELECT <include refid="Base_Column_List" />
+        from hotfix
+        where mac=#{mac}
+        AND updated_time = (SELECT MAX(updated_time) FROM hotfix)
+        order by id
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from hotfix

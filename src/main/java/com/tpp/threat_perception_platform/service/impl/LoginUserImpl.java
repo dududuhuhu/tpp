@@ -60,10 +60,13 @@ public class LoginUserImpl implements LoginServcie {
         user.setLastLoginTime(new Timestamp(System.currentTimeMillis()));
         userService.updateUser(user);
 
-        // 把token响应给前端
-        HashMap<String, String> map = new HashMap<>();
+        // 6. 封装返回数据
+        HashMap<String, Object> map = new HashMap<>();
         map.put("token", jwt);
         map.put("userid", user.getId().toString());
+        map.put("username", loginUser.getUsername());
+        map.put("accessiblePathList", accessiblePath);
+        System.out.println("map:"+map);
         return new ResponseResult<Object>(200, "登录成功！", map);
 
         // 没有授权

@@ -5,6 +5,7 @@ import com.tpp.threat_perception_platform.pojo.Host;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author dawn
@@ -48,4 +49,7 @@ public interface HostMapper {
     String getIpByMac(String macAddress);
 
 
+    Integer countHosts();
+
+    List<Map<String, Object>> countByOsType();
 }

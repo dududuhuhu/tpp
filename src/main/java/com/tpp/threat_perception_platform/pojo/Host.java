@@ -10,7 +10,7 @@ public class Host {
     /**
      * 自增ID
      */
-    private Integer id;
+    private Long id;
 
     /**
      * 主机mac地址
@@ -75,14 +75,14 @@ public class Host {
     /**
      * 自增ID
      */
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     /**
      * 自增ID
      */
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -160,4 +160,7 @@
         JOIN role_path rp ON rp.role_id = u.user_role
         WHERE u.id = #{userId}
     </select>
+    <select id="countUsers" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+    </select>
 </mapper>
