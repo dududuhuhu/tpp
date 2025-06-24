@@ -191,4 +191,14 @@
             harmful_key =  #{harmfulKey}
         where   id = #{id} 
     </update>
+
+    <!-- 根据 mac 和 name 查询账号信息 -->
+    <select id="selectByMacAndName" parameterType="map" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        SELECT *
+        FROM account_info
+        WHERE mac = #{mac}
+          AND name = #{name}
+            LIMIT 1
+    </select>
+
 </mapper>

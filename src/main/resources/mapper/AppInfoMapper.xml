@@ -44,28 +44,37 @@
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo" useGeneratedKeys="true">
         insert into app_info
-        ( id,mac,display_name,install_location,uninstall_string,collect_time)
-        values (#{id},#{mac},#{displayName},#{installLocation},#{uninstallString},#{collectTime})
+        (id, mac, display_name, install_location, uninstall_string, collect_time,
+         is_harmful, harmful_key)
+        values
+            (#{id}, #{mac}, #{displayName}, #{installLocation}, #{uninstallString}, #{collectTime},
+             #{isHarmful}, #{harmfulKey})
     </insert>
+
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo" useGeneratedKeys="true">
         insert into app_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="id != null">id,</if>
-                <if test="mac != null">mac,</if>
-                <if test="displayName != null">display_name,</if>
-                <if test="installLocation != null">install_location,</if>
-                <if test="uninstallString != null">uninstall_string,</if>
-                <if test="collectTime != null">collect_time,</if>
+            <if test="id != null">id,</if>
+            <if test="mac != null">mac,</if>
+            <if test="displayName != null">display_name,</if>
+            <if test="installLocation != null">install_location,</if>
+            <if test="uninstallString != null">uninstall_string,</if>
+            <if test="collectTime != null">collect_time,</if>
+            <if test="isHarmful != null">is_harmful,</if>
+            <if test="harmfulKey != null">harmful_key,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="id != null">#{id},</if>
-                <if test="mac != null">#{mac},</if>
-                <if test="displayName != null">#{displayName},</if>
-                <if test="installLocation != null">#{installLocation},</if>
-                <if test="uninstallString != null">#{uninstallString},</if>
-                <if test="collectTime != null">#{collectTime},</if>
+            <if test="id != null">#{id},</if>
+            <if test="mac != null">#{mac},</if>
+            <if test="displayName != null">#{displayName},</if>
+            <if test="installLocation != null">#{installLocation},</if>
+            <if test="uninstallString != null">#{uninstallString},</if>
+            <if test="collectTime != null">#{collectTime},</if>
+            <if test="isHarmful != null">#{isHarmful},</if>
+            <if test="harmfulKey != null">#{harmfulKey},</if>
         </trim>
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AppInfo">
         update app_info
         <set>
