@@ -201,4 +201,10 @@
             platform =  #{platform}
         where   id = #{id} 
     </update>
+
+    <!-- ApplicationRiskRulesMapper.xml -->
+    <select id="selectRiskNameById" parameterType="int" resultType="string">
+        SELECT risk_name FROM application_risk_rules WHERE id = #{id}
+    </select>
+
 </mapper>

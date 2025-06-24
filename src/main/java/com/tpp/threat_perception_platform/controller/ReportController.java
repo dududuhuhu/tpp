@@ -7,6 +7,10 @@ import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
+import com.tpp.threat_perception_platform.service.AccChgReportService;
+import com.tpp.threat_perception_platform.service.ApplicationRiskService;
+import com.tpp.threat_perception_platform.service.LoginActionService;
+import com.tpp.threat_perception_platform.service.SystemRiskService;
 import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +38,9 @@ public class ReportController {
 
     @Autowired
     private VulnerabilityService vulnerabilityService;
+
+    @Autowired
+    private SystemRiskService systemRiskService;
 
     /**
      * 根据 MAC 地址生成账号变更风险分析报告
@@ -89,6 +96,7 @@ public class ReportController {
         return hotfixService.analyzeAndSaveHotfixRiskReport(dangerList, param.getMacAddress());
     }
 
+
     /**
      * 根据 MAC 地址分析风险记录并生成AI报告
      * @param mac 主机MAC地址，作为请求参数传入
@@ -99,4 +107,14 @@ public class ReportController {
         return vulnerabilityService.analyzeAndSaveVulnerabilityRiskReport(mac);
     }
 
+
+    /**
+     * 根据 MAC 地址分析系统风险记录并生成AI报告
+     * @param mac 主机MAC地址，作为请求参数传入
+     * @return 响应结果，包含报告内容
+     */
+    @GetMapping("/system-risk/analyze")
+    public ResponseResult analyzeSystemRiskReport(@RequestParam("mac") String mac) {
+        return systemRiskService.analyzeAndSaveSystemRiskReport(mac);
+    }
 }

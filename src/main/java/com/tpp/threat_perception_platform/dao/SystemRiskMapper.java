@@ -42,4 +42,12 @@ public interface SystemRiskMapper {
     Map<String, Integer> groupCountByRiskType(SystemRiskParam param);
 
     Integer countSys();
+
+    /**
+     * 根据MAC地址查询系统风险记录列表
+     * @param mac 主机MAC地址
+     * @return 系统风险列表
+     */
+    List<SystemRisk> selectByMac(String mac);
+
 }

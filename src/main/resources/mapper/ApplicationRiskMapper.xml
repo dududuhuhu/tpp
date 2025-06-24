@@ -294,6 +294,16 @@
     <select id="countApp" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM application_risk
     </select>
+    <select id="selectByRuleIdAndMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
+        SELECT *
+        FROM application_risk
+        WHERE rule_id = #{ruleId} AND mac = #{mac}
+            LIMIT 1
+    </select>
+
+
+
+
 
 
 </mapper>

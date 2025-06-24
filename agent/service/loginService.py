@@ -1,11 +1,17 @@
 from utils.crypto.src.asymmetric import SignKeyPair
 import pika
-from system.SystemInfo import SystemInfo
 import json
 from mq.service import Service
 from utils import logger
 from mq import extract_public_key
-from service import MAC
+from service import MAC, PLATFORM
+if PLATFORM == 'Linux':
+    from linux.systemInfo import SystemInfoLinux as SystemInfo
+elif PLATFORM == 'Windows':
+    from system.SystemInfo import SystemInfo
+else:
+    logger.error(f"Unsupported platform: {PLATFORM}")
+    exit(-1)
 from time import sleep
 
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
@@ -29,9 +35,6 @@ class LoginService(Service):
         self._verifier = SignKeyPair()
         self._verifier.load_pub(server_pub_key)
 
-        # self._sysinfo = SystemInfo()
-        # self._sysinfo.get_info()
-        # self._mac = self._sysinfo.get_mac_address()
         self._mac = MAC
 
         self._login_exchange = login_exchange
@@ -49,6 +52,26 @@ class LoginService(Service):
             'status':1,
         })
 
+        # Declare a exchange and queue for login response
+        connection = pika.BlockingConnection(pika.URLParameters(self._amqp_url))
+        channel = connection.channel()
+        channel.exchange_declare(
+            exchange=self._login_recv_exchange,
+            exchange_type=pika.exchange_type.ExchangeType.direct,
+            durable=True
+        )
+        channel.queue_declare(
+            queue=self._login_recv_queue,
+            durable=True,
+            exclusive=False,
+            auto_delete=False
+        )
+        channel.queue_bind(
+            exchange=self._login_recv_exchange,
+            queue=self._login_recv_queue,
+            routing_key=self._login_recv_routing_key
+        )
+
         self._login()
         super().__init__(self._login_exchange, self._amqp_url)
         self._queue_key_pairs = {
@@ -59,17 +82,6 @@ class LoginService(Service):
     def _login(self):
         sysinfo = SystemInfo()
         sysinfo_data = sysinfo.get_info()
-        # sysinfo_data = json.dumps({
-        #     "host_name":"boat",
-        #     "ip_address":"127.0.0.1",
-        #     "mac_address":MAC,
-        #     "os_type":"Linux",
-        #     "os_name":"Ubuntu",
-        #     "os_version":"0000",
-        #     "os_bit":"64bit",
-        #     "cpu_name":"cpuname",
-        #     "ram":16,
-        # })
         login_data_d:dict = json.loads(sysinfo_data)
         login_data_d['pub'] = extract_public_key(self._key_pair.get_pem_pub())
         login_message = json.dumps(login_data_d)

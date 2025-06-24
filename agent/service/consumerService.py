@@ -1,16 +1,30 @@
 import json
 import uuid
-
+import platform
 from mq.consumer import Consumer
 from mq.publisher import Publisher
-from work.HotfixDetect import HotfixDetector
+
 from work.ApplicationRiskDetect import ApplicationRiskDetect
-from work.PasswordDetect import SMBWeakPasswordScanner
-from work.SystemRiskDetect import SystemRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
-from work.AssetsDetect import *
+PLATFORM = platform.system()
+# platform specific imports
+if PLATFORM == "Linux":
+    from linux.hotfixDetect import HotfixDetectLinux as HotfixDetector
+    from linux.passwordDetect import WeakPasswordDetect as SMBWeakPasswordScanner
+    from linux.systemRiskDetect import SystemRiskDetectLinux as SystemRiskDetect
+    from linux.assetsDetect import AcountDetectorLinux as AcountDetector, AppDetectorLinux as AppDetector, \
+        ProcessDetectorLinux as ProcessDetector, ServiceDetectorLinux as ServiceDetector
+    from linux.logDetector import AuditLogDetector, AccountChangeLogDetector, LoginLogDetector
+elif PLATFORM == "Windows":
+    from work.HotfixDetect import HotfixDetector
+    from work.PasswordDetect import SMBWeakPasswordScanner
+    from work.SystemRiskDetect import SystemRiskDetect
+    from work.AssetsDetect import *
+    from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
+else:
+    print("Unsupported platform. Please set PLATFORM to 'Linux' or 'Windows'.")
+    exit(-1)
 from threading import Thread
-from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
 
 def wrapper(routing_key, detector, publisher, need_publish):

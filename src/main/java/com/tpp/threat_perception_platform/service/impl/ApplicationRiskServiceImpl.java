@@ -54,14 +54,28 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
         try {
             appRisk.setDetectionTime(appRisk.getDetectionTime() != null ? appRisk.getDetectionTime() : new Date());
 
-            int insertResult = applicationRiskMapper.insertSelective(appRisk);
-            System.out.println("插入结果: " + insertResult);
-            return new ResponseResult<>(0, "插入成功");
+            // 先根据 ruleId 和 mac 查询是否存在记录
+            ApplicationRisk existing = applicationRiskMapper.selectByRuleIdAndMac(appRisk.getRuleId(), appRisk.getMac());
+
+            if (existing != null) {
+                // 已存在，更新 detectionTime 和 riskName（可根据需求更新其他字段）
+                existing.setDetectionTime(appRisk.getDetectionTime());
+                existing.setRiskName(appRisk.getRiskName());
+                int updateResult = applicationRiskMapper.updateByPrimaryKeySelective(existing);
+                System.out.println("更新结果: " + updateResult);
+                return new ResponseResult<>(0, "更新成功");
+            } else {
+                // 不存在，插入新记录
+                int insertResult = applicationRiskMapper.insertSelective(appRisk);
+                System.out.println("插入结果: " + insertResult);
+                return new ResponseResult<>(0, "插入成功");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult<>(-1, "保存失败: " + e.getMessage());
         }
     }
+
 
 
 
