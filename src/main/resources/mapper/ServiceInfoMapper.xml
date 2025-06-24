@@ -14,12 +14,14 @@
             <result property="product" column="product" />
             <result property="version" column="version" />
             <result property="extrainfo" column="extrainfo" />
+            <result property="isHarmful" column="is_harmful" />
+            <result property="harmfulKey" column="harmful_key" />
             <result property="detectTime" column="detect_time" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,host_id,port,name,state,protocol,
-        product,version,extrainfo,detect_time
+        product,version,extrainfo,is_harmful,harmful_key,detect_time
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

@@ -66,6 +66,21 @@
         </where>
         ORDER BY login_time DESC
     </select>
+    <select id="getLoginAbnormalStats" resultType="java.util.Map">
+        SELECT '风险用户登录' AS name, COUNT(*) AS value
+        FROM login_log
+        WHERE is_risk_user = 1
+
+        UNION ALL
+
+        SELECT '非正常时间登录' AS name, COUNT(*) AS value
+        FROM login_log
+        WHERE is_risk_time = 1
+
+        UNION ALL
+
+        SELECT '正常登录' AS name, 0 AS value
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from login_log

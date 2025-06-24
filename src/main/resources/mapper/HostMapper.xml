@@ -81,6 +81,14 @@
         from host
         where username=#{username}
     </select>
+    <select id="countHosts" resultType="java.lang.Integer">
+        select COUNT(*) from host
+    </select>
+    <select id="countByOsType" resultType="java.util.Map">
+        SELECT os_type AS name, COUNT(*) AS value
+        FROM host
+        GROUP BY os_type
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from host

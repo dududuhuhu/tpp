@@ -22,6 +22,7 @@ public interface ApplicationRiskService {
      */
     ResponseResult getRiskCount(ApplicationRiskParam param);
 
+    Integer countApplicationRisks();
 
         /**
          * 根据mac分析应用风险记录并生成AI报告

@@ -11,6 +11,7 @@ import com.rabbitmq.client.Channel;
 import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.DangerousHotfix;
@@ -390,6 +391,8 @@ public class RabbitSysInfoConsumer {
 
             boolean allSuccess = true;
 
+            // 设置创建时间、更新时间
+            Date now = new Date();
             for (ServiceInfo service : serviceList) {
                 try {
                     int res = serviceInfoService.analyzeAndSaveServiceInfo(service);
@@ -544,15 +547,18 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (Hotfix hotfix : hotfixList) {
-                ResponseResult result = hotfixService.saveHotfix(hotfix);
+                ResponseResult result = hotfixService.saveHotfix(hotfix,now);
                 System.out.println("Save result: " + result.getMsg());
                 // test: 提取危险补丁并输出
                 if (!hotfixList.isEmpty()) {
                     String mac = hotfix.getMac();
-                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(mac);
-                    List<DangerousHotfix> dangerousList = response.getData();
+                    HotfixParam param=null;
+                    param.setMacAddress(mac);
+//                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(param);
+//                    List<DangerousHotfix> dangerousList = response.getData();
                 } else {
                     System.out.println("未收到任何 Hotfix 数据，跳过危险补丁检测");
                 }
@@ -866,5 +872,35 @@ public class RabbitSysInfoConsumer {
             channel.basicAck(deliveryTag, false);
         }
     }
+
+//    @RabbitListener(queues = "inTimeRequest_queue")
+//    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers,
+//                              Channel channel) throws IOException {
+//        System.out.println("Received inTime Request message: " + message);
+//        // 反序列化数据
+//        try {
+//            Host host = validateAndParseObject(message, Host.class);
+//            if (host == null) {
+//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//                channel.basicAck(deliveryTag,false);
+//                return;
+//            }
+//
+//            int res = hostService.updateHostByMacAddress(host);
+//            if (res > 0){
+//
+//                // 手动 ACK, 先获取 deliveryTag
+//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//                // ACK
+//                channel.basicAck(deliveryTag,false);
+//            }
+//        } catch (IOException e) {
+//            // 手动 ACK, 先获取 deliveryTag
+//            Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+//            // ACK
+//            channel.basicAck(deliveryTag,false);
+//        }
+//
+//    }
 
 }

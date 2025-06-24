@@ -6,6 +6,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author 34617
@@ -34,4 +35,6 @@ public interface LoginLogMapper {
     List<LoginLog> selectByCondition(LogParam param);
 
     void updateByMacAndUsernameAndLoginTime(LoginLog loginLog);
+
+    List<Map<String, Object>> getLoginAbnormalStats();
 }

@@ -46,4 +46,6 @@ public interface UserService {
     ResponseResult delete(Integer[] ids);
 
     public List<String> getUserAccessiblePath(Integer id);
+
+    Integer countUsers();
 }

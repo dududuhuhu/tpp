@@ -113,6 +113,11 @@ public class SystemRiskServiceImpl implements SystemRiskService {
     }
 
     @Override
+    public Integer countSystemRisks() {
+        return systemRiskMapper.countSys();
+    }
+
+    @Override
     public ResponseResult analyzeAndSaveSystemRiskReport(String mac) {
         try {
             // 1. 根据 mac 查询所有相关的系统风险记录

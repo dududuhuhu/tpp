@@ -127,6 +127,11 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
     }
 
     @Override
+    public Integer countApplicationRisks() {
+        return applicationRiskMapper.countApp();
+    }
+
+    @Override
     public ResponseResult analyzeAndSaveAppRiskReport(String mac) {
         try {
             // 1. 根据 mac 查询所有相关的应用风险记录

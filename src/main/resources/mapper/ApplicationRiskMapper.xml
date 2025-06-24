@@ -268,7 +268,6 @@
         </where>
         GROUP BY risk_type
     </select>
-
     <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
         SELECT
             id,
@@ -292,6 +291,9 @@
         ORDER BY detection_time DESC
     </select>
 
+    <select id="countApp" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM application_risk
+    </select>
     <select id="selectByRuleIdAndMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
         SELECT *
         FROM application_risk

@@ -81,15 +81,12 @@
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
                             <!-- 主机列表按钮 -->
-                            <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="batchdel">删除</button>
                             <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
-
-                        </div>
+                            <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="user" data-type="AI" disabled>AI辅助分析</button>                        </div>
                         <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
 
                         <!-- 表格工具栏 -->
                         <script type="text/html" id="table-useradmin-webuser">
-                            <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="hotfixInfo"><i class="layui-icon layui-icon-edit"></i>安全补丁详情</a>
                             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
                         </script>
                     </div>
@@ -177,19 +174,34 @@
             ,element=layui.element
             ,table = layui.table;
 
+
+        // 页面初始化时禁用按钮并移除搜索标记
+        $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+        let searchedMac = null;
+        // 初始化表格（只初始化一次）
         table.render({
-            elem: '#LAY-user-manage'
-            ,method: 'post'
-            ,url:'/host/dangerousHotfixRisk'
-            ,contentType: 'application/json'
-            ,headers: {
+            elem: '#LAY-user-manage',
+            method: 'post',
+            url: '/host/dangerousHotfixRisk',
+            contentType: 'application/json',
+            headers: {
                 'Authorization': localStorage.getItem('token'),
-                'userId':localStorage.getItem('id'),
-                'Content-Type': 'application/json'
-            }
-            ,cellMinWidth: 80
-            ,title: '危险补丁探测数据表'
-            ,cols: [[
+                'userId':localStorage.getItem('id')
+            },
+            where: {}, // 初始空
+            request: {
+                pageName: 'page',
+                limitName: 'limit'
+            },
+            parseData: function(res){
+                return {
+                    code: res.code,
+                    msg: res.msg,
+                    count: res.total,
+                    data: res.data
+                };
+            },
+            cols: [[
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'macAddress', title: 'MAC地址', width: 160},
                 {field: 'hotfixId', title: '补丁编号', width: 130},
@@ -197,22 +209,35 @@
                 {field: 'score', title: '评分', width: 80, templet: function (d) {
                         let color = '';
                         let score = parseFloat(d.score);
-                        if (score >= 9) {
-                            color = '#FF5722'; // 高危 - 橙红
-                        } else if (score >= 7) {
-                            color = '#FFB800'; // 中危 - 橙黄
-                        } else if (score >= 4) {
-                            color = '#1E9FFF'; // 低危 - 蓝色
-                        } else {
-                            color = '#009688'; // 信息 - 青色
-                        }
+                        if (score >= 9) color = '#FF5722';
+                        else if (score >= 7) color = '#FFB800';
+                        else if (score >= 4) color = '#1E9FFF';
+                        else color = '#009688';
                         return `<span class="layui-btn layui-btn-xs" style="background-color:${color};">${score}</span>`;
                     }
                 }
-                ]]
-            ,page: { curr: 1, limit: 5 }
-            ,limits:[5,10,15,20]
+            ]],
+            page: true,
+            limits: [5, 10, 20],
+            limit: 5
         });
+
+        // 搜索事件绑定
+        form.on('submit(LAY-sysuser-front-search)', function(data){
+            searchedMac = 1;
+            var mac = data.field.keywords;
+
+            table.reload('LAY-user-manage', {
+                where: {
+                    macAddress: mac
+                },
+                page: { curr: 1 }
+            });
+
+            $('#btn-ai-analyze').removeClass('layui-btn-disabled').attr('disabled', false);
+            return false;
+        });
+
 
         // 规则库
         table.render({
@@ -257,54 +282,6 @@
         });
 
 
-
-        table.on('tool(LAY-user-manage)', function(obj){
-            var data = obj.data;
-            if(obj.event === 'del'){
-                layer.confirm('真的删除吗?', function(index){
-                    $.ajax({
-                        url:"/rule/hotfix/delete",
-                        type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token'),
-                            'userId':localStorage.getItem('id') },
-                        data:{ids:[data.id]},
-                        dataType:"json",
-                        success:function (res){
-                            if(res.code == 0){
-                                layer.msg(res.msg);
-                                table.reload('LAY-user-manage');
-                                layer.close(index);
-                            }else {
-                                layer.msg(res.msg,{icon: 5});
-                            }
-                        }
-                    })
-                });
-            }
-            else if(obj.event==='hotfixInfo'){
-                layer.open({
-                    type: 2,
-                    skin: 'layui-layer-molv',
-                    title: '应用风险详情',
-                    area: ['800px', '600px'],
-                    content: '/page/risk/hotfixInfo',
-                    maxmin: true,
-                    btn: ['关闭'],
-                    yes: function(index, layero){
-                        layer.close(index);
-                    },
-                    success: function(layero, index){
-                        // 获取iframe窗口对象
-                        var iframeWin = layero.find('iframe')[0].contentWindow;
-                        // 延迟发送，保证页面2监听就绪
-                        setTimeout(() => {
-                            iframeWin.postMessage(data, '*');
-                        }, 200);
-                    }
-                });
-            }
-        });
-
         table.on('tool(LAY-rule-manage)', function(obj){
             var data = obj.data;
             if(obj.event === 'del'){
@@ -330,22 +307,7 @@
             }
         });
 
-        //监听搜索
-        form.on('submit(LAY-sysuser-front-search)', function(data){
-            var field = data.field;
-            console.log(field);
-            //执行重载
-            table.reload('LAY-user-manage', {
-                url: '/host/list',
-                method: "post",
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId':localStorage.getItem('id')
-                },
-                data: JSON.stringify(field), // 发送JSON格式的数据
-                where: field
-            });
-        });
+
 
         //监听搜索
         form.on('submit(LAY-sysrule-front-search)', function(data){
@@ -366,43 +328,70 @@
 
 
         var active = {
-            // 主机管理相关
-            host_batchdel: function(){
-                var checkData = table.checkStatus('LAY-user-manage').data;
-                if(checkData.length == 0){
-                    return layer.msg('请选择数据');
+            host_AI: function () {
+                if (!searchedMac) {
+                    return layer.msg('请先通过 MAC 地址进行搜索后再使用 AI 辅助分析');
                 }
-                layer.confirm('确定删除吗？', function (){
-                    var userIds = checkData.map(item => item.id);
-                    $.ajax({
-                        url:"/host/delete",
-                        type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token'),
-                            'userId':localStorage.getItem('id') },
-                        data:{ids:userIds},
-                        dataType:"json",
-                        success:function (res){
-                            if(res.code == 0){
-                                layer.msg(res.msg);
-                                table.reload('LAY-user-manage');
-                            }else{
-                                layer.msg(res.msg,{icon: 5});
-                            }
+
+                var checkStatus = table.checkStatus('LAY-user-manage');
+                var data = checkStatus.data;
+
+                if (data.length === 0) {
+                    return layer.msg('请至少选择一条主机记录');
+                }
+                // 只取第一个 MAC 地址
+                var mac = data[0].macAddress;
+                console.log("hotfixAImac:",mac);
+
+                // 发送 AI 分析请求...
+                $.ajax({
+                    url: '/api/report/hotfix/analyze',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('token'),
+                        'userId': localStorage.getItem('id')
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ macAddress: mac }),
+                    success: function (res) {
+                        if (res.code === 0) {
+                            layer.open({
+                                type: 1,
+                                title: 'AI 分析报告',
+                                area: ['600px', '400px'],
+                                shadeClose: true,
+                                content: `
+                        <div style="padding:20px;">
+                            <p><strong>主机：</strong>${mac}</p>
+                            <p><strong>总风险等级：</strong>1</p>
+                            <p><strong>高危补丁数量：</strong>2</p>
+                            <p><strong>分析说明：</strong>dddd</p>
+                        </div>
+                    `
+                            });
+                        } else {
+                            layer.msg(res.msg || '分析失败', {icon: 5});
                         }
-                    });
+                    },
+                    error: function () {
+                        layer.msg('请求失败，请检查接口或网络连接', {icon: 2});
+                    }
                 });
             },
+
+
             host_refresh: function(){
                 table.reload('LAY-user-manage', {
-                    url: '/host/list',
+                    url: '/host/dangerousHotfixRisk',
                     method: "post",
                     headers: {
                         'Authorization': localStorage.getItem('token'),
                         'userId':localStorage.getItem('id')
                     }
                 });
+                // 禁用按钮并清除搜索标记
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
             },
-
             // 应用规则相关
             rule_batchdel: function(){
                 var checkData = table.checkStatus('LAY-rule-manage').data;

@@ -65,6 +65,5 @@ public interface ApplicationRiskMapper {
 
 
 
-
-
+    Integer countApp();
 }

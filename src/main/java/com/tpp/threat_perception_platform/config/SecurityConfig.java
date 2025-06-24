@@ -53,6 +53,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth->{
                     // 对于规则接口，所有都能访问
                     auth.requestMatchers("/rule/**").permitAll();
+                    // 对于控制台接口，所有都能访问
+                    auth.requestMatchers("/console/**").permitAll();
                     auth.requestMatchers("/api/**").permitAll();
                     // 对于登录接口 允许匿名访问
                     auth.requestMatchers("/user/login").anonymous();

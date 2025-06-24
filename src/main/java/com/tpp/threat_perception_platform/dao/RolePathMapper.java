@@ -1,6 +1,10 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.RolePath;
+import com.tpp.threat_perception_platform.pojo.User;
+
+import java.util.List;
 
 /**
 * @author dawn
@@ -22,4 +26,7 @@ public interface RolePathMapper {
 
     int updateByPrimaryKey(RolePath record);
 
+    List<RolePath> findAll(MyParam param);
+
+    void delete(Integer[] ids);
 }

@@ -1,14 +1,21 @@
 package com.tpp.threat_perception_platform.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.tpp.threat_perception_platform.param.HotfixParam;
+import com.tpp.threat_perception_platform.dao.HotfixRiskAiReportMapper;
+import com.tpp.threat_perception_platform.param.HotfixParam;
 import com.tpp.threat_perception_platform.param.LogParam;
+import com.tpp.threat_perception_platform.response.DangerousHotfix;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.AccChgReportService;
 import com.tpp.threat_perception_platform.service.ApplicationRiskService;
 import com.tpp.threat_perception_platform.service.LoginActionService;
 import com.tpp.threat_perception_platform.service.SystemRiskService;
+import com.tpp.threat_perception_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 报告统一 Controller，处理账号变更等风险报告接口
@@ -25,6 +32,12 @@ public class ReportController {
 
     @Autowired
     private ApplicationRiskService applicationRiskService;
+
+    @Autowired
+    private HotfixService hotfixService;
+
+    @Autowired
+    private VulnerabilityService vulnerabilityService;
 
     @Autowired
     private SystemRiskService systemRiskService;
@@ -54,6 +67,13 @@ public class ReportController {
         System.out.println("report:"+loginActionService.loginActionReportList(param));
         return loginActionService.loginActionReportList(param);
     }
+    @PostMapping("/hotfix/analyze")
+    public ResponseResult analyzeHotfix(@RequestBody HotfixParam param) {
+        String mac=param.getMacAddress();
+        System.out.println("mac:"+mac);
+        return new ResponseResult(0,"success");
+    }
+
 
     /**
      * 根据 MAC 地址分析应用风险记录并生成AI报告
@@ -64,6 +84,28 @@ public class ReportController {
     public ResponseResult analyzeAppRiskReport(@RequestParam("mac") String mac) {
         return applicationRiskService.analyzeAndSaveAppRiskReport(mac);
     }
+
+    /**
+     * 根据 MAC 地址分析风险记录并生成AI报告
+     * @param param，作为请求参数传入
+     * @return 响应结果，包含报告内容
+     */
+    @PostMapping("/hotfix-risk/analyze")
+    public ResponseResult analyzeHotfixRiskReport(@RequestBody HotfixParam param) {
+        List<DangerousHotfix> dangerList = hotfixService.getDangerousPatch(param.getPage(), param.getLimit()).getData();
+        return hotfixService.analyzeAndSaveHotfixRiskReport(dangerList, param.getMacAddress());
+    }
+
+    /**
+     * 根据 MAC 地址分析风险记录并生成AI报告
+     * @param mac 主机MAC地址，作为请求参数传入
+     * @return 响应结果，包含报告内容
+     */
+    @GetMapping("/vulnerability-risk/analyze")
+    public ResponseResult analyzeVulnerabilityRiskReport(@RequestParam("mac") String mac) {
+        return vulnerabilityService.analyzeAndSaveVulnerabilityRiskReport(mac);
+    }
+
 
     /**
      * 根据 MAC 地址分析系统风险记录并生成AI报告
