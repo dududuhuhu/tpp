@@ -1,11 +1,13 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.*;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
+import com.tpp.threat_perception_platform.service.RabbitService;
 import com.tpp.threat_perception_platform.service.RuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,10 @@ public class RuleServiceImpl implements RuleService {
     private VulnerabilityRulesMapper vulnerabilityRulesMapper;
     @Autowired
     private WinCveDbMapper winCveDbMapper;
+    @Autowired
+    private LogRulesMapper logRulesMapper;
+    @Autowired
+    private RabbitService rabbitService;
 
     @Override
     public List<ApplicationRiskRules> getAllApplicationRiskRules() {
@@ -176,4 +182,19 @@ public class RuleServiceImpl implements RuleService {
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
+    @Override
+    public void sendLogRules(String mac,String platform) {
+        List<LogRules> rulesList = logRulesMapper.selectByPlatform(platform); // 多条规则
+        if (rulesList == null || rulesList.isEmpty()) {
+            System.out.println("未找到日志规则，平台: " + platform);
+            return;
+        }
+        // 将规则列表转为 JSON 数组字符串
+        String json = JSON.toJSONString(rulesList);
+        String routingKey = mac.replace(":", "") + "Rule";
+        rabbitService.sendMessage("agent_exchange", routingKey, json);
+        System.out.println("已发送规则到路由键: " + routingKey);
+    }
+
 }

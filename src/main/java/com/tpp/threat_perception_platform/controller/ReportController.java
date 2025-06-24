@@ -85,7 +85,7 @@ public class ReportController {
      */
     @PostMapping("/hotfix-risk/analyze")
     public ResponseResult analyzeHotfixRiskReport(@RequestBody HotfixParam param) {
-        List<DangerousHotfix> dangerList = hotfixService.getDangerousPatch(param.getPage(), param.getLimit()).getData();
+        List<DangerousHotfix> dangerList = hotfixService.getDangerousPatch(param).getData();
         return hotfixService.analyzeAndSaveHotfixRiskReport(dangerList, param.getMacAddress());
     }
 
