@@ -92,9 +92,10 @@ public class ReportController {
      */
     @PostMapping("/hotfix-risk/analyze")
     public ResponseResult analyzeHotfixRiskReport(@RequestBody HotfixParam param) {
-        List<DangerousHotfix> dangerList = hotfixService.getDangerousPatch(param.getPage(), param.getLimit()).getData();
+        List<DangerousHotfix> dangerList = hotfixService.getDangerousPatch(param).getData();
         return hotfixService.analyzeAndSaveHotfixRiskReport(dangerList, param.getMacAddress());
     }
+
 
     /**
      * 根据 MAC 地址分析风险记录并生成AI报告
