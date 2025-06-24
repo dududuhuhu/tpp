@@ -40,4 +40,6 @@ public interface SystemRiskMapper {
     // 新增：按风险类型分组统计
     @MapKey("key")
     Map<String, Integer> groupCountByRiskType(SystemRiskParam param);
+
+    Integer countSys();
 }

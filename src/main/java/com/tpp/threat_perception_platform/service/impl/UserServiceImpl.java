@@ -105,4 +105,9 @@ public class UserServiceImpl implements UserService {
     public List<String> getUserAccessiblePath(Integer id) {
         return userMapper.getUserAccessiblePaths(id);
     }
+
+    @Override
+    public Integer countUsers() {
+        return userMapper.countUsers();
+    }
 }

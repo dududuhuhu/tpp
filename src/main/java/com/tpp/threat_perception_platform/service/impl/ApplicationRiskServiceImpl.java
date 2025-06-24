@@ -102,5 +102,10 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
         return new ResponseResult<>(0, "统计成功", report);
     }
 
+    @Override
+    public Integer countApplicationRisks() {
+        return applicationRiskMapper.countApp();
+    }
+
 
 }

@@ -268,8 +268,9 @@
         </where>
         GROUP BY risk_type
     </select>
-
-
+    <select id="countApp" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM application_risk
+    </select>
 
 
 </mapper>

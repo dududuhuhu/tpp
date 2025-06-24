@@ -105,4 +105,9 @@ public class SystemRiskServiceImpl implements SystemRiskService {
         return new ResponseResult<>(0, "统计成功", report);
     }
 
+    @Override
+    public Integer countSystemRisks() {
+        return systemRiskMapper.countSys();
+    }
+
 }

@@ -285,7 +285,6 @@
 
         // 获取权限路径
         const pathList = JSON.parse(localStorage.getItem("accessiblePathList") || "[]");
-        console.log("pathList:",pathList);
         const isAdmin = pathList.includes("/");
 
         // 允许访问的具体路径集合

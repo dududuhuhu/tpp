@@ -22,4 +22,5 @@ public interface ApplicationRiskService {
      */
     ResponseResult getRiskCount(ApplicationRiskParam param);
 
+    Integer countApplicationRisks();
 }

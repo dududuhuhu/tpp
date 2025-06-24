@@ -185,6 +185,9 @@
         </where>
         ORDER BY id
     </select>
+    <select id="countSys" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM system_risk
+    </select>
 
 
 </mapper>

@@ -48,6 +48,5 @@ public interface ApplicationRiskMapper {
     Map<String, Integer> groupCountByRiskType(ApplicationRiskParam param);
 
 
-
-
+    Integer countApp();
 }

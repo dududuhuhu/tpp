@@ -23,4 +23,5 @@ public interface SystemRiskService {
      */
     ResponseResult getRiskCount(SystemRiskParam param);
 
+    Integer countSystemRisks();
 }
