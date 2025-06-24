@@ -38,4 +38,6 @@ public interface RuleService {
 
 
     public ResponseResult systemRiskRulesList(MyParam param);
+
+    void sendLogRules(String mac,String platform);
 }

@@ -34,6 +34,8 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
 
         boolean needAI = true;
 
+        // 设置统一传入的时间
+        processInfo.setCollectTime(now);
         if (existing != null) {
             // 判断关键字段是否有变化
             boolean isChanged = false;
@@ -49,9 +51,13 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
                     existing.getIsHarmful() != null &&
                     existing.getHarmfulKey() != null) {
                 // 数据未变化，已有 AI 分析结果，跳过重复调用
-                System.out.println("Process info unchanged, skip AI analysis.");
-                return 1; // 已存在且无需更新
+                System.out.println("Process info unchanged, skip AI analysis."); // 已存在且无需更新
             }
+
+            processInfo.setId(existing.getId());
+            processInfo.setHarmfulKey(existing.getHarmfulKey());
+            processInfo.setIsHarmful(existing.getIsHarmful());
+            return processInfoMapper.updateByPrimaryKey(processInfo);
         }
 
         if (needAI) {
@@ -115,15 +121,8 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
             processInfo.setHarmfulKey(existing.getHarmfulKey());
         }
 
-        // 设置统一传入的时间
-        processInfo.setCollectTime(now);
-
-        if (existing != null) {
-            processInfo.setId(existing.getId());
-            return processInfoMapper.updateByPrimaryKey(processInfo);
-        } else {
-            return processInfoMapper.insert(processInfo);
-        }
+        // 插入新数据
+        return processInfoMapper.insert(processInfo);
     }
 
     @Override

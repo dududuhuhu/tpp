@@ -28,7 +28,10 @@ public class AccountInfoServiceImpl implements AccountInfoService {
     @Override
     public int analyzeAndSaveAccountInfo(AccountInfo accountInfo, Date now) {
         // 查询数据库是否存在
-        AccountInfo existing = accountInfoMapper.selectBySidAndMac(accountInfo.getMac(), accountInfo.getSid());
+        AccountInfo existing = accountInfoMapper.selectBySidAndMac(accountInfo.getSid(), accountInfo.getMac());
+
+        accountInfo.setCreatedAt(now);
+        accountInfo.setUpdatedAt(now);
 
         if (existing != null) {
             boolean isChanged = !Objects.equals(existing.getStatus(), accountInfo.getStatus()) ||
@@ -39,8 +42,13 @@ public class AccountInfoServiceImpl implements AccountInfoService {
 
             if (!isChanged && existing.getIsHarmful() != null && existing.getHarmfulKey() != null) {
                 System.out.println("Account info unchanged, skip AI analysis.");
-                return 1;
             }
+            accountInfo.setId(existing.getId());
+            accountInfo.setCreatedAt(existing.getCreatedAt()); // 保留原创建时间
+            accountInfo.setUpdatedAt(now);
+            accountInfo.setHarmfulKey(existing.getHarmfulKey());
+            accountInfo.setIsHarmful(existing.getIsHarmful());
+            return accountInfoMapper.updateByPrimaryKey(accountInfo);
         }
 
         String promptTemplate =
@@ -106,16 +114,8 @@ public class AccountInfoServiceImpl implements AccountInfoService {
         accountInfo.setCreatedAt(now);
         accountInfo.setUpdatedAt(now);
 
-        if (existing != null) {
-            accountInfo.setId(existing.getId());
-            accountInfo.setCreatedAt(existing.getCreatedAt()); // 保留原创建时间
-            accountInfo.setUpdatedAt(now);
-            return accountInfoMapper.updateByPrimaryKeySelective(accountInfo);
-        } else {
-            accountInfo.setCreatedAt(now);
-            accountInfo.setUpdatedAt(now);
-            return accountInfoMapper.insertSelective(accountInfo);
-        }
+        return accountInfoMapper.insert(accountInfo);
+
 
     }
 

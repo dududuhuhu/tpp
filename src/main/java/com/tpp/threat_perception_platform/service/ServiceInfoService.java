@@ -5,13 +5,14 @@ import com.tpp.threat_perception_platform.pojo.ProcessInfo;
 import com.tpp.threat_perception_platform.pojo.ServiceInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ServiceInfoService {
 
-    public int analyzeAndSaveServiceInfo(ServiceInfo serviceInfo);
-
     public ResponseResult retrieveAssetsService(MyParam param);
+
+    int analyzeAndSaveServiceInfo(ServiceInfo serviceInfo, Date now);
 
     public ResponseResult selectByHostId(Long hostId);
 }

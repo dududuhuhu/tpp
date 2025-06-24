@@ -30,7 +30,7 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
     private HostMapper hostMapper;
 
     @Override
-    public int analyzeAndSaveServiceInfo(ServiceInfo serviceInfo) {
+    public int analyzeAndSaveServiceInfo(ServiceInfo serviceInfo, Date now) {
         // 1️⃣ 补全 hostId（通过 mac 查找）
         if (serviceInfo.getHostId() == null) {
             String mac = serviceInfo.getMac();
@@ -57,6 +57,8 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
 
         boolean needAiAnalysis = false;
 
+        serviceInfo.setDetectTime(now);
+
         if (existing != null) {
             // 判断是否变化
             boolean isChanged = !Objects.equals(existing.getName(), serviceInfo.getName()) ||
@@ -72,8 +74,14 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
             } else {
                 // 数据完全一致，不需分析
                 System.out.println("服务信息未变化，跳过 AI 分析。");
-                return 1;
             }
+
+            serviceInfo.setId(existing.getId());
+            serviceInfo.setHarmfulKey(existing.getHarmfulKey());
+            serviceInfo.setIsHarmful(existing.getIsHarmful());
+            int updated = serviceInfoMapper.updateByPrimaryKey(serviceInfo);
+            System.out.println("服务更新结果: " + updated);
+            return updated;
         } else {
             // 新数据，需要分析
             needAiAnalysis = true;
@@ -144,16 +152,9 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
             }
         }
 
-        // 5️⃣ 保存数据
-        if (existing != null) {
-            int updated = serviceInfoMapper.updateByPrimaryKeySelective(serviceInfo);
-            System.out.println("服务更新结果: " + updated);
-            return updated;
-        } else {
-            int inserted = serviceInfoMapper.insert(serviceInfo);
-            System.out.println("服务插入结果: " + inserted);
-            return inserted;
-        }
+        int inserted = serviceInfoMapper.insert(serviceInfo);
+        System.out.println("服务插入结果: " + inserted);
+        return inserted;
     }
 
 

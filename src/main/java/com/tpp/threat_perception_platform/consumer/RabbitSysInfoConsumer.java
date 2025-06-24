@@ -2,13 +2,15 @@ package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.rabbitmq.client.Channel;
 
-import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
+import com.tpp.threat_perception_platform.dao.HostMapper;
+import com.tpp.threat_perception_platform.dao.LogRulesMapper;
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
@@ -39,6 +41,9 @@ public class RabbitSysInfoConsumer {
     private AppInfoService appInfoService;
 
     @Autowired
+    private RuleService ruleService;
+
+    @Autowired
     private ProcessInfoService processInfoService;
 
     @Autowired
@@ -49,10 +54,6 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private ApplicationRiskService applicationRiskService;
-
-    @Autowired
-    private ApplicationRiskRulesMapper applicationRiskRulesMapper;
-
 
 
     @Autowired
@@ -87,6 +88,10 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private BaselineHardeningService baselineHardeningService;
+    @Autowired
+    private HostMapper hostMapper;
+    @Autowired
+    private LogRulesMapper logRulesMapper;
 
     <T> T validateAndParseObject(String message, Class<T> clazz) {
         try {
@@ -192,7 +197,7 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "status_queue")
     public void receiveStatus(String message, @Headers Map<String,Object> headers,
-                        Channel channel) throws IOException {
+                              Channel channel) throws IOException {
         System.out.println("Received message: " + message);
         // 反序列化数据
         try {
@@ -395,7 +400,7 @@ public class RabbitSysInfoConsumer {
             Date now = new Date();
             for (ServiceInfo service : serviceList) {
                 try {
-                    int res = serviceInfoService.analyzeAndSaveServiceInfo(service);
+                    int res = serviceInfoService.analyzeAndSaveServiceInfo(service, now);
                     if (res <= 0) {
                         allSuccess = false;
                         System.err.println("Failed to save service: " + service);
@@ -421,6 +426,8 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+
+
     @RabbitListener(queues = "applicationRisk_queue")
     public void receiveAppRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received ApplicationRiskParam list message: " + message);
@@ -428,60 +435,50 @@ public class RabbitSysInfoConsumer {
         boolean allSuccess = true;
 
         try {
-            // 解析消息为 ApplicationRisk 简化版列表（只含 ruleId 和 mac）
+            // 解析消息为参数列表
+            // List<ApplicationRisk> paramList = JSON.parseArray(message, ApplicationRisk.class);
             List<ApplicationRisk> paramList = validateAndParseList(message, ApplicationRisk.class);
-            if (paramList == null || paramList.isEmpty()) {
-                System.err.println("No valid risk params found in message.");
-                channel.basicAck(deliveryTag, false);
+            if (paramList == null) {
                 return;
             }
 
             for (ApplicationRisk param : paramList) {
                 try {
+                    // 转换并赋值检测时间
                     ApplicationRisk appRisk = new ApplicationRisk();
                     BeanUtils.copyProperties(param, appRisk);
                     appRisk.setDetectionTime(new Date());
-
-                    // 查 risk_name
-                    String riskName = applicationRiskRulesMapper.selectRiskNameById(param.getRuleId());
-                    if (riskName == null || riskName.trim().isEmpty()) {
-                        riskName = "未知风险";
-                    }
-                    appRisk.setRiskName(riskName);
-
-                    // 保存
+                    appRisk.setMac(param.getMac());
+                    // 保存到数据库
                     ResponseResult result = applicationRiskService.saveAppRisk(appRisk);
-                    System.out.printf("Risk detection result: ruleId=%d, mac=%s, code=%d, msg=%s%n",
-                            param.getRuleId(), param.getMac(), result.getCode(), result.getMsg());
+                    System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
+                            param, result.getCode(), result.getMsg());
 
                     if (result.getCode() != 0) {
                         allSuccess = false;
-                        System.err.printf("Failed to save risk info for ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
+                        System.err.printf("Failed to save risk info for param: %s%n", param);
                     }
-
                 } catch (Exception e) {
                     allSuccess = false;
-                    System.err.printf("Exception while saving risk info: ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
+                    System.err.printf("Exception while saving risk info for param %s:%n", param);
                     e.printStackTrace();
                 }
             }
-
         } catch (Exception e) {
             allSuccess = false;
             System.err.println("Exception while processing risk message:");
             e.printStackTrace();
-
         } finally {
             if (allSuccess) {
                 channel.basicAck(deliveryTag, false);
-                System.out.println("All ApplicationRisk messages processed successfully, ACKed.");
+                System.out.println("All risk messages processed successfully, ACKed.");
             } else {
+                // 出错时决定是否重试，这里设为重试
                 channel.basicNack(deliveryTag, false, true);
-                System.err.println("Some ApplicationRisk messages failed, message NACKed and requeued.");
+                System.err.println("Some risk messages failed, message NACKed and requeued.");
             }
         }
     }
-
 
     @RabbitListener(queues = "systemRisk_queue")
     public void receiveSystemRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
@@ -873,34 +870,55 @@ public class RabbitSysInfoConsumer {
         }
     }
 
-//    @RabbitListener(queues = "inTimeRequest_queue")
-//    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers,
-//                              Channel channel) throws IOException {
-//        System.out.println("Received inTime Request message: " + message);
-//        // 反序列化数据
-//        try {
-//            Host host = validateAndParseObject(message, Host.class);
-//            if (host == null) {
-//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//                channel.basicAck(deliveryTag,false);
+    @RabbitListener(queues = "inTimeRequest_queue")
+    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+        System.out.println("接收到的消息: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
+        try {
+//            String mac = validateAndParseObject(message,String.class);
+//            if (mac == null) {
+//                channel.basicAck(deliveryTag, false);
+//                System.out.println("实时信息验证失败");
 //                return;
 //            }
-//
-//            int res = hostService.updateHostByMacAddress(host);
-//            if (res > 0){
-//
-//                // 手动 ACK, 先获取 deliveryTag
-//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//                // ACK
-//                channel.basicAck(deliveryTag,false);
-//            }
-//        } catch (IOException e) {
-//            // 手动 ACK, 先获取 deliveryTag
-//            Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//            // ACK
-//            channel.basicAck(deliveryTag,false);
-//        }
-//
-//    }
+
+            // 直接解析为 JSONObject
+            JSONObject jsonObject = JSON.parseObject(message);
+            String mac = jsonObject.getString("mac");
+            if (mac == null || mac.trim().isEmpty()) {
+                System.out.println("消息中缺少 MAC 字段，丢弃消息");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            System.out.println("提取到的 MAC: " + mac);
+
+            // 查询主机信息
+            Host db_host = hostMapper.selectByMacAddress(mac);
+            if (db_host == null) {
+                System.out.println("数据库中未找到主机信息，MAC: " + mac + "，丢弃消息");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            String platform = db_host.getOsType();
+            System.out.println("获取到主机平台类型: " + platform);
+
+            // 发送日志规则
+            ruleService.sendLogRules(mac, platform);
+            System.out.println("已向指定队列发送日志规则");
+
+            // 正常 ACK 消息
+            channel.basicAck(deliveryTag, false);
+
+        } catch (Exception e) {
+            System.err.println("处理实时请求消息异常: " + e.getMessage());
+            e.printStackTrace();
+            // 即使异常也 ACK，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
 
 }
