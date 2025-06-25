@@ -27,8 +27,8 @@ class BaselineCheckDetect:
         """
         print("开始基线核查..............!")
         # 创建扫描器实例并执行
-        scanner = BaselineCheck(mac)
         # mac=self.mac
-        self.results = scanner.run_scan(mac)
+        self.results = BaselineCheck(mac)
 
         print("基线核查结束！")
+        return self.results
