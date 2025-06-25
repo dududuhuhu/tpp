@@ -55,6 +55,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/rule/**").permitAll();
                     // 对于控制台接口，所有都能访问
                     auth.requestMatchers("/console/**").permitAll();
+                    auth.requestMatchers("/api/**").permitAll();
                     // 对于登录接口 允许匿名访问
                     auth.requestMatchers("/user/login").anonymous();
                     // 退出登录接口
@@ -63,6 +64,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/page/**").anonymous();
                     auth.requestMatchers("/").anonymous();
                     // CSS/JS/IMG/LIB/FONTS放行
+                    auth.requestMatchers("/static/**").anonymous();
                     auth.requestMatchers("/css/**").anonymous();
                     auth.requestMatchers("/js/**").anonymous();
                     auth.requestMatchers("/img/**").anonymous();

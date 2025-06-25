@@ -5,105 +5,91 @@
     <title>添加系统风险规则</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
     <style>
-        .st{
-            width: 270px!important;
+        .st {
+            width: 270px !important;
         }
-        .layui-form-label{
-            width: 120px!important;
+        .layui-form-label {
+            width: 120px !important;
         }
-        .xinghao{
-            color: red!important;
+        .xinghao {
+            color: red !important;
         }
     </style>
 </head>
 <body>
 
-<form class="layui-form" lay-filter="riskForm">
-    <!-- 风险名称 -->
+<div class="layui-form" lay-filter="layuiadmin-form-sysrule" id="layuiadmin-form-sysrule" style="padding: 20px 0 0 0;">
+    <input type="hidden" name="id">
+
     <div class="layui-form-item">
         <label class="layui-form-label">风险名称<span class="xinghao">*</span></label>
         <div class="layui-input-inline">
-            <input type="text" name="riskName" lay-verify="required" placeholder="请输入风险名称" autocomplete="off" class="layui-input">
+            <input type="text" name="riskName" lay-verify="required" placeholder="请输入风险名称" autocomplete="off" class="layui-input st">
         </div>
     </div>
 
-    <!-- 风险类型 -->
     <div class="layui-form-item">
         <label class="layui-form-label">风险类型<span class="xinghao">*</span></label>
         <div class="layui-input-inline">
-            <input type="text" name="riskType" lay-verify="required" placeholder="请输入风险类型" autocomplete="off" class="layui-input">
+            <input type="text" name="riskType" lay-verify="required" placeholder="如 注册表/命令/NTP" autocomplete="off" class="layui-input st">
         </div>
     </div>
 
-    <!-- 风险等级 -->
     <div class="layui-form-item">
         <label class="layui-form-label">风险等级<span class="xinghao">*</span></label>
+        <div class="layui-input-inline">
+            <select name="riskLevel" lay-verify="required" class="st">
+                <option value="">请选择风险等级</option>
+                <option value="1">低</option>
+                <option value="2">中</option>
+                <option value="3">高</option>
+                <option value="4">严重</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">检测方式<span class="xinghao">*</span></label>
+        <div class="layui-input-inline">
+            <input type="text" name="detectionMethod" lay-verify="required" placeholder="如 注册表、命令、NTP" autocomplete="off" class="layui-input st">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">检测路径</label>
+        <div class="layui-input-inline">
+            <input type="text" name="rulePath"  placeholder="如 注册表路径、命令行" autocomplete="off" class="layui-input st">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">路径载荷</label>
         <div class="layui-input-block">
-            <input type="radio" name="riskLevel" value="1" title="低" lay-verify="required">
-            <input type="radio" name="riskLevel" value="2" title="中">
-            <input type="radio" name="riskLevel" value="3" title="高">
-            <input type="radio" name="riskLevel" value="4" title="严重">
+            <textarea name="rulePayload" placeholder="请输入路径负载（如参数、期望值）" class="layui-textarea" style="min-height: 80px;"></textarea>
         </div>
     </div>
 
-    <!-- 检测方式 -->
-    <div class="layui-form-item">
-        <label class="layui-form-label">检测方式类型<span class="xinghao">*</span></label>
-        <div class="layui-input-inline">
-            <input type="text" name="detectionMethod" lay-verify="required" placeholder="请输入检测方式" autocomplete="off" class="layui-input">
-        </div>
-    </div>
-
-    <!-- 路径 -->
-    <div class="layui-form-item">
-        <label class="layui-form-label">检测路径<span class="xinghao">*</span></label>
-        <div class="layui-input-inline">
-            <input type="text" name="rulePath" lay-verify="required" placeholder="请输入检测路径" autocomplete="off" class="layui-input">
-        </div>
-    </div>
-
-    <!-- 检测路径负载 -->
-    <div class="layui-form-item">
-        <label class="layui-form-label">检测路径负载<span class="xinghao">*</span></label>
-        <div class="layui-input-inline">
-            <input type="text" name="rulePayload" lay-verify="required" placeholder="请输入检测路径负载" autocomplete="off" class="layui-input">
-        </div>
-    </div>
-
-    <!-- 修复建议 -->
     <div class="layui-form-item">
         <label class="layui-form-label">修复建议</label>
         <div class="layui-input-block">
-            <textarea name="remediationAdvice" placeholder="请输入修复建议" class="layui-textarea"></textarea>
+            <textarea name="remediationAdvice" placeholder="请输入修复建议" class="layui-textarea" style="min-height: 80px;"></textarea>
         </div>
     </div>
 
-    <!-- 风险状态 -->
     <div class="layui-form-item">
-        <label class="layui-form-label">风险状态<span class="xinghao">*</span></label>
-        <div class="layui-input-block">
-            <input type="radio" name="isActive" value="1" title="活跃" lay-verify="required">
-            <input type="radio" name="isActive" value="0" title="不活跃">
-        </div>
-    </div>
-
-    <!-- 创建时间 -->
-    <div class="layui-form-item">
-        <label class="layui-form-label">创建时间</label>
+        <label class="layui-form-label">适用平台<span class="xinghao">*</span></label>
         <div class="layui-input-inline">
-            <input type="text" name="createdAt" placeholder="系统自动生成" readonly class="layui-input">
+            <input type="text" name="platform" lay-verify="required" placeholder="如 Windows/Linux" autocomplete="off" class="layui-input st">
         </div>
     </div>
-</form>
 
-<!--  提交 -->
-<div class="layui-form-item layui-hide">
-    <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit" value="确认">
-</div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit" value="确认">
+    </div>
 </div>
 
 <script src="/layui/layui.js"></script>
@@ -112,21 +98,25 @@
         base: '/layui/layuiAdmin/'
     }).extend({
         index: 'lib/index'
-    }).use(['index', 'layer', 'form', 'laydate'], function(){
-        var $ = layui.$
-            ,form = layui.form
-            ,layer = layui.layer
-            ,laydate = layui.laydate;
+    }).use(['index', 'form'], function(){
+        var form = layui.form;
 
-        // 渲染表单（关键！）
-        form.render();
-
-        // 可选：日期组件、验证等
-        // laydate.render({
-        //     elem: '#hiredate'
-        // });
+        // 自定义验证（如需要）
+        form.verify({
+            riskName: function(value){
+                if(value.length < 2){
+                    return '风险名称至少2个字符';
+                }
+            },
+            rulePath: function(value){
+                if(value.length < 2){
+                    return '检测路径至少2个字符';
+                }
+            }
+        });
 
     });
 </script>
+
 </body>
 </html>

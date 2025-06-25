@@ -1,5 +1,6 @@
 from mq.consumer import Consumer
 import uuid
+import platform as _platform
 from service.consumerService import agent_mac_queue_callback
 all = ['HOST', 'PORT', 'USERNAME', 'PASSWORD', 'VHOST', 'consumer_routing', 'publisher_routing']
 HOST = '192.168.192.128'
@@ -9,6 +10,13 @@ PASSWORD = '20250606'
 VHOST = 'my_vhost'
 
 MAC = ':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))
+if _platform.system() == "Linux":
+    PLATFORM = "Linux"
+elif _platform.system() == "Windows":
+    PLATFORM = "Windows"
+else:
+    PLATFORM = "Unknown"
+
 CONSUMER_EXCHANGE_NAME = f'agent_{MAC.replace(":", "")}_exchange'
 PUBLISHER_EXCHANGE_NAME = 'sysinfo_exchange'
 

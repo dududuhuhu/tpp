@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.WeakPasswords;
 
 import java.util.List;
@@ -27,4 +28,10 @@ public interface WeakPasswordsMapper {
     List<String> selectAllWeakPasswords();
 
     List<WeakPasswords> findAll();
+
+    List<WeakPasswords> findRulesBySearchTypeAndKeywords(MyParam param);
+
+    WeakPasswords selectByPsd(String password);
+
+    void delete(Integer[] ids);
 }

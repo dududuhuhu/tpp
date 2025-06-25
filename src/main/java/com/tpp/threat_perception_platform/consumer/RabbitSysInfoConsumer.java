@@ -2,12 +2,15 @@ package com.tpp.threat_perception_platform.consumer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.rabbitmq.client.Channel;
 
+import com.tpp.threat_perception_platform.dao.HostMapper;
+import com.tpp.threat_perception_platform.dao.LogRulesMapper;
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
@@ -36,6 +39,9 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private AppInfoService appInfoService;
+
+    @Autowired
+    private RuleService ruleService;
 
     @Autowired
     private ProcessInfoService processInfoService;
@@ -82,6 +88,10 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private BaselineHardeningService baselineHardeningService;
+    @Autowired
+    private HostMapper hostMapper;
+    @Autowired
+    private LogRulesMapper logRulesMapper;
 
     <T> T validateAndParseObject(String message, Class<T> clazz) {
         try {
@@ -187,7 +197,7 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "status_queue")
     public void receiveStatus(String message, @Headers Map<String,Object> headers,
-                        Channel channel) throws IOException {
+                              Channel channel) throws IOException {
         System.out.println("Received message: " + message);
         // 反序列化数据
         try {
@@ -270,8 +280,6 @@ public class RabbitSysInfoConsumer {
     @RabbitListener(queues = "process_queue")
     public void receiveProcess(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received process info message: " + message);
-        System.out.println("Headers: " + headers);
-        System.out.println("deliveryTag: " + headers.get(AmqpHeaders.DELIVERY_TAG));
 
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
@@ -433,7 +441,6 @@ public class RabbitSysInfoConsumer {
             if (paramList == null) {
                 return;
             }
-
             Timestamp now = new Timestamp(System.currentTimeMillis());
             for (ApplicationRisk param : paramList) {
                 try {
@@ -546,7 +553,7 @@ public class RabbitSysInfoConsumer {
                 // test: 提取危险补丁并输出
                 if (!hotfixList.isEmpty()) {
                     String mac = hotfix.getMac();
-                    HotfixParam param=null;
+                    HotfixParam param = new HotfixParam();
                     param.setMacAddress(mac);
 //                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(param);
 //                    List<DangerousHotfix> dangerousList = response.getData();
@@ -617,6 +624,7 @@ public class RabbitSysInfoConsumer {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (VulnerabilityRisk vulnerabilityRisk: vulnerabilityRiskList) {
+                vulnerabilityRisk.setIsExit(1);
                 ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk, now);
                 System.out.println("Save result: " + result.getMsg());
             }
@@ -866,34 +874,55 @@ public class RabbitSysInfoConsumer {
         }
     }
 
-//    @RabbitListener(queues = "inTimeRequest_queue")
-//    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers,
-//                              Channel channel) throws IOException {
-//        System.out.println("Received inTime Request message: " + message);
-//        // 反序列化数据
-//        try {
-//            Host host = validateAndParseObject(message, Host.class);
-//            if (host == null) {
-//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//                channel.basicAck(deliveryTag,false);
+    @RabbitListener(queues = "inTimeRequest_queue")
+    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+        System.out.println("接收到的消息: " + message);
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+
+        try {
+//            String mac = validateAndParseObject(message,String.class);
+//            if (mac == null) {
+//                channel.basicAck(deliveryTag, false);
+//                System.out.println("实时信息验证失败");
 //                return;
 //            }
-//
-//            int res = hostService.updateHostByMacAddress(host);
-//            if (res > 0){
-//
-//                // 手动 ACK, 先获取 deliveryTag
-//                Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//                // ACK
-//                channel.basicAck(deliveryTag,false);
-//            }
-//        } catch (IOException e) {
-//            // 手动 ACK, 先获取 deliveryTag
-//            Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
-//            // ACK
-//            channel.basicAck(deliveryTag,false);
-//        }
-//
-//    }
+
+            // 直接解析为 JSONObject
+            JSONObject jsonObject = JSON.parseObject(message);
+            String mac = jsonObject.getString("mac");
+            if (mac == null || mac.trim().isEmpty()) {
+                System.out.println("消息中缺少 MAC 字段，丢弃消息");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            System.out.println("提取到的 MAC: " + mac);
+
+            // 查询主机信息
+            Host db_host = hostMapper.selectByMacAddress(mac);
+            if (db_host == null) {
+                System.out.println("数据库中未找到主机信息，MAC: " + mac + "，丢弃消息");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            String platform = db_host.getOsType();
+            System.out.println("获取到主机平台类型: " + platform);
+
+            // 发送日志规则
+            ruleService.sendLogRules(mac, platform);
+            System.out.println("已向指定队列发送日志规则");
+
+            // 正常 ACK 消息
+            channel.basicAck(deliveryTag, false);
+
+        } catch (Exception e) {
+            System.err.println("处理实时请求消息异常: " + e.getMessage());
+            e.printStackTrace();
+            // 即使异常也 ACK，避免消息堆积
+            channel.basicAck(deliveryTag, false);
+        }
+    }
+
 
 }

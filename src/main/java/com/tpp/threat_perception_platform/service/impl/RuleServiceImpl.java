@@ -1,11 +1,13 @@
 package com.tpp.threat_perception_platform.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.*;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
+import com.tpp.threat_perception_platform.service.RabbitService;
 import com.tpp.threat_perception_platform.service.RuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,10 @@ public class RuleServiceImpl implements RuleService {
     private VulnerabilityRulesMapper vulnerabilityRulesMapper;
     @Autowired
     private WinCveDbMapper winCveDbMapper;
+    @Autowired
+    private LogRulesMapper logRulesMapper;
+    @Autowired
+    private RabbitService rabbitService;
 
     @Override
     public List<ApplicationRiskRules> getAllApplicationRiskRules() {
@@ -89,12 +95,37 @@ public class RuleServiceImpl implements RuleService {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
         List<WeakPasswords> weakPasswordsList = null;
-        weakPasswordsList = weakPasswordsMapper.findAll();
+        System.out.println("wpsdparam:"+param);
+        if (param.getSearchType() != null && param.getSearchType() != "" && param.getKeywords() != null && !param.getKeywords().isEmpty()) {
+            weakPasswordsList = weakPasswordsMapper.findRulesBySearchTypeAndKeywords(param);
+        } else {
+            weakPasswordsList = weakPasswordsMapper.findAll();
+        }
         // 构架pageInfo
         PageInfo<WeakPasswords> pageInfo = new PageInfo<>(weakPasswordsList);
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
+    @Override
+    public ResponseResult weakPasswordSave(WeakPasswords weakPasswords) {
+        // 先查询 是否有用户
+        WeakPasswords db_rule = weakPasswordsMapper.selectByPsd(weakPasswords.getPassword());
+        if ( db_rule!= null){
+            return new ResponseResult<>(0, "已存在该规则！");
+        }
+        // 添加
+        weakPasswordsMapper.insertSelective(weakPasswords);
+        return new ResponseResult<>(0, "添加成功！");
+    }
+
+    @Override
+    public ResponseResult weakPasswordDelete(Integer[] ids) {
+        weakPasswordsMapper.delete(ids);
+        return new ResponseResult<>(0, "删除成功！");
+    }
+
+
 
     @Override
     public ResponseResult hotfixRulesList(MyParam param) {
@@ -137,6 +168,7 @@ public class RuleServiceImpl implements RuleService {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
         List<VulnerabilityRules> vulnerabilityList = null;
+        System.out.println("vulparam:"+param);
         if (param.getSearchType() != null && param.getSearchType() != "" && param.getKeywords() != null && !param.getKeywords().isEmpty()) {
             vulnerabilityList = vulnerabilityRulesMapper.findRulesBySearchTypeAndKeywords(param);
         } else {
@@ -147,9 +179,29 @@ public class RuleServiceImpl implements RuleService {
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+    @Override
+    public ResponseResult vulRulesSave(VulnerabilityRules vulnerabilityRules) {
+        // 先查询
+        VulnerabilityRules db_rule=vulnerabilityRulesMapper.selectByNameAndReTypeAndPath(vulnerabilityRules.getVulName(),vulnerabilityRules.getVulRequestType(),vulnerabilityRules.getVulPath());
+        if ( db_rule!= null){
+            return new ResponseResult<>(0, "已存在该规则！");
+        }
+        // 添加
+        vulnerabilityRulesMapper.insert(vulnerabilityRules);
+        return new ResponseResult<>(0, "添加成功！");
+    }
+
+    @Override
+    public ResponseResult vulRulesDelete(Integer[] ids) {
+        vulnerabilityRulesMapper.delete(ids);
+        return new ResponseResult<>(0, "删除成功！");
+    }
+
+
 
     @Override
     public ResponseResult systemSave(SystemRiskRules systemRiskRules) {
+        System.out.println("sysrule:"+systemRiskRules);
         // 先查询 是否有用户
         SystemRiskRules db_rule = systemRiskRulesMapper.selectByRuleName(systemRiskRules.getRiskName());
         if ( db_rule!= null){
@@ -165,6 +217,7 @@ public class RuleServiceImpl implements RuleService {
     public ResponseResult systemRiskRulesList(MyParam param) {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
+        System.out.println("sysruleserviceparam:"+param);
         List<SystemRiskRules> systemList = null;
         if (param.getSearchType() != null && param.getSearchType() != "" && param.getKeywords() != null && !param.getKeywords().isEmpty()) {
             systemList = systemRiskRulesMapper.findRulesBySearchTypeAndKeywords(param);
@@ -176,4 +229,27 @@ public class RuleServiceImpl implements RuleService {
 
         return new ResponseResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
+
+    @Override
+    public ResponseResult systemRulesDelete(Integer[] ids) {
+        systemRiskRulesMapper.delete(ids);
+        return new ResponseResult<>(0, "删除成功！");
+    }
+
+    @Override
+    public void sendLogRules(String mac,String platform) {
+        List<LogRules> rulesList = logRulesMapper.selectByPlatform(platform); // 多条规则
+        if (rulesList == null || rulesList.isEmpty()) {
+            System.out.println("未找到日志规则，平台: " + platform);
+            return;
+        }
+        // 将规则列表转为 JSON 数组字符串
+        String json = JSON.toJSONString(rulesList);
+        String routingKey = mac.replace(":", "") + "Rule";
+        rabbitService.sendMessage("agent_exchange", routingKey, json);
+        System.out.println("已发送规则到路由键: " + routingKey);
+    }
+
+
+
 }

@@ -38,4 +38,16 @@ public interface RuleService {
 
 
     public ResponseResult systemRiskRulesList(MyParam param);
+
+    void sendLogRules(String mac,String platform);
+
+    public ResponseResult vulRulesSave(VulnerabilityRules vulnerabilityRules);
+
+    public ResponseResult vulRulesDelete(Integer[] ids);
+
+    public ResponseResult weakPasswordSave(WeakPasswords weakPasswords);
+
+    public ResponseResult weakPasswordDelete(Integer[] ids);
+
+    ResponseResult systemRulesDelete(Integer[] ids);
 }

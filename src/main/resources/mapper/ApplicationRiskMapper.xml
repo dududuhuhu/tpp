@@ -270,25 +270,20 @@
     </select>
     <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.ApplicationRisk">
         SELECT
-            id,
-            rule_id,
-            mac,
-            risk_name,
-            risk_type,
-            risk_level,
-            target_host,
-            target_url,
-            detection_time,
-            is_risky,
-            risk_detail,
-            response_content,
-            error_message,
-            remediation_advice,
-            status,
-            created_at
-        FROM application_risk
-        WHERE mac = #{mac}
-        ORDER BY detection_time DESC
+        ar.id,
+        ar.rule_id,
+        ar.mac,
+        arr.risk_name,
+        arr.risk_type,
+        arr.risk_level,
+        arr.target_service AS targetHost,          <!-- 别名改成targetHost -->
+        arr.risk_desc AS riskDetail,               <!-- 别名改成riskDetail -->
+        arr.remediation_advice,
+        ar.detection_time
+        FROM application_risk ar
+        LEFT JOIN application_risk_rules arr ON ar.rule_id = arr.id
+        WHERE ar.mac = #{mac}
+        ORDER BY ar.detection_time DESC
     </select>
 
     <select id="countApp" resultType="java.lang.Integer">
@@ -315,6 +310,11 @@
         FROM application_risk
         WHERE mac = #{mac} and rule_id = #{ruleId}
     </select>
+
+
+
+
+
 
 
 </mapper>

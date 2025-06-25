@@ -82,7 +82,8 @@
                         <div style="padding-bottom: 10px;">
                             <!-- 主机列表按钮 -->
                             <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
-                            <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="user" data-type="AI" disabled>AI辅助分析</button>                        </div>
+                            <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="user" data-type="AI" disabled>AI辅助分析</button>
+                        </div>
                         <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
 
                         <!-- 表格工具栏 -->
@@ -142,7 +143,7 @@
 
 <!-- Layui 核心 JS -->
 <script src="/layui/layui.js"></script>
-
+<script src="/js/reportUtils.js"></script>  <!-- 确保路径正确 -->
 <!-- 工具函数：时间格式化 -->
 <script>
     function formatDate(str) {
@@ -312,7 +313,6 @@
         //监听搜索
         form.on('submit(LAY-sysrule-front-search)', function(data){
             var field = data.field;
-            console.log(field);
             //执行重载
             table.reload('LAY-rule-manage', {
                 url: '/rule/hotfix/list',
@@ -341,11 +341,10 @@
                 }
                 // 只取第一个 MAC 地址
                 var mac = data[0].macAddress;
-                console.log("hotfixAImac:",mac);
 
                 // 发送 AI 分析请求...
                 $.ajax({
-                    url: '/api/report/hotfix/analyze',
+                    url: '/api/report/hotfix-risk/analyze',
                     method: 'POST',
                     headers: {
                         'Authorization': localStorage.getItem('token'),
@@ -355,20 +354,7 @@
                     data: JSON.stringify({ macAddress: mac }),
                     success: function (res) {
                         if (res.code === 0) {
-                            layer.open({
-                                type: 1,
-                                title: 'AI 分析报告',
-                                area: ['600px', '400px'],
-                                shadeClose: true,
-                                content: `
-                        <div style="padding:20px;">
-                            <p><strong>主机：</strong>${mac}</p>
-                            <p><strong>总风险等级：</strong>1</p>
-                            <p><strong>高危补丁数量：</strong>2</p>
-                            <p><strong>分析说明：</strong>dddd</p>
-                        </div>
-                    `
-                            });
+                            reportUtils.showReportDialog('安全补丁风险分析报告', res.data);
                         } else {
                             layer.msg(res.msg || '分析失败', {icon: 5});
                         }
@@ -378,16 +364,21 @@
                     }
                 });
             },
-
-
             host_refresh: function(){
+                // 清空搜索输入框
+                $('input[name="keywords"]').val('');
+                // 清空搜索类型（如果需要，也可以清空或重置select）
+                $('select[name="searchType"]').val('macAddress');
+                form.render('select'); // 重新渲染select，否则界面不会更新
                 table.reload('LAY-user-manage', {
                     url: '/host/dangerousHotfixRisk',
                     method: "post",
                     headers: {
                         'Authorization': localStorage.getItem('token'),
                         'userId':localStorage.getItem('id')
-                    }
+                    },
+                    where: {},  // 传空对象，重置所有搜索条件
+                    page: {curr: 1} // 刷新时重置页码到第一页
                 });
                 // 禁用按钮并清除搜索标记
                 $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
@@ -418,12 +409,19 @@
                 });
             },
             rule_refresh: function(){
+                // 清空搜索输入框
+                $('input[name="keywords"]').val('');
+                // 清空搜索类型（如果需要，也可以清空或重置select）
+                $('select[name="searchType"]').val('cve');
+                form.render('select'); // 重新渲染select，否则界面不会更新
                 table.reload('LAY-rule-manage', {
                     url: '/rule/hotfix/list',
                     method: 'post',
                     headers: {
                         'Authorization': localStorage.getItem('token')
-                    }
+                    },
+                    where: {},  // 传空对象，重置所有搜索条件
+                    page: {curr: 1} // 刷新时重置页码到第一页
                 });
             },
             rule_add: function(){
@@ -432,7 +430,6 @@
                     title: '添加规则',
                     skin: 'layui-layer-molv',
                     content: '/page/risk/hotfixAdd',
-                    maxmin: true,
                     area: ['580px', '600px'],
                     btn: ['确定', '取消'],
                     yes: function (index,layero){

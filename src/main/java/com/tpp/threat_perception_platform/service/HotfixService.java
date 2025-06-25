@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface HotfixService {
 
-    // public ResponseResult hotfixList(HotfixParam param);
+     public ResponseResult<List<Hotfix>> hotfixList(HotfixParam param);
+
 
     public ResponseResult saveHotfix(Hotfix hotfix, Timestamp now);
 
@@ -22,5 +23,5 @@ public interface HotfixService {
     public ResponseResult<List<DangerousHotfix>> getDangerousPatch(HotfixParam param);
 
 
-    ResponseResult analyzeAndSaveHotfixRiskReport(List<DangerousHotfix> hotfixes, String mac);
+    ResponseResult analyzeAndSaveHotfixRiskReport(List<Hotfix> hotfixes, String mac);
 }

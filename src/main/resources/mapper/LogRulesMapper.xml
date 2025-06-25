@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.LogRulesMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.LogRules">
+            <id property="id" column="id" />
+            <result property="platform" column="platform" />
+            <result property="eventId" column="event_id" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="description" column="description" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,platform,event_id,risk_level,description
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from log_rules
+        where  id = #{id} 
+    </select>
+    <select id="selectByPlatform" resultType="com.tpp.threat_perception_platform.pojo.LogRules">
+        select
+        <include refid="Base_Column_List" />
+        from log_rules
+        where platform = #{platform}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from log_rules
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LogRules" useGeneratedKeys="true">
+        insert into log_rules
+        ( id,platform,event_id,risk_level,description)
+        values (#{id},#{platform},#{eventId},#{riskLevel},#{description})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.LogRules" useGeneratedKeys="true">
+        insert into log_rules
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="platform != null">platform,</if>
+                <if test="eventId != null">event_id,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="description != null">description,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="platform != null">#{platform},</if>
+                <if test="eventId != null">#{eventId},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="description != null">#{description},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.LogRules">
+        update log_rules
+        <set>
+                <if test="platform != null">
+                    platform = #{platform},
+                </if>
+                <if test="eventId != null">
+                    event_id = #{eventId},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="description != null">
+                    description = #{description},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.LogRules">
+        update log_rules
+        set 
+            platform =  #{platform},
+            event_id =  #{eventId},
+            risk_level =  #{riskLevel},
+            description =  #{description}
+        where   id = #{id} 
+    </update>
+</mapper>

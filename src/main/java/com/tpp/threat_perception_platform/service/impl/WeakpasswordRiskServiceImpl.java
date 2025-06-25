@@ -5,9 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.AccountInfoMapper;
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.WeakpasswordRiskMapper;
+import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.WeakpasswordParam;
-import com.tpp.threat_perception_platform.pojo.AccountInfo;
-import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
+import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.WeakpasswordRiskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,13 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
         // 查询weak = true
-        List<WeakpasswordRisk> weakpasswordRiskList = weakpasswordRiskMapper.findAll();
+
+        List<WeakpasswordRisk> weakpasswordRiskList;
+        if (mac!= null && !mac.isEmpty()) {
+            weakpasswordRiskList=weakpasswordRiskMapper.findByMac(mac);
+        }else{
+            weakpasswordRiskList=weakpasswordRiskMapper.findAll();
+        }
         // 构架pageInfo
         PageInfo<WeakpasswordRisk> pageInfo = new PageInfo<>(weakpasswordRiskList);
 

@@ -78,6 +78,8 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
 
 
 
+
+
     @Override
     public ResponseResult editAppRisk(ApplicationRisk appRisk) {
         applicationRiskMapper.updateByPrimaryKeySelective(appRisk);
@@ -216,12 +218,11 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
         StringBuilder sb = new StringBuilder();
         for (ApplicationRisk risk : risks) {
             sb.append(String.format(
-                    "风险名称: %s\n风险类型: %s\n风险等级: %s\n目标主机: %s\n目标URL: %s\n探测时间: %s\n风险详情: %s\n\n",
+                    "风险名称: %s\n风险类型: %s\n风险等级: %s\n目标服务: %s\n探测时间: %s\n风险详情: %s\n\n",
                     risk.getRiskName(),
                     risk.getRiskType(),
                     risk.getRiskLevel(),
                     risk.getTargetHost(),
-                    risk.getTargetUrl(),
                     risk.getDetectionTime(),
                     risk.getRiskDetail()
             ));

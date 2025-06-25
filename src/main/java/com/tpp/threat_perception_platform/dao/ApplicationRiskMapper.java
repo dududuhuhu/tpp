@@ -54,6 +54,15 @@ public interface ApplicationRiskMapper {
      */
     List<ApplicationRisk> selectByMac(String mac);
 
+    /**
+     * 根据 ruleId 和 mac 查询记录（用于判重）
+     * @param ruleId 风险规则 ID
+     * @param mac MAC 地址
+     * @return 匹配的风险记录
+     */
+    ApplicationRisk selectByMacAndRuleId(String mac, Integer ruleId);
+
+
 
 
     Integer countApp();

@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface WeakpasswordRiskService {
 
-
     ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk, Timestamp now);
 
     public ResponseResult weakpasswordList(WeakpasswordParam param);

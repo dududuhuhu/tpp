@@ -36,7 +36,6 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
 
         // 设置统一传入的时间
         processInfo.setCollectTime(now);
-
         if (existing != null) {
             // 判断关键字段是否有变化
             boolean isChanged = false;
