@@ -1,5 +1,6 @@
 import subprocess
 import json
+import os
 # # 第一步：设置执行策略为 Unrestricted（跳过确认）
 # set_policy_cmd = [
 #     'powershell',
@@ -46,8 +47,8 @@ def BaselineCheck(mac):
     result = subprocess.run(ps_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
     results = []
     entry = {}
-
-    with open("baseLine.log", "r", encoding="utf-8") as f:
+    log_path = os.path.join(os.path.dirname(__file__), "baseLine.log")
+    with open(log_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     i = 0
     while i < len(lines):
