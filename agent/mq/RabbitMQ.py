@@ -149,3 +149,4 @@ class RabbitMQ:
         routing_key = 'app'
         # 发送数据
         self.__my_producer(exchange, routing_key, data)
+
