@@ -3,7 +3,6 @@ import uuid
 import platform
 from mq.consumer import Consumer
 from mq.publisher import Publisher
-
 from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
 PLATFORM = platform.system()
@@ -25,8 +24,9 @@ else:
     print("Unsupported platform. Please set PLATFORM to 'Linux' or 'Windows'.")
     exit(-1)
 from threading import Thread
+from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
+from work.BaselineCheckDetect import BaselineCheckDetect
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
-
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
         publisher.publish_message(routing_key=routing_key, message=detector.detect())
@@ -73,11 +73,13 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
             detector = None
         #     需要更新消费队列
         elif data['type'] == 'auditLog':
-             detector = AuditLogDetector(data)
+            detector = AuditLogDetector(data)
         elif data['type'] == 'loginLog':
             detector = LoginLogDetector(data)
         elif data['type'] == 'accountChangeLog':
             detector = AccountChangeLogDetector(data)
+        elif data['type'] == 'baseline_detect':
+            detector = BaselineCheckDetect(data)
         else:
             print(f"Unknown message type: {data['type']}")
         if detector:

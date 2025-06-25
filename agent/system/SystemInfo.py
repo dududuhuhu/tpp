@@ -133,3 +133,7 @@ class SystemInfo(object):
     # mac_address的getter方法
     def get_mac_address(self):
         return self.__mac_address
+
+if __name__ == '__main__':
+    system_info = SystemInfo()
+    print(system_info.get_info())
