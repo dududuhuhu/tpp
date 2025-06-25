@@ -3,9 +3,6 @@ import json
 from ..baseline.BaselineCheck import BaselineCheck
 
 class BaselineCheckDetect:
-    """
-    漏洞探测类（非线程版本）
-    """
 
     def __init__(self,data):
         # 可扩展初始化参数（如扫描目标等）
@@ -23,10 +20,10 @@ class BaselineCheckDetect:
         """
         内部实际探测逻辑
         """
-        print("开始探测漏洞数据..............!")
+        print("开始基线检查..............!")
         # 创建扫描器实例并执行
         scanner = BaselineCheck(mac)
         # mac=self.mac
         self.results = scanner.run_scan(mac)
 
-        print("探测漏洞数据结束！")
+        print("基线检查结束！")
