@@ -887,27 +887,44 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+    public static class InTimeRequest {
+        private String mac;
+        public InTimeRequest() {}
+
+        public String getMac() {
+            return mac;
+        }
+        public void setMac(String mac) {
+            this.mac = mac;
+        }
+    }
+
     @RabbitListener(queues = "inTimeRequest_queue")
-    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+    public void receiveInTimeRequest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
         System.out.println("接收到的消息: " + message);
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
-//            String mac = validateAndParseObject(message,String.class);
-//            if (mac == null) {
-//                channel.basicAck(deliveryTag, false);
-//                System.out.println("实时信息验证失败");
-//                return;
-//            }
-
-            // 直接解析为 JSONObject
-            JSONObject jsonObject = JSON.parseObject(message);
-            String mac = jsonObject.getString("mac");
-            if (mac == null || mac.trim().isEmpty()) {
-                System.out.println("消息中缺少 MAC 字段，丢弃消息");
+            InTimeRequest inTimeRequest = validateAndParseObject(message, InTimeRequest.class);
+            if (inTimeRequest == null) {
                 channel.basicAck(deliveryTag, false);
                 return;
             }
+            String mac = inTimeRequest.getMac();
+            // if (mac == null) {
+            //     channel.basicAck(deliveryTag, false);
+            //     System.out.println("实时信息验证失败");
+            //     return;
+            // }
+
+            // 直接解析为 JSONObject
+            // JSONObject jsonObject = JSON.parseObject(message);
+            // String mac = jsonObject.getString("mac");
+            // if (mac == null || mac.trim().isEmpty()) {
+            //     System.out.println("消息中缺少 MAC 字段，丢弃消息");
+            //     channel.basicAck(deliveryTag, false);
+            //     return;
+            // }
 
             System.out.println("提取到的 MAC: " + mac);
 

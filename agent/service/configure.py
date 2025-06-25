@@ -1,11 +1,12 @@
 from mq.consumer import Consumer
 import uuid
 from service.consumerService import agent_mac_queue_callback
+from Logs.logRuleSave import save_log_rule
 all = ['HOST', 'PORT', 'USERNAME', 'PASSWORD', 'VHOST', 'consumer_routing', 'publisher_routing']
-HOST = '192.168.192.128'
-PORT = 4568
+HOST = '172.17.0.2'
+PORT = 5672
 USERNAME = 'admin'
-PASSWORD = '20250606'
+PASSWORD = 'hello123456'
 VHOST = 'my_vhost'
 
 MAC = ':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))
@@ -20,6 +21,11 @@ CONSUMER_ROUTING = [
         queue_name=f'agent_{MAC.replace(":", "")}_queue',
         routing_key=MAC.replace(":", ""),
         callback=agent_mac_queue_callback
+    ),
+    Consumer.RoutingInfo(
+        queue_name=f'inTime_{MAC.replace(':', '')}_queue',
+        routing_key=f'{MAC.replace(":", "")}Rule',
+        callback=save_log_rule,
     )
 ]
 
@@ -36,5 +42,7 @@ PUBLISHER_ROUTING = {
     'auditLog_queue':'auditLog',
     'loginLog_queue':'loginLog',
     'accountChangeLog_queue':'accountChangeLog',
+    'inTime_queue':'inTime',
+    'inTimeRequest_queue':'inTimeRequest',
 }
 

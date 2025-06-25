@@ -7,6 +7,8 @@ from service.configure import SERVER_PEM_PUB
 from user.userConfig import USER_PEM_PRI
 
 from linux.logDetect import LogDetect
+import platform
+PLATFORM = platform.platform()
 
 
 all = ['default_consumer', 'default_publisher', 'user_signer', 'server_verifier', 'logDetector']
