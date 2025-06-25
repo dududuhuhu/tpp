@@ -6,6 +6,7 @@
 
     <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.BaselineDetect">
             <id property="id" column="id" />
+            <result property="taskId" column="task_id" />
             <result property="mac" column="mac" />
             <result property="name" column="name" />
             <result property="result" column="result" />
@@ -16,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,mac,name,result,current_value,recommended_value,
+        id,task_id,mac,name,result,current_value,recommended_value,
         description,updated_time
     </sql>
 
@@ -36,7 +37,39 @@
         select
         <include refid="Base_Column_List" />
         from baseline_detect
-        where updated_time = (SELECT MAX(updated_time) FROM baseline_detect)
+        order by
+        case result
+        when '异常项' then 0
+        when '合格项' then 1
+        else 2
+        end,
+        id asc
+    </select>
+    <select id="findByMac" resultType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_detect
+        where mac=#{mac}
+        order by
+        case result
+        when '异常项' then 0
+        when '合格项' then 1
+        else 2
+        end,
+        id asc
+    </select>
+    <select id="findByTaskId" resultType="com.tpp.threat_perception_platform.pojo.BaselineDetect">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_detect
+        where task_id=#{taskId}
+        order by
+        case result
+        when '异常项' then 0
+        when '合格项' then 1
+        else 2
+        end,
+        id asc
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

@@ -36,11 +36,11 @@ public class BaselineDetectServiceImpl implements BaselineDetectService {
      * 保存
      */
     @Override
-    public ResponseResult saveBaselineDetect(BaselineDetect baselineDetect) {
+    public ResponseResult saveBaselineDetect(BaselineDetect baselineDetect, Timestamp now) {
         // 先查询是否已存在
         BaselineDetect db = baselineDetectMapper.selectByMacAndName(baselineDetect.getMac(), baselineDetect.getName());
         // 添加
-        baselineDetect.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        baselineDetect.setUpdatedTime(now);
         if (db != null) {
             // 若已存在，更新字段（只更新 updated_time 或者所有字段）
             // 方式 1：只更新 updated_time
@@ -62,11 +62,16 @@ public class BaselineDetectServiceImpl implements BaselineDetectService {
      */
     @Override
     public ResponseResult baselineDetectList(BaselineDetectParam param) {
-        String mac= param.getMac();
-        System.out.println("mac:"+mac);
+        Integer taskId= param.getTaskId();
+        System.out.println("taskId:"+taskId);
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
-        List<BaselineDetect> baselineDetectList = baselineDetectMapper.findAll();
+        List<BaselineDetect> baselineDetectList;
+        if(taskId!=null){
+            baselineDetectList = baselineDetectMapper.findByTaskId(taskId);
+        }else{
+            baselineDetectList = baselineDetectMapper.findAll();
+        }
         // 构架pageInfo
         PageInfo<BaselineDetect> pageInfo = new PageInfo<>(baselineDetectList);
 

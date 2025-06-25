@@ -3,6 +3,16 @@ package com.tpp.threat_perception_platform.param;
 public class BaselineDetectParam {
     private String hostName;
 
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    private Integer taskId;
+
     private String mac;
 
     private String type;

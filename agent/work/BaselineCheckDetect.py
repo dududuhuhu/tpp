@@ -1,7 +1,6 @@
 # coding=utf-8
 import json
 import uuid
-
 from baseline.BaselineCheck import BaselineCheck
 
 class BaselineCheckDetect:
@@ -19,7 +18,9 @@ class BaselineCheckDetect:
         外部调用接口：执行漏洞探测，返回 JSON 字符串
         """
         self.__BaselineCheck_detect(self.mac)
-        return json.dumps(self.results, ensure_ascii=False)
+        result=json.dumps(self.results, ensure_ascii=False)
+        print(result)
+        return result
 
     def __BaselineCheck_detect(self,mac):
         """
@@ -27,8 +28,9 @@ class BaselineCheckDetect:
         """
         print("开始基线核查..............!")
         # 创建扫描器实例并执行
-        scanner = BaselineCheck(mac)
         # mac=self.mac
-        self.results = scanner.run_scan(mac)
+        self.results = BaselineCheck(mac)
 
         print("基线核查结束！")
+        return self.results
+

@@ -1,5 +1,6 @@
 import subprocess
 import json
+import os
 # # 第一步：设置执行策略为 Unrestricted（跳过确认）
 # set_policy_cmd = [
 #     'powershell',
@@ -42,12 +43,19 @@ def BaselineCheck(mac):
     subprocess.run(set_policy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     # 第二步：执行你的 PowerShell 脚本
-    ps_command = 'powershell -ExecutionPolicy Bypass -File ./ps/windows.ps1'
+    # 构造 PowerShell 脚本路径
+    SCRIPT_PATH = os.path.join(os.path.dirname(__file__), 'ps', 'windows.ps1')
+    LOG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'baseLine.log'))
+
+    # 执行 PowerShell 脚本
+    ps_command = f'powershell -ExecutionPolicy Bypass -File "{SCRIPT_PATH}"'
     result = subprocess.run(ps_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
     results = []
     entry = {}
+    # 这里指定日志文件为 agent/work/baseLine.log，保证路径正确
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'work', 'baseLine.log'))
 
-    with open("baseLine.log", "r", encoding="utf-8") as f:
+    with open(log_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     i = 0
     while i < len(lines):

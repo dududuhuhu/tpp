@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基线检测结果</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <!-- 搜索栏 -->
+        <div class="layui-card-header layuiadmin-card-header-auto" style="border-radius: 0; border-top: 4px solid #d2d2d2;">
+            <form class="layui-form" lay-filter="searchForm">
+                <div class="layui-form-item" style="margin-bottom:0;">
+                    <div class="layui-inline">
+                        <select name="searchType" lay-filter="searchType">
+                            <option value="taskId">任务ID</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-baseline-search">
+                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 按钮区和表格 -->
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-table="baseline" data-type="refresh">刷新</button>
+                <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="baseline" data-type="AI" disabled>AI辅助分析</button>
+            </div>
+            <table id="LAY-baseline-manage" lay-filter="LAY-baseline-manage"></table>
+        </div>
+        <script type="text/html" id="table-baseline-operation">
+            {{# if(d.result === '合格项'){ }}
+            <a class="layui-btn layui-btn-disabled layui-btn-xs" disabled>加固</a>
+            {{# } else { }}
+            <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="fix"><i class="layui-icon layui-icon-auz"></i>加固</a>
+            {{# } }}
+        </script>
+    </div>
+</div>
+
+<script src="/layui/layui.js"></script>
+<script src="/js/reportUtils.js"></script>  <!-- 确保路径正确 -->
+<script>
+    function padZero(n) {
+        return n < 10 ? '0' + n : n;
+    }
+    function formatDate(str) {
+        if (str != null) {
+            const d = new Date(str);
+            const year = d.getFullYear();
+            const month = padZero(d.getMonth() + 1);
+            const date = padZero(d.getDate());
+            const hour = padZero(d.getHours());
+            const minute = padZero(d.getMinutes());
+            const second = padZero(d.getSeconds());
+            return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
+        }
+        return '';
+    }
+</script>
+<script type="text/javascript" th:inline="none">
+    layui.use(['table', 'form', 'layer', 'jquery'], function () {
+        var table = layui.table,
+            form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        // 页面初始化时禁用按钮并移除搜索标记
+        $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+        var searchedTaskId = null;
+
+        // 渲染表格
+        table.render({
+            elem: '#LAY-baseline-manage',
+            method: 'post',
+            url: '/baseline/result/list',
+            contentType: 'application/json',
+            headers: {
+                'Authorization': localStorage.getItem('token'),
+                'userId': localStorage.getItem('id')
+            },
+            title: '基线检测结果',
+            cellMinWidth: 80,
+            page: { curr: 1, limit: 5 },
+            limits: [5, 10, 15, 20],
+            request: {
+                pageName: 'page',
+                limitName: 'limit'
+            },
+            parseData: function (res) {
+                return {
+                    code: res.code,
+                    msg: res.msg,
+                    count: res.count,
+                    data: res.data
+                };
+            },
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field:'taskId',title:'任务ID',width: 80},
+                {field: 'mac', title: 'MAC地址', width: 160},
+                {field: 'name', title: '基线名称', minWidth: 200},
+                {field: 'result', title: '检测结果', width: 100, align: 'center', templet: function (d) {
+                        var colorMap = {
+                            '合格项': '#5FB878',
+                            '异常项': '#FF5722'
+                        };
+                        var color = colorMap[d.result] || '#999';
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${color};">${d.result}</span>`;
+                    }},
+                // {field: 'currentValue', title: '当前值', minWidth: 200},
+                // {field: 'recommendedValue', title: '推荐值', minWidth: 200},
+                {field: 'description', title: '说明', minWidth: 300},
+                {field: 'updatedTime', title: '更新时间', width: 160, templet: d => formatDate(d.updatedTime)},
+                {fixed: 'right', title: '操作', toolbar: '#table-baseline-operation', width: 80}
+
+            ]]
+        });
+
+        // 统一事件处理对象
+        var active = {
+            AI: function () {
+                if (!searchedMac) {
+                    return layer.msg('请先通过 MAC 地址进行搜索后再使用 AI 辅助分析');
+                }
+                var checkStatus = table.checkStatus('LAY-baseline-manage');
+                var data = checkStatus.data;
+                if (data.length === 0) {
+                    return layer.msg('请至少选择一条记录');
+                }
+                var mac = data[0].mac;
+
+                var $btn = $('#btn-ai-analyze');
+                $btn.attr('disabled', true).addClass('layui-btn-disabled');
+
+                $.ajax({
+                    url: '/api/report/baseline/analyze',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('token'),
+                        'userId': localStorage.getItem('id')
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ macAddress: mac }),
+                    success: function (res) {
+                        if (res.code === 0) {
+                            if (res.code === 0) {
+                                reportUtils.showReportDialog('漏洞检测分析报告', res.data);
+                            } else {
+                                layer.msg(res.msg || '分析失败', {icon: 5});
+                            }
+                        }
+                    },
+                    error: function () {
+                        layer.msg('请求失败，请检查接口或网络连接', {icon: 2});
+                    },
+                    complete: function () {
+                        $btn.attr('disabled', false).removeClass('layui-btn-disabled');
+                    }
+                });
+            },
+            refresh: function () {
+                $('input[name="keywords"]').val('');
+                searchedTaskId = null;
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+                table.reload('LAY-baseline-manage', {
+                    where: {},
+                    page: { curr: 1 }
+                });
+            }
+        };
+
+        // 搜索表单提交
+        form.on('submit(LAY-baseline-search)', function (data) {
+            var taskId = data.field.keywords.trim();
+            console.log("resultid:",taskId);
+            searchedTaskId = taskId ? true : false;
+
+            table.reload('LAY-baseline-manage', {
+                where: { taskId: taskId },
+                page: { curr: 1 }
+            });
+
+            if (searchedTaskId) {
+                $('#btn-ai-analyze').removeClass('layui-btn-disabled').attr('disabled', false);
+            } else {
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+            }
+
+            return false;
+        });
+
+        // 按钮点击统一处理
+        $('.layuiadmin-btn-useradmin').on('click', function () {
+            var type = $(this).data('type');
+            var tableName = $(this).data('table');
+            if (tableName === 'baseline' && active[type]) {
+                active[type]();
+            }
+        });
+
+        table.on('tool(LAY-baseline-manage)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'fix') {
+                layer.confirm('确定对该基线项执行加固操作吗？', function(index){
+                    $.ajax({
+                        url: '/baseline/fix',
+                        type: 'POST',
+                        headers: {
+                            'Authorization': localStorage.getItem('token'),
+                            'userId': localStorage.getItem('id')
+                        },
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: data.id, mac: data.mac }),  // 根据你后端字段调整
+                        success: function (res) {
+                            if (res.code === 0) {
+                                layer.msg('加固成功');
+                                table.reload('LAY-baseline-manage');
+                            } else {
+                                layer.msg(res.msg || '加固失败', {icon: 5});
+                            }
+                        },
+                        error: function () {
+                            layer.msg('请求失败，请检查接口或网络连接', {icon: 2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+
+    });
+</script>
+</body>
+</html>
