@@ -3,6 +3,7 @@ import uuid
 
 from mq.consumer import Consumer
 from mq.publisher import Publisher
+from utils.crypto.src import translate_str_to_bytes
 from work.HotfixDetect import HotfixDetector
 from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.PasswordDetect import SMBWeakPasswordScanner
@@ -23,7 +24,12 @@ def wrapper(routing_key, detector, publisher, need_publish):
 def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
     try:
         print(body.decode('utf-8'))
-        data = json.loads(body.decode('utf-8'))
+        _body = json.loads(body.decode('utf-8'))
+        if (
+        not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig']))):
+            return
+
+        data = json.loads(_body['message'])
         print(f"Received message: {data}")
         detector = None
         routing_key = data['type']

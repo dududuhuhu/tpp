@@ -8,26 +8,11 @@ import subprocess
 class SMBWeakPasswordScanner:
     def __init__(self, data):
         print(data)
-        # 初始化时从 data 字典中获取目标主机 MAC 和 IP
         self.mac = data['macAddress']
         self.target_ip = data['ipAddress']
-        # 从后端接口获取弱口令列表
-        self.weak_passwords = self.load_from_backend("http://localhost:8080/rule/weakPassword")
-
-    def load_from_backend(self, url):
-        """
-        从后端接口获取弱口令规则列表
-        """
-        try:
-            response = requests.get(url, timeout=5)  # 设置请求超时时间
-            response.raise_for_status()  # 如果状态码不是 200，将抛出异常
-            data = response.json()  # 解析 JSON 响应，应为一个字符串列表
-            print(data)
-            print(f"已获得{len(data)}条弱口令")
-            return data if isinstance(data, list) else []  # 确保返回是列表类型
-        except Exception as e:
-            print(f"获取弱口令列表失败：{e}")
-            return []
+        self.weak_passwords = data.get('weakPasswords', [])  # ← 从参数里取弱密码列表
+        print(self.weak_passwords)
+        print(f"已获得{len(self.weak_passwords)}条弱口令")
 
     def list_local_users(self):
         """

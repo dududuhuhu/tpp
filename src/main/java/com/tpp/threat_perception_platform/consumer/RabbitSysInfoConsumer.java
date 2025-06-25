@@ -744,8 +744,8 @@ public class RabbitSysInfoConsumer {
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
-            List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
-
+//            List<LogParam> logParams = JSON.parseArray(message, LogParam.class);
+            List<LogParam> logParams=validateAndParseList(message,LogParam.class);
             for (LogParam param : logParams) {
                 // 构造 LoginLog
                 LoginLog log = new LoginLog();
@@ -771,22 +771,23 @@ public class RabbitSysInfoConsumer {
     }
 
     // 基线检查
-    @RabbitListener(queues = "baselineDetect_queue")
+//    @RabbitListener(queues = "baselineDetect_queue")
     public void receiveBaselineDetect(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received BaselineDetect message: " + message);
         try {
             // 反序列化 JSON → 对象
             // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
-            List<BaselineDetect> baselineDetectList = JSON.parseArray(message, BaselineDetect.class);
+            List<BaselineDetect> baselineDetectList = validateAndParseList(message, BaselineDetect.class);
             if (baselineDetectList == null) {
                 Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
                 channel.basicAck(deliveryTag, false);
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (BaselineDetect baselineDetect: baselineDetectList) {
-                ResponseResult result = baselineDetectService.saveBaselineDetect(baselineDetect);
+                ResponseResult result = baselineDetectService.saveBaselineDetect(baselineDetect,now);
                 System.out.println("Save result: " + result.getMsg());
             }
 
@@ -829,7 +830,7 @@ public class RabbitSysInfoConsumer {
         try {
             // 反序列化 JSON → 对象
             // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
-            List<BaselineHardening> baselineHardeningList = JSON.parseArray(message, BaselineHardening.class);
+            List<BaselineHardening> baselineHardeningList = validateAndParseList(message, BaselineHardening.class);
             if (baselineHardeningList == null) {
                 Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
                 channel.basicAck(deliveryTag, false);
