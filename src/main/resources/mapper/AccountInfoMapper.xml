@@ -55,6 +55,18 @@
         )
         ORDER BY id
     </select>
+    <select id="selectByNameAndMac" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        select *
+        from account_info
+        where mac=#{mac}
+        and name=#{username}
+    </select>
+    <select id="selectBySidAndMac" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        select *
+        from account_info
+        where sid=#{sid}
+        and mac=#{mac}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from account_info
@@ -179,4 +191,14 @@
             harmful_key =  #{harmfulKey}
         where   id = #{id} 
     </update>
+
+    <!-- 根据 mac 和 name 查询账号信息 -->
+    <select id="selectByMacAndName" parameterType="map" resultType="com.tpp.threat_perception_platform.pojo.AccountInfo">
+        SELECT *
+        FROM account_info
+        WHERE mac = #{mac}
+          AND name = #{name}
+            LIMIT 1
+    </select>
+
 </mapper>

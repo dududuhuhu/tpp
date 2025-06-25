@@ -31,4 +31,9 @@ public interface ServiceInfoMapper {
 
     int insertBatch(@Param("list") List<ServiceInfo> list, @Param("hostId") Long hostId);
 
+    ServiceInfo selectByHostIdAndPortAndProtocol(@Param("hostId") Long hostId,
+                                                 @Param("port") Integer port,
+                                                 @Param("protocol") String protocol);
+
+
 }

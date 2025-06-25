@@ -8,7 +8,6 @@ import com.tpp.threat_perception_platform.service.AcctChgLogService;
 import com.tpp.threat_perception_platform.service.AuditLogService;
 import com.tpp.threat_perception_platform.service.LoginActionService;
 import com.tpp.threat_perception_platform.service.LoginLogService;
-import com.tpp.threat_perception_platform.vo.LoginLogWithActionsVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +55,6 @@ public class LogsController {
     public ResponseResult accountChangeLog(@RequestBody LogParam param){
         return acctChgLogService.listAcctChgLog(param);
     }
-
     @PostMapping("/logs/accountChange/sync")
     public ResponseResult accountChangeLogDiscovery(){
         return acctChgLogService.accountChangeLogDiscovery();

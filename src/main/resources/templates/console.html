@@ -1,308 +1,450 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>控制台主页</title>
-  <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <!--引入本地layui.css-->
-  <link rel="stylesheet" href="/layui/css/layui.css" media="all">
-  <!--引入本地自定义的admin、login.css-->
-  <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
-  <!-- 引入刚刚下载的 ECharts 文件 -->
-  <script src="/js/echarts.min.js"></script>
+    <meta charset="utf-8" />
+    <title>控制台主页</title>
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" />
+    <script src="/js/echarts.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* 禁止滚动 */
+            background: #f7f7f7;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .layui-fluid {
+            height: calc(100vh - 30px);
+            padding: 10px 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stats-card .layui-card {
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            color: white;
+            height: 100%;
+        }
+        .stats-card .layui-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+        }
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+        .card-text {
+            text-align: left;
+        }
+        .card-title {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.95;
+        }
+        .card-text h2 {
+            font-size: 24px;
+            margin: 6px 0 0;
+            color: white;
+        }
+        .stats-card .layui-col-md2 {
+            width: 20%;
+        }
+        .stats-card .layui-col-md2:nth-child(1) .layui-card {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+        }
+        .stats-card .layui-col-md2:nth-child(2) .layui-card {
+            background: linear-gradient(to right, #70a1ff, #b6fbff);
+        }
+        .stats-card .layui-col-md2:nth-child(3) .layui-card {
+            background: linear-gradient(to right, #ff6a00, #ee0979);
+        }
+        .stats-card .layui-col-md2:nth-child(4) .layui-card {
+            background: linear-gradient(to right, #d56ff7, #c6e5fe);
+        }
+        .stats-card .layui-col-md2:nth-child(5) .layui-card {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        /* 快捷方式和待办事项区域整体压缩 */
+        .main-bottom {
+            display: flex;
+            gap: 15px;
+            flex: 0 0 140px;  /* 压缩高度到140px */
+        }
+        .main-bottom > div {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            padding: 8px 12px; /* 减小内边距 */
+        }
+        .main-bottom .layui-col-md8 {
+            flex: 1;
+            min-width: 0;
+        }
+        .main-bottom .layui-col-md4 {
+            flex: 0 0 260px;
+        }
+        .layui-carousel {
+            height: 200px !important;  /* 压缩轮播高度 */
+        }
+
+        /* 快捷方式中的图标和文字缩小 */
+        .layadmin-shortcut-icon {
+            font-size: 18px !important;
+            padding: 8px 0 !important;
+        }
+        .layadmin-shortcut-icon i {
+            font-size: 20px !important;
+        }
+        .layadmin-shortcut-icon cite {
+            font-size: 12px !important;
+        }
+
+        /* 待办事项字体缩小 */
+        .layadmin-backlog-body h3 {
+            font-size: 13px !important;
+            margin-bottom: 4px !important;
+        }
+        .layadmin-backlog-body p {
+            font-size: 12px !important;
+        }
+        .layadmin-backlog-body cite {
+            font-size: 14px !important;
+        }
+
+        /* 图表区域 */
+        .charts-row {
+            flex: 1 1 auto;
+            display: flex;
+            gap: 20px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .chart-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 280px;
+        }
+        .chart-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            text-align: center;
+            color: #333;
+        }
+        #hostSystemPie, #loginAbnormalPie {
+            flex: 1;
+        }
+
+        .layui-col-md7-5 {
+            width: 68%; /* 7.5 / 12 */
+            float: left;
+            box-sizing: border-box;
+            padding-right: 10px;
+        }
+
+        .layui-col-md4-5 {
+            width: 32%; /* 4.5 / 12 */
+            float: left;
+            box-sizing: border-box;
+            padding-left: 10px;
+        }
+    </style>
 </head>
 <body>
-  
-  <div class="layui-fluid">
-    <div class="layui-row layui-col-space15">
-      <div class="layui-col-md8">
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15 stats-card">
         <div class="layui-row layui-col-space15">
-          <div class="layui-col-md6">
-            <div class="layui-card">
-              <div class="layui-card-header">快捷方式</div>
-              <div class="layui-card-body">
-                
-                <div class="layui-carousel layadmin-carousel layadmin-shortcut">
-                  <div carousel-item>
-                    <ul class="layui-row layui-col-space10">
-                      <li class="layui-col-xs3">
-                        <a lay-href="home/homepage1.html">
-                          <i class="layui-icon layui-icon-console"></i>
-                          <cite>主页一</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="home/homepage2.html">
-                          <i class="layui-icon layui-icon-chart"></i>
-                          <cite>主页二</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="component/layer/list.html">
-                          <i class="layui-icon layui-icon-template-1"></i>
-                          <cite>弹层</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a layadmin-event="im">
-                          <i class="layui-icon layui-icon-chat"></i>
-                          <cite>聊天</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="component/progress/index.html">
-                          <i class="layui-icon layui-icon-find-fill"></i>
-                          <cite>进度条</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="app/workorder/list.html">
-                          <i class="layui-icon layui-icon-survey"></i>
-                          <cite>工单</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="user/user/list.html">
-                          <i class="layui-icon layui-icon-user"></i>
-                          <cite>用户</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/system/website.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>设置</cite>
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="layui-row layui-col-space10">
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs3">
-                        <a lay-href="set/user/info.html">
-                          <i class="layui-icon layui-icon-set"></i>
-                          <cite>我的资料</cite>
-                        </a>
-                      </li>
-                    </ul>
-                    
-                  </div>
-                </div>
-                
-              </div>
-            </div>
-          </div>
-          <div class="layui-col-md6">
-            <div class="layui-card">
-              <div class="layui-card-header">待办事项</div>
-              <div class="layui-card-body">
-
-                <div class="layui-carousel layadmin-carousel layadmin-backlog">
-                  <div carousel-item>
-                    <ul class="layui-row layui-col-space10">
-                      <li class="layui-col-xs6">
-                        <a lay-href="app/content/comment.html" class="layadmin-backlog-body">
-                          <h3>待审评论</h3>
-                          <p><cite>66</cite></p>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs6">
-                        <a lay-href="app/forum/list.html" class="layadmin-backlog-body">
-                          <h3>待审帖子</h3>
-                          <p><cite>12</cite></p>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs6">
-                        <a lay-href="template/goodslist.html" class="layadmin-backlog-body">
-                          <h3>待审商品</h3>
-                          <p><cite>99</cite></p>
-                        </a>
-                      </li>
-                      <li class="layui-col-xs6">
-                        <a href="javascript:;" onclick="layer.tips('不跳转', this, {tips: 3});" class="layadmin-backlog-body">
-                          <h3>待发货</h3>
-                          <p><cite>20</cite></p>
-                        </a>
-                      </li>
-                    </ul>
-                    <ul class="layui-row layui-col-space10">
-                      <li class="layui-col-xs6">
-                        <a href="javascript:;" class="layadmin-backlog-body">
-                          <h3>待审友情链接</h3>
-                          <p><cite style="color: #FF5722;">5</cite></p>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="layui-col-md12">
-            <div class="layui-card">
-              <div class="layui-card-header">数据概览</div>
-              <div class="layui-card-body">
-                <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
-                <div id="main" style="width: 600px;height:400px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="layui-col-md4">
-        <div class="layui-card">
-          <div class="layui-card-header">版本信息</div>
-          <div class="layui-card-body layui-text">
-            <table class="layui-table">
-              <colgroup>
-                <col width="100">
-                <col>
-              </colgroup>
-              <tbody>
-                <tr>
-                  <td>当前版本</td>
-                  <td>
-                    <script type="text/html" template>
-                      v{{ layui.admin.v }}
-                      <a href="http://fly.layui.com/docs/3/" target="_blank" style="padding-left: 10px;">日志</a>
-                    </script>
-                    <a href="javascript:;" layadmin-event="update" style="padding-left: 5px;">检查更新</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>基于框架</td>
-                  <td>
-                    <script type="text/html" template>
-                      layui-v{{ layui.v }}
-                    </script>
-                 </td>
-                </tr>
-                <tr>
-                  <td>主要特色</td>
-                  <td>零门槛 / 响应式 / 清爽 / 极简</td>
-                </tr>
-                <tr>
-                  <td>获取渠道</td>
-                  <td style="padding-bottom: 0;">
-                    <div class="layui-btn-container">
-                      <a href="http://www.layui.com/admin/" target="_blank" class="layui-btn layui-btn-danger">获取授权</a>
-                      <a href="http://fly.layui.com/download/layuiAdmin/" target="_blank" class="layui-btn">立即下载</a>
+            <div class="layui-col-md2">
+                <div class="layui-card">
+                    <div class="layui-card-body card-content">
+                        <div class="card-icon"><i class="layui-icon layui-icon-username"></i></div>
+                        <div class="card-text">
+                            <p class="card-title">用户总数</p>
+                            <h2 id="totalUsers">--</h2>
+                        </div>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                </div>
+            </div>
+            <div class="layui-col-md2">
+                <div class="layui-card">
+                    <div class="layui-card-body card-content">
+                        <div class="card-icon"><i class="layui-icon layui-icon-console"></i></div>
+                        <div class="card-text">
+                            <p class="card-title">登入主机总数</p>
+                            <h2 id="totalHosts">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md2">
+                <div class="layui-card">
+                    <div class="layui-card-body card-content">
+                        <div class="card-icon"><i class="layui-icon layui-icon-vercode"></i></div>
+                        <div class="card-text">
+                            <p class="card-title">检测漏洞总数</p>
+                            <h2 id="totalVulns">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md2">
+                <div class="layui-card">
+                    <div class="layui-card-body card-content">
+                        <div class="card-icon"><i class="layui-icon layui-icon-app"></i></div>
+                        <div class="card-text">
+                            <p class="card-title">应用风险总数</p>
+                            <h2 id="totalAppRisks">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md2">
+                <div class="layui-card">
+                    <div class="layui-card-body card-content">
+                        <div class="card-icon"><i class="layui-icon layui-icon-set-fill"></i></div>
+                        <div class="card-text">
+                            <p class="card-title">系统风险总数</p>
+                            <h2 id="totalSysRisks">--</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="layui-card">
-          <div class="layui-card-header">效果报告</div>
-          <div class="layui-card-body layadmin-takerates">
-            <div class="layui-progress" lay-showPercent="yes">
-              <h3>转化率（日同比 28% <span class="layui-edge layui-edge-top" lay-tips="增长" lay-offset="-15"></span>）</h3>
-              <div class="layui-progress-bar" lay-percent="65%"></div>
-            </div>
-            <div class="layui-progress" lay-showPercent="yes">
-              <h3>签到率（日同比 11% <span class="layui-edge layui-edge-bottom" lay-tips="下降" lay-offset="-15"></span>）</h3>
-              <div class="layui-progress-bar" lay-percent="32%"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="layui-card">
-          <div class="layui-card-header">实时监控</div>
-          <div class="layui-card-body layadmin-takerates">
-            <div class="layui-progress" lay-showPercent="yes">
-              <h3>CPU使用率</h3>
-              <div class="layui-progress-bar" lay-percent="58%"></div>
-            </div>
-            <div class="layui-progress" lay-showPercent="yes">
-              <h3>内存占用率</h3>
-              <div class="layui-progress-bar layui-bg-red" lay-percent="90%"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
     </div>
-  </div>
 
-  <script type="text/javascript" src="/layui/layui.js"></script>
+    <!-- 快捷方式 + 待办事项 -->
+    <div class="main-bottom">
+        <div class="layui-col-md7-5">
+            <div class="layui-card">
+                <div class="layui-card-header" style="padding:10px 15px; font-weight:bold;height: 10px;line-height: 8px;">快捷方式</div>
+                <div class="layui-card-body" style="padding:10px 15px; min-height: 200px;">
+                    <div class="layui-carousel layadmin-carousel layadmin-shortcut" id="shortcut-carousel">
+                        <div carousel-item id="shortcut-pages"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <script type="text/javascript">
-    // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.getElementById('main'));
+        <div class="layui-col-md4-5">
+            <div class="layui-card">
+                <div class="layui-card-header" style="padding:10px 15px; font-weight:bold;height: 10px;line-height: 8px;">待办事项</div>
+                <div class="layui-card-body" style="padding:10px 15px; min-height: 200px;">
+                    <div class="layui-carousel layadmin-carousel layadmin-backlog">
+                        <div carousel-item>
+                            <ul class="layui-row layui-col-space10" style="margin:0;">
+                                <li class="layui-col-xs6"><a href="javascript:;" class="layadmin-backlog-body"><h3>待审评论</h3><p><cite>66</cite></p></a></li>
+                                <li class="layui-col-xs6"><a href="javascript:;" class="layadmin-backlog-body"><h3>待审帖子</h3><p><cite>12</cite></p></a></li>
+                                <li class="layui-col-xs6"><a href="javascript:;" class="layadmin-backlog-body"><h3>待审商品</h3><p><cite>99</cite></p></a></li>
+                                <li class="layui-col-xs6"><a href="javascript:;" class="layadmin-backlog-body"><h3>待发货</h3><p><cite>20</cite></p></a></li>
+                                <li class="layui-col-xs6"><a href="javascript:;" class="layadmin-backlog-body"><h3>待审友情链接</h3><p><cite style="color: #FF5722;">5</cite></p></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // 指定图表的配置项和数据
-    var option = {
-      title: {
-        text: '销量图'
-      },
-      tooltip: {},
-      legend: {
-        data: ['销量']
-      },
-      xAxis: {
-        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-      },
-      yAxis: {},
-      series: [
-        {
-          name: '销量',
-          type: 'bar',
-          data: [5, 20, 36, 10, 10, 20]
+    <!-- 两个扇形图区域 -->
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6">
+            <div class="layui-card" style="border-radius: 15px;">
+                <div class="layui-card-header" style="font-weight:bold;">主机系统类型统计</div>
+                <div class="layui-card-body" style="height: 280px;">
+                    <div id="hostSystemPie" style="height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-card" style="border-radius: 15px;">
+                <div class="layui-card-header" style="font-weight:bold;">登录日志异常统计</div>
+                <div class="layui-card-body" style="height: 280px;">
+                    <div id="loginAbnormalPie" style="height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.config({ base: '/layui/layuiAdmin/' }).extend({ index: 'lib/index' }).use(['carousel', 'jquery', 'index'], function(){
+        var carousel = layui.carousel;
+        var $ = layui.jquery;
+        var index = layui.index;
+
+        const shortcuts = [
+            { icon: 'layui-icon-user', title: '用户管理', url: '/page/user/list', permission: '/user/list' },
+            { icon: 'layui-icon-username', title: '角色管理', url: '/page/role/list', permission: '/role/list' },
+            { icon: 'layui-icon-auz', title: '权限管理', url: '/page/access/list', permission: '/access/list' },
+            { icon: 'layui-icon-console', title: '主机管理', url: '/page/host/list' },
+            { icon: 'layui-icon-vercode', title: '安全补丁', url: '/page/risk/hotfixList' },
+            { icon: 'layui-icon-survey', title: '漏洞检测', url: '/page/risk/vulnerabilityList' },
+            { icon: 'layui-icon-password', title: '弱密码', url: '/page/risk/weakpasswordList' },
+            { icon: 'layui-icon-app', title: '应用风险', url: '/page/risk/applicationList' },
+            { icon: 'layui-icon-set', title: '系统风险', url: '/page/risk/systemList' },
+            { icon: 'layui-icon-form', title: '审计日志', url: '/page/log/audit' },
+            { icon: 'layui-icon-log', title: '登录日志', url: '/page/log/login' },
+            { icon: 'layui-icon-friends', title: '账号变更日志', url: '/page/log/accountChange' },
+            { icon: 'layui-icon-read', title: '基线规则管理', url: '/page/baseline/rule' },
+            { icon: 'layui-icon-set', title: '基线任务管理', url: '/page/baseline/task' },
+            { icon: 'layui-icon-chart', title: '基线检测结果', url: '/page/baseline/result' }
+        ];
+
+        const pathList = JSON.parse(localStorage.getItem("accessiblePathList") || "[]");
+
+        const filteredShortcuts = pathList.includes('/') ? shortcuts : shortcuts.filter(item => {
+            if (!item.permission) return true;
+            return pathList.includes(item.permission);
+        });
+
+        const pageSize = 8;
+        const pages = Math.ceil(filteredShortcuts.length / pageSize);
+        let html = '';
+        for(let i = 0; i < pages; i++){
+            const pageItems = filteredShortcuts.slice(i * pageSize, (i + 1) * pageSize);
+            html += '<ul class="layui-row layui-col-space10" style="padding:10px;">';
+            pageItems.forEach(function(item){
+                html += `
+        <li class="layui-col-xs3">
+          <a class="layadmin-shortcut-icon" lay-href="${item.url}">
+            <i class="layui-icon ${item.icon}"></i>
+            <cite>${item.title}</cite>
+          </a>
+        </li>`;
+            });
+            html += '</ul>';
         }
-      ]
-    };
+        document.getElementById('shortcut-pages').innerHTML = html;
 
-    // 使用刚指定的配置项和数据显示图表。
-    myChart.setOption(option);
-  </script>
+        carousel.render({ elem: '#shortcut-carousel', width: '100%', arrow: 'hover', anim: 'default', autoplay: false });
+
+        $('#shortcut-pages').on('click', 'a.layadmin-shortcut-icon', function(e){
+            e.preventDefault();
+            const url = $(this).attr('lay-href');
+            const title = $(this).find('cite').text();
+            if(url) layui.index.openTabsPage(url, title);
+        });
+
+        // 请求统计卡片数据
+        $.get('/console/stats/summary', function(data){
+            console.log("data:",data);
+            $('#totalUsers').text(data.totalUsers || '--');
+            $('#totalHosts').text(data.totalHosts || '--');
+            $('#totalVulns').text(data.totalVulns || '--');
+            $('#totalAppRisks').text(data.totalAppRisks || '--');
+            $('#totalSysRisks').text(data.totalSysRisks || '--');
+        });
+        // // 模拟数据填充
+        // document.getElementById('totalUsers').innerText = '128';
+        // document.getElementById('totalHosts').innerText = '24';
+        // document.getElementById('totalVulns').innerText = '89';
+        // document.getElementById('totalAppRisks').innerText = '45';
+        // document.getElementById('totalSysRisks').innerText = '30';
+
+        // 初始化Echarts实例并绘制图表
+        var hostSystemPie = echarts.init(document.getElementById('hostSystemPie'));
+        var loginAbnormalPie = echarts.init(document.getElementById('loginAbnormalPie'));
+
+        // 图表基础配置函数（接收数据）
+        function getHostOption(data) {
+            return {
+                tooltip: { trigger: 'item' },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 0,
+                    left: 'center',
+                    textStyle: { fontSize: 12 }
+                },
+                series: [{
+                    name: '系统类型',
+                    type: 'pie',
+                    radius: ['40%', '60%'],
+                    center: ['50%', '40%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: true,
+                        position: 'outside',
+                        formatter: '{b}: {c} ({d}%)',
+                        fontSize: 12
+                    },
+                    labelLine: { length: 10, length2: 5 },
+                    data: data
+                }]
+            };
+        }
+
+        function getLoginOption(data) {
+            return {
+                tooltip: { trigger: 'item' },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 0,
+                    left: 'center',
+                    textStyle: { fontSize: 12 }
+                },
+                series: [{
+                    name: '异常类型',
+                    type: 'pie',
+                    radius: ['40%', '60%'],
+                    center: ['50%', '40%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: true,
+                        position: 'outside',
+                        formatter: '{b}: {c} ({d}%)',
+                        fontSize: 12
+                    },
+                    labelLine: { length: 10, length2: 5 },
+                    data: data
+                }]
+            };
+        }
+
+        // 从接口获取主机系统数据并渲染图表
+        $.get('/console/stats/host-systems', function(res){
+            // 这里假设接口返回格式是 [{name: 'Windows', value: 40}, ...]
+            hostSystemPie.setOption(getHostOption(res));
+        });
+
+        // 从接口获取登录异常数据并渲染图表
+        $.get('/console/stats/login-abnormal', function(res){
+            loginAbnormalPie.setOption(getLoginOption(res));
+        });
+
+        // 窗口大小改变时自适应
+        window.addEventListener('resize', function(){
+            hostSystemPie.resize();
+            loginAbnormalPie.resize();
+        });
+    });
+</script>
 </body>
 </html>
-

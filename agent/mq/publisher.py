@@ -6,6 +6,7 @@ from mq.service import Service
 from utils import logger
 from utils.crypto.src.asymmetric import SignKeyPair
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
+from mq.timedService import TimedService
 
 class Publisher(Service):
     """
@@ -25,12 +26,22 @@ class Publisher(Service):
         self._sign_key_pair = sign_key_pair
         self._mac = mac
 
+        # timed task
+        self._timed_services:list[TimedService] = []
+
+
+    def add_timed_services(self, services:list[TimedService]):
+        self._timed_services += services
+
     def _app_on_bindok(self, frame, userdata):
         """
         队列绑定成功后的回调
         """
         print('bindok')
         self._start_publishing()
+        for service in self._timed_services:
+            service.bind_publisher(self)
+            self.timed_task_schedule(service.get_startup_delay(), service)
 
     def _start_publishing(self):
         """
@@ -111,7 +122,7 @@ class Publisher(Service):
 
             body = {
                 "mac":self._mac,
-                "messege":message,
+                "message":message,
                 "sig":translate_bytes_to_str(self._sign_key_pair.sign((self._mac + message).encode('utf-8')))
             }
 

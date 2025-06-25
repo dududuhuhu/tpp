@@ -266,6 +266,16 @@ public class HostServiceImpl implements HostService {
         return new ResponseResult(0, "漏洞探测任务已下发，请稍后查看！");
     }
 
+    @Override
+    public Integer countHosts() {
+        return hostMapper.countHosts();
+    }
+
+    @Override
+    public List<Map<String, Object>> getHostSystemStats() {
+        return hostMapper.countByOsType(); // 调用 Mapper
+    }
+
     /**
      * 判断主机是否在线
      */

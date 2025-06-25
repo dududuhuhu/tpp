@@ -76,26 +76,15 @@
             text-align: center;
             color: #999;
         }
-
-        .search-bar-sticky {
-            position: sticky;
-            top: 60px;
-            z-index: 99;
-            background: #fff;
-            padding: 12px 20px;
-            border-bottom: 1px solid #eee;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-            border-radius: 0 0 8px 8px;
-        }
     </style>
 </head>
 <body>
 
-<!-- 标题 + 搜索栏 -->
+<!-- 顶部：标题 + 搜索栏 -->
 <div class="layui-card sticky-header">
     <div class="layui-card-header">
         🕒 登录日志分析（含风险标记）
-        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
+        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" id="sync-btn" style="margin-left: 12px;">
             🔄 同步
         </button>
     </div>
@@ -114,10 +103,11 @@
     </div>
 </div>
 
-<!-- 时间轴展示 -->
+<!-- 时间轴容器 -->
 <div class="layui-container" id="timeline-container"></div>
 <div id="pagination" style="text-align: center; padding: 20px;"></div>
 
+<!-- 脚本 -->
 <script src="/layui/layui.js"></script>
 <script>
     layui.use(['layer', 'laypage', 'form'], function () {
@@ -129,6 +119,7 @@
         let limit = 5;
         let totalCount = 0;
 
+        // 请求后端数据
         function fetchData() {
             const mac = $('#mac-search').val().trim();
             $.ajax({
@@ -136,12 +127,11 @@
                 type: 'POST',
                 headers: {
                     'Authorization': localStorage.getItem('token'),
-                    'userId':localStorage.getItem('id')
+                    'userId': localStorage.getItem('id')
                 },
                 contentType: 'application/json',
                 data: JSON.stringify({ mac: mac || null, page: page, limit: limit }),
                 success: function (res) {
-                    console.log("res:",res);
                     if (res.code === 0) {
                         totalCount = res.count;
                         renderTimeline(res.data);
@@ -159,40 +149,55 @@
         function renderTimeline(data) {
             let html = '';
             const grouped = {};
-            data.forEach(item => {
+            // 过滤掉没有任何风险信息的记录
+            const filtered = data.filter(item =>
+                item.isRiskUser === 1 || item.isRiskTime === 1 || item.isRiskUser===0|| item.isRiskTime===0
+            );
+
+
+
+            // 没有任何符合条件的记录
+            if (filtered.length === 0) {
+                $('#timeline-container').html('<div class="no-data">⚠ 没有匹配的记录</div>');
+                return;
+            }
+
+            // 按 MAC 分组
+            filtered.forEach(item => {
                 if (!grouped[item.mac]) grouped[item.mac] = [];
                 grouped[item.mac].push(item);
             });
 
             for (let mac in grouped) {
                 html += `<div class="layui-card">
-                <div class="layui-card-header">
-                    💻 MAC 地址：<strong>${mac}</strong>
-                </div>
-                <div class="layui-card-body">
-                    <ul class="layui-timeline">`;
+            <div class="layui-card-header">
+                💻 MAC 地址：<strong>${mac}</strong>
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">`;
 
                 grouped[mac].forEach(item => {
                     html += `<li class="layui-timeline-item">
-                    <i class="layui-icon layui-timeline-axis"></i>
-                    <div class="layui-timeline-content layui-text">
-                       <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
-                        <p>
-                          👤 用户：<strong>${item.username}</strong><br>
-                          ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
-                          ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
-                          ${(!item.isRiskUser && !item.isRiskTime) ? '✅ 正常登录' : ''}
-                        </p>
-                    </div>
-                </li>`;
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                    <h3 class="layui-timeline-title">${item.loginTime || '无登录时间'}</h3>
+                    <p>
+                        👤 用户：<strong>${item.username}</strong><br>
+                        ${item.isRiskUser ? '<span class="risk-user">⚠ 风险用户</span><br>' : ''}
+                        ${item.isRiskTime ? '<span class="risk-time">⏰ 非正常时间登录</span>' : ''}
+                    </p>
+                </div>
+            </li>`;
                 });
+
                 html += `</ul></div></div>`;
             }
-            $('#timeline-container').html(html || '<div class="no-data">⚠ 没有匹配的记录</div>');
+
+            $('#timeline-container').html(html);
         }
 
 
-
+        // 分页渲染
         function renderPagination() {
             laypage.render({
                 elem: 'pagination',
@@ -211,21 +216,23 @@
             });
         }
 
-        // 同步按钮点击事件
+        // 同步按钮事件
         $('#sync-btn').click(function () {
-            layer.load(1, { shade: [0.1, '#fff'] }); // 加载动画
+            layer.load(1, { shade: [0.1, '#fff'] });
 
             $.ajax({
-                url: '/logs/login/sync',  // 后端触发消息队列的接口
+                url: '/logs/login/sync',
                 type: 'POST',
                 headers: {
                     'Authorization': localStorage.getItem('token'),
-                    'userId':localStorage.getItem('id')
+                    'userId': localStorage.getItem('id')
                 },
                 success: function (res) {
                     layer.closeAll('loading');
                     if (res.code === 0) {
-                        layer.msg('同步请求已发送，稍后自动刷新数据');
+                        layer.msg('同步请求已发送，请稍等片刻');
+                        // 如需同步完立即刷新可添加 fetchData();
+                        fetchData();
                     } else {
                         layer.msg('同步失败：' + res.msg, { icon: 2 });
                     }
@@ -237,18 +244,20 @@
             });
         });
 
-        $('#search-btn').on('click', function () {
+        // 搜索事件
+        $('#search-btn').click(function () {
             page = 1;
             fetchData();
         });
 
-        $('#reset-btn').on('click', function () {
+        // 重置事件
+        $('#reset-btn').click(function () {
             $('#mac-search').val('');
             page = 1;
             fetchData();
         });
 
-
+        // 初始化加载数据
         fetchData();
     });
 </script>

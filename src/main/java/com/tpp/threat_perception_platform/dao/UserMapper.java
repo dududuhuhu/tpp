@@ -50,4 +50,6 @@ public interface UserMapper {
      * @return 路径列表
      */
     List<String> getUserAccessiblePaths(@Param("userId") Integer userId);
+
+    Integer countUsers();
 }

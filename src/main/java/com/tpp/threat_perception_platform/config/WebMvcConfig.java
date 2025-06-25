@@ -25,6 +25,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/role/edit").setViewName("role/edit");
         registry.addViewController("/page/role/add").setViewName("role/add");
 
+
+        // 权限相关页面
+        registry.addViewController("/page/access/list").setViewName("access/list");
+        registry.addViewController("/page/access/edit").setViewName("access/edit");
+        registry.addViewController("/page/access/add").setViewName("access/add");
+
         // 主机相关页面
         registry.addViewController("/page/host/list").setViewName("host/list");
         registry.addViewController("/page/host/assets").setViewName("host/assets");
@@ -62,10 +68,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/page/risk/weakpasswordAdd").setViewName("risk/weakpasswordAdd");
         registry.addViewController("/page/risk/vulnerabilityRulesAdd").setViewName("risk/vulnerabilityRulesAdd");
 
-        registry.addViewController("/page/risk/hotfixInfo").setViewName("risk/hotfixInfo");
-        registry.addViewController("/page/risk/systemInfo").setViewName("risk/systemInfo");
-        registry.addViewController("/page/risk/weakpasswordInfo").setViewName("risk/weakpasswordInfo");
-        registry.addViewController("/page/risk/vulnerabilityInfo").setViewName("risk/vulnerabilityInfo");
 
          // 日志相关页面
         registry.addViewController("/page/log/audit").setViewName("log/audit");
