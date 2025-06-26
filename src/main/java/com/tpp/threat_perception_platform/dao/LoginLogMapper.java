@@ -30,11 +30,13 @@ public interface LoginLogMapper {
 
     LoginLog selectByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 
-    List<LoginLog> findAll(@Param("params") LogParam params);
+    List<LoginLog> findAllForAudit(@Param("params") LogParam params);
 
     List<LoginLog> selectByCondition(LogParam param);
 
     void updateByMacAndUsernameAndLoginTime(LoginLog loginLog);
 
     List<Map<String, Object>> getLoginAbnormalStats();
+
+    List<LoginLog> findAllForLogin(@Param("params") LogParam param);
 }

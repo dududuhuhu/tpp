@@ -204,5 +204,10 @@
     <select id="selectRiskNameById" parameterType="int" resultType="string">
         SELECT risk_name FROM application_risk_rules WHERE id = #{id}
     </select>
+    <select id="getRulesByPlatform" resultType="com.tpp.threat_perception_platform.param.RuleParam">
+        select id,detection_payload
+        from application_risk_rules
+        where platform=#{platform}
+    </select>
 
 </mapper>

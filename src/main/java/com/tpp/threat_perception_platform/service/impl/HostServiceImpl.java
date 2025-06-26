@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.tpp.threat_perception_platform.dao.HostMapper;
+import com.tpp.threat_perception_platform.dao.*;
 import com.tpp.threat_perception_platform.param.*;
 import com.tpp.threat_perception_platform.param.*;
 import com.tpp.threat_perception_platform.param.SystemRiskParam;
@@ -31,6 +31,14 @@ public class HostServiceImpl implements HostService {
 
     @Autowired
     private RabbitService rabbitService;
+    @Autowired
+    private ApplicationRiskRulesMapper applicationRiskRulesMapper;
+    @Autowired
+    private SystemRiskRulesMapper systemRiskRulesMapper;
+    @Autowired
+    private VulnerabilityRulesMapper vulnerabilityRulesMapper;
+    @Autowired
+    private WeakPasswordsMapper weakPasswordsMapper;
 
     @Override
     public ResponseResult hostList(MyParam param) {
@@ -165,14 +173,25 @@ public class HostServiceImpl implements HostService {
             // 如果 appRisk 不为 1，可以自定义其他任务类型或报错
             return new ResponseResult<>(1004, "未知的应用风险任务类型！");
         }
+        String platform = dbHost.getOsType();
 
-        // 打印最终消息参数
-        System.out.println("即将发送的任务参数: " + JSON.toJSONString(param));
+        // 4. 查询规则列表（从数据库或服务层）
+        List<RuleParam> ruleList = applicationRiskRulesMapper.getRulesByPlatform(platform); // 假设你写了这个方法
+        if (ruleList == null || ruleList.isEmpty()) {
+            return new ResponseResult<>(1005, "未获取到应用风险规则！");
+        }
 
+        // 5. 封装成 RiskMessageParam
+        RiskMessageParam message = new RiskMessageParam();
+        message.setMacAddress(param.getMacAddress());
+        message.setAppRisk(param.getAppRisk());
+        message.setIpAddress(param.getIpAddress());
+        message.setType(param.getType());
+        message.setRules(ruleList);
 
-
-// 重新序列化为 JSON
-        String json = JSON.toJSONString(param);
+        // 6. 发送消息
+        String json = JSON.toJSONString(message);
+        System.out.println("即将发送到应用风险命令队列里的参数:"+json);
         String routingKey = param.getMacAddress().replace(":", "");
         rabbitService.sendMessage("agent_exchange", routingKey, json);
 
@@ -201,15 +220,28 @@ public class HostServiceImpl implements HostService {
             return new ResponseResult<>(1004, "未知的应用风险任务类型！");
         }
 
-        // 打印最终消息参数
-        System.out.println("即将发送的任务参数: " + JSON.toJSONString(param));
+        String platform = dbHost.getOsType();
 
-        // 转成 JSON 发送 RabbitMQ
-        String json = JSON.toJSONString(param);
+        // 4. 查询规则列表（从数据库或服务层）
+        List<RuleParam> ruleList = systemRiskRulesMapper.getRulesByPlatform(platform); // 假设你写了这个方法
+        if (ruleList == null || ruleList.isEmpty()) {
+            return new ResponseResult<>(1005, "未获取到应用风险规则！");
+        }
+
+        // 5. 封装成 RiskMessageParam
+        RiskMessageParam message = new RiskMessageParam();
+        message.setMacAddress(param.getMacAddress());
+        message.setSystemRisk(param.getSystemRisk());
+        message.setType(param.getType());
+        message.setRules(ruleList);
+
+        // 6. 发送消息
+        String json = JSON.toJSONString(message);
+        System.out.println("即将发送到应用风险命令队列里的参数:"+json);
         String routingKey = param.getMacAddress().replace(":", "");
         rabbitService.sendMessage("agent_exchange", routingKey, json);
 
-        return new ResponseResult<>(0, "系统风险发现任务已下发，请稍后查看！");
+        return new ResponseResult<>(0, "应用风险发现任务已下发，请稍后查看！");
     }
 
 
@@ -241,8 +273,13 @@ public class HostServiceImpl implements HostService {
         String ip = hostMapper.getIpByMac(param.getMacAddress());
         System.out.println("ip:"+ip);
         param.setIpAddress(ip);
+        // 从数据库或规则库接口查询弱口令列表
+        List<String> weakPasswords = weakPasswordsMapper.selectAllWeakPasswords();  // 示例方法
+
+        param.setWeakPasswords(weakPasswords);  // 设置进 param 中
         // 将param转换成JSON
         String json = JSON.toJSONString(param);
+
         // 组装队列的名字
         String routingKey=param.getMacAddress().replace(":","");
         rabbitService.sendMessage("agent_exchange",routingKey,json);
@@ -258,13 +295,31 @@ public class HostServiceImpl implements HostService {
         param.setType("vulnerability");
         String ip = hostMapper.getIpByMac(param.getMacAddress());
         param.setIpAddress(ip);
-        // 将param转换成JSON
-        String json = JSON.toJSONString(param);
-        // 组装队列的名字
-        String routingKey=param.getMacAddress().replace(":","");
-        rabbitService.sendMessage("agent_exchange",routingKey,json);
-        return new ResponseResult(0, "漏洞探测任务已下发，请稍后查看！");
+        Host dbHost = hostMapper.selectByMacAddress(param.getMacAddress());
+        String platform = dbHost.getOsType();
+
+        // 4. 查询规则列表（从数据库或服务层）
+        List<RuleParam> ruleList = vulnerabilityRulesMapper.getRulesByPlatform(platform); // 假设你写了这个方法
+        if (ruleList == null || ruleList.isEmpty()) {
+            return new ResponseResult<>(1005, "未获取到应用风险规则！");
+        }
+
+        // 5. 封装成 RiskMessageParam
+        RiskMessageParam message = new RiskMessageParam();
+        message.setMacAddress(param.getMacAddress());
+        message.setSystemRisk(1);
+        message.setType(param.getType());
+        message.setRules(ruleList);
+
+        // 6. 发送消息
+        String json = JSON.toJSONString(message);
+        System.out.println("即将发送到应用风险命令队列里的参数:"+json);
+        String routingKey = param.getMacAddress().replace(":", "");
+        rabbitService.sendMessage("agent_exchange", routingKey, json);
+
+        return new ResponseResult<>(0, "应用风险发现任务已下发，请稍后查看！");
     }
+
 
     @Override
     public Integer countHosts() {

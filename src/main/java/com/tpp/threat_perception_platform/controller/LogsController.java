@@ -53,6 +53,7 @@ public class LogsController {
 
     @PostMapping("/logs/accountChange")
     public ResponseResult accountChangeLog(@RequestBody LogParam param){
+        System.out.println("accLog_param:"+param);
         return acctChgLogService.listAcctChgLog(param);
     }
     @PostMapping("/logs/accountChange/sync")

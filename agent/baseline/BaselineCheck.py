@@ -34,7 +34,7 @@ baseLine.log每一行数据为：Registry::ScreenSaveTimeOut    [合格项]|300|
 
 """
 
-def BaselineCheck(mac):
+def BaselineCheck(mac,taskId):
     set_policy_cmd = [
         'powershell',
         '-Command',
@@ -43,11 +43,18 @@ def BaselineCheck(mac):
     subprocess.run(set_policy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     # 第二步：执行你的 PowerShell 脚本
-    ps_command = 'powershell -ExecutionPolicy Bypass -File ./ps/windows.ps1'
+    # 构造 PowerShell 脚本路径
+    SCRIPT_PATH = os.path.join(os.path.dirname(__file__), 'ps', 'windows.ps1')
+    LOG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'baseLine.log'))
+
+    # 执行 PowerShell 脚本
+    ps_command = f'powershell -ExecutionPolicy Bypass -File "{SCRIPT_PATH}"'
     result = subprocess.run(ps_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
     results = []
     entry = {}
-    log_path = os.path.join(os.path.dirname(__file__), "baseLine.log")
+    # 这里指定日志文件为 agent/work/baseLine.log，保证路径正确
+    log_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'work', 'baseLine.log'))
+
     with open(log_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     i = 0
@@ -74,6 +81,7 @@ def BaselineCheck(mac):
                 description = parts[3].strip()
 
                 entry = {
+                    "taskId":taskId,
                     "mac": mac,
                     "name": name,
                     "result": result_raw,

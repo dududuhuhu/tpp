@@ -65,6 +65,11 @@
         from system_risk_rules
         order by id
     </select>
+    <select id="getRulesByPlatform" resultType="com.tpp.threat_perception_platform.param.RuleParam">
+        select id,risk_name,risk_level,risk_type,detection_method,rule_path,rule_payload,remediation_advice
+        from system_risk_rules
+        where platform=#{platform}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from system_risk_rules

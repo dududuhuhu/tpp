@@ -16,22 +16,12 @@ else:
 class ApplicationRiskDetect:
     def __init__(self, data):
         self._mac = data['macAddress']
-    
+        self.rules = data.get('rules', [])  # 直接用传入的规则列表
+
     def _get_application_risk_rules(self) -> list[dict]:
-        """
-        从后端接口获取风险检测规则
-        """
-        try:
-            url = "http://localhost:8080/rule/applicationRisk"
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            rules = response.json()
-            print("rules:",rules)
-            print(f"获取到 {len(rules)} 条规则")
-            return rules
-        except requests.RequestException as e:
-            print(f"[错误] 获取规则失败: {e}")
-            return []
+        print(f"获取了{len(self.rules)}条规则")
+        print("规则列表:", self.rules)
+        return self.rules
     
     def _detect_application_risk(self, rule:dict) -> dict | None:
         """

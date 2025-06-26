@@ -71,7 +71,7 @@ public class LoginLogServiceImpl implements LoginLogService {
     public ResponseResult loginLogList(LogParam param){
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
-        List<LoginLog> loginLogList = loginLogMapper.findAll(param);
+        List<LoginLog> loginLogList = loginLogMapper.findAllForLogin(param);
         // 构架pageInfo
         PageInfo<LoginLog> pageInfo = new PageInfo<>(loginLogList);
 

@@ -113,14 +113,21 @@
     </select>
 
     <select id="selectByParam" parameterType="com.tpp.threat_perception_platform.param.LogParam" resultType="com.tpp.threat_perception_platform.pojo.AcctChgLog">
-        SELECT * FROM acct_chg_log
+        SELECT *
+        FROM acct_chg_log a
+        INNER JOIN (
+        SELECT mac, MAX(updated_at) AS max_time
+        FROM acct_chg_log
         <where>
-            1 = 1
             <if test="mac != null and mac != ''">
-                AND mac = #{mac}
+                mac = #{mac}
             </if>
-
         </where>
+        GROUP BY mac
+        ) b ON a.mac = b.mac AND a.updated_at = b.max_time
+        <if test="mac != null and mac != ''">
+            WHERE a.mac = #{mac}
+        </if>
         <!-- 根据需求添加更多条件 -->
     </select>
 

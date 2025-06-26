@@ -7,9 +7,19 @@ import java.util.Date;
  * @TableName baseline_detect
  */
 public class BaselineDetect {
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
     /**
      * 
      */
+
+    private Integer taskId;
     private Integer id;
 
     /**
