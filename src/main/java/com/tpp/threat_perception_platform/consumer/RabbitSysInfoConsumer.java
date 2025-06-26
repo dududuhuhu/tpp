@@ -119,13 +119,25 @@ public class RabbitSysInfoConsumer {
     <T> List<T> validateAndParseList(String message, Class<T> clazz) {
         try {
             AgentMessageParam agentMessageParam = JSON.parseObject(message, AgentMessageParam.class);
-            if (!agentMessageParam.check() || !verifierService.verifySign(agentMessageParam.getMac(), agentMessageParam.getMac() + agentMessageParam.getMessage(), agentMessageParam.getSig())) {
+            if (agentMessageParam == null) {
+                System.out.println("AgentMessageParam解析失败");
                 return null;
             }
+            System.out.println("AgentMessageParam内容: " + agentMessageParam);
 
+            if (!agentMessageParam.check()) {
+                System.out.println("check()失败");
+                return null;
+            }
+            boolean signOk = verifierService.verifySign(agentMessageParam.getMac(), agentMessageParam.getMac() + agentMessageParam.getMessage(), agentMessageParam.getSig());
+            System.out.println("验签结果: " + signOk);
+            if (!signOk) {
+                System.out.println("验签失败");
+                return null;
+            }
             return JSON.parseArray(agentMessageParam.getMessage(), clazz);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -959,7 +971,7 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "inTime_queue")
     public void receiveInTime(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
-        System.out.println("接收到的消息: " + message);
+        System.out.println("接收到的实时消息: " + message);
         try {
             // 反序列化 JSON → 对象
             // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
@@ -967,6 +979,7 @@ public class RabbitSysInfoConsumer {
             if (inTimeList == null) {
                 Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
                 channel.basicAck(deliveryTag, false);
+                System.out.println("实时日志数据为空！");
                 return;
             }
 

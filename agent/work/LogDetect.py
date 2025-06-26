@@ -1,19 +1,16 @@
-import json
-import uuid
 from datetime import datetime, timedelta
 from Logs.logs import get_log_info, EVENT_ACTION_MAP
 import sqlite3
 import os
 import json
-from tpp.agent.utils.logParser import LogParser
-from service import MAC
+from utils.logParser import LogParser
 from db.tpp import get_log_rules
 from xml.dom import minidom
 import html
 from evtx import PyEvtxParser
 import uuid
 import re
-from datetime import datetime
+import pytz
 
 def to_beijing_time(utc_str):
     try:
@@ -361,19 +358,33 @@ class LogDetect(object):
                     subject = data.get("SubjectUserName", "未知主体")
                     target = data.get("TargetUserName", "未知目标")
                     ts = timestamp
-                    if isinstance(ts, datetime):
-                        ts_str = ts.strftime("%Y-%m-%d %H:%M:%S.%f") + " UTC"
-                    else:
-                        ts_str = str(ts)
 
+                    if isinstance(ts, datetime):
+                        try:
+                            china_tz = pytz.timezone("Asia/Shanghai")
+                            ts_china = ts.replace(tzinfo=pytz.utc).astimezone(china_tz)
+                            ts_str = ts_china.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            print(f"[时区转换失败] {e}")
+                            ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        try:
+                            dt = datetime.strptime(str(ts).replace(" UTC", ""), "%Y-%m-%d %H:%M:%S.%f")
+                            ts_china = dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Shanghai"))
+                            ts_str = ts_china.strftime("%Y-%m-%d %H:%M:%S")
+                        except Exception as e:
+                            print(f"[时间格式转换失败] {e}")
+                            ts_str = str(ts)
+
+                    # print(f"[日志时间] {ts_str}")
                     action = EVENT_ACTION_MAP.get(int(event_id), "未知操作")
                     rule_info = events[event_id]  # [rule_id, risk_level]
 
                     results.append({
-                        "event_id": int(event_id),
-                        "timestamp": ts_str,
+                        "eventId": str(event_id),
+                        "eventTime": ts_str,
                         "event": f"{subject}对{target}{action}",
-                        "risk_level": rule_info[1],
+                        "riskLevel": rule_info[1],
                         "mac": MAC,
                     })
                 except Exception as e:
@@ -397,13 +408,13 @@ class LogDetect(object):
         events = self._get_obj_events()
         if not events:
             print("[警告] 未加载到任何事件规则。")
-            return []
+            return None
 
         results = self._parse(events)
         if not results:
             print("[信息] 日志中未发现匹配的事件。")
             return None
-
+        print(f"[信息] 检测到 {len(results)} 条匹配事件。")
         return json.dumps(results, ensure_ascii=False, indent=2)
 if __name__ == '__main__':
     log_path = r"C:\Windows\System32\winevt\Logs\Security.evtx"

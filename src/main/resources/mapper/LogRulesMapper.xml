@@ -23,8 +23,7 @@
         where  id = #{id} 
     </select>
     <select id="selectByPlatform" resultType="com.tpp.threat_perception_platform.pojo.LogRules">
-        select
-        <include refid="Base_Column_List" />
+        select id,platform,event_id,risk_level,description
         from log_rules
         where platform = #{platform}
     </select>

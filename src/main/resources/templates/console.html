@@ -161,17 +161,35 @@
         }
 
         .layui-col-md7-5 {
-            width: 68%; /* 7.5 / 12 */
+            width: 67%; /* 7.5 / 12 */
             float: left;
             box-sizing: border-box;
             padding-right: 10px;
         }
 
         .layui-col-md4-5 {
-            width: 32%; /* 4.5 / 12 */
+            width: 55%; /* 4.5 / 12 */
             float: left;
             box-sizing: border-box;
             padding-left: 10px;
+        }
+
+             /* 跑马灯样式 */
+        #marquee-list li {
+            font-size: 14px;      /* 更小字体 */
+            padding: 7px 0;       /* 减少上下间距 */
+            line-height: 25px;    /* 控制行高 */
+        }
+        #marquee-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            user-select: none;
+        }
+        #marquee-tip {
+            font-size: 14px;
+            font-weight: bold;
+            padding-top: 30px;    /* 原来是 60px，减小间隔 */
         }
     </style>
 </head>
@@ -253,23 +271,12 @@
 
         <div class="layui-col-md4-5">
             <div class="layui-card">
-                <div class="layui-card-header" style="padding:10px 15px; font-weight:bold;height: 10px;line-height: 8px;">异常提示</div>
-                <div class="layui-card-body" style="padding:10px 15px; min-height: 200px;">
-                    <div class="layui-carousel layadmin-carousel layadmin-backlog">
-
-                            <ul class="layui-row layui-col-space10" style="margin:0;">
-                                <li>
-                                    <p style="font-size: 13px; color: #333; margin: 4px 0;">[严重] 2025-06-25 08:42 用户登录失败 - MAC: 00-1A-2B-3C-4D-5E</p>
-                                </li>
-                                <li>
-                                    <p style="font-size: 13px; color: #333; margin: 4px 0;">[中等] 2025-06-24 22:18 账号被锁定 - 用户: admin</p>
-                                </li>
-                                <li>
-                                    <p style="font-size: 13px; color: #333; margin: 4px 0;">[中等] 2025-06-24 21:00 异常登录地 - IP: 203.0.113.45</p>
-                                </li>
-                            </ul>
-
-                    </div>
+                <div class="layui-card-header" style="padding:10px 15px; font-weight:bold; height: 10px; line-height: 8px;">
+                    异常提示
+                </div>
+                <div class="layui-card-body" style="height: 200px; overflow: hidden; padding:10px 15px;">
+                    <ul id="marquee-list"></ul>
+                    <div id="marquee-tip">暂无异常提醒</div>
                 </div>
             </div>
         </div>
@@ -442,6 +449,91 @@
         $.get('/console/stats/login-abnormal', function(res){
             loginAbnormalPie.setOption(getLoginOption(res));
         });
+
+
+        // 异常提示
+        let marqueeIndex = 0;
+        let marqueeTimer = null;
+
+        function startMarquee() {
+            const $list = $('#marquee-list');
+            const $items = $list.find('li');
+            if ($items.length <= 1) {
+                // 只有0或1条时不滚动
+                return;
+            }
+
+            const itemHeight = $items.eq(0).outerHeight(true);
+            const total = $items.length;
+
+            marqueeTimer = setInterval(() => {
+                marqueeIndex++;
+                if (marqueeIndex >= total) {
+                    marqueeIndex = 0;
+                    $list.css('transition', 'none');
+                    $list.css('transform', 'translateY(0)');
+                } else {
+                    $list.css('transition', 'transform 0.5s');
+                    $list.css('transform', `translateY(-${itemHeight * marqueeIndex}px)`);
+                }
+
+                // 最后一条滚动上来时触发刷新
+                if (marqueeIndex === total - 6) {
+                    fetchAlerts();
+                }
+            }, 3000);
+        }
+
+
+        function stopMarquee() {
+            if (marqueeTimer) {
+                clearInterval(marqueeTimer);
+                marqueeTimer = null;
+            }
+        }
+
+        function updateMarqueeData(response) {
+            const $list = $('#marquee-list');
+            const $tip = $('#marquee-tip');
+
+            if (!response || response.length === 0) {
+                stopMarquee();
+                $list.hide();
+                $tip.show().text("暂无异常提醒");
+                return;
+            }
+
+            // 时间升序排序
+            response.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+
+            $tip.hide();
+            $list.show();
+
+            const html = response.map(item =>
+                `<li>[${item.level}] ${item.time} ${item.mac} ${item.message}</li>`).join('');
+            $list.html(html);
+
+            marqueeIndex = 0;
+            $list.css('transition', 'none');
+            $list.css('transform', 'translateY(0)');
+
+            stopMarquee();
+            startMarquee();
+        }
+
+// 定时拉取异常数据
+        function fetchAlerts() {
+            $.get('/console/stats/alerts', function(res){
+                updateMarqueeData(res);
+            });
+        }
+
+// 页面加载时立刻请求一次
+        fetchAlerts();
+
+// 10秒轮询刷新
+        setInterval(fetchAlerts, 10000*6);
+
 
         // 窗口大小改变时自适应
         window.addEventListener('resize', function(){

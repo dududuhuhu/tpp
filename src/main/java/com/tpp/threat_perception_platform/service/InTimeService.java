@@ -5,6 +5,7 @@ import com.tpp.threat_perception_platform.pojo.InTime;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface InTimeService {
     ResponseResult saveInTime(InTime inTime, Timestamp now);
@@ -12,4 +13,6 @@ public interface InTimeService {
     ResponseResult inTimeList(InTimeParam param);
 
     ResponseResult inTimeDiscovery();
+
+    List<InTime> getLatestAlerts(int limit);
 }

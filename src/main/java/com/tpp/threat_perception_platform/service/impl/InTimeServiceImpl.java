@@ -37,10 +37,10 @@ public class InTimeServiceImpl implements InTimeService {
      */
     @Override
     public ResponseResult saveInTime(InTime inTime, Timestamp now) {
+        System.out.println("实时日志数据："+inTime);
         // 先查询是否已存在
         InTime db = inTimeMapper.selectByMacAndEventIdAndEventTime(inTime.getMac(),inTime.getEventId(),inTime.getEventTime());
         // 添加
-        inTime.setUpdateTime(now);
         if (db != null) {
             // 若已存在，更新字段（只更新 updated_time 或者所有字段）
             // 方式 1：只更新 updated_time
@@ -50,9 +50,9 @@ public class InTimeServiceImpl implements InTimeService {
             // 方式 2：更新所有字段（推荐）
             inTime.setId(db.getId()); // 设置主键，用于 where 条件
             inTimeMapper.updateByPrimaryKey(inTime);
-
             return new ResponseResult<>(0, "记录已存在，已更新时间戳");
         }
+        inTime.setUpdateTime(now);
         inTimeMapper.insert(inTime);
         return new ResponseResult<>(0, "添加成功！");
     }
@@ -96,5 +96,10 @@ public class InTimeServiceImpl implements InTimeService {
             }
         }
         return new ResponseResult(0, "开始同步，请稍后查看！");
+    }
+
+    @Override
+    public List<InTime> getLatestAlerts(int limit) {
+        return inTimeMapper.getLatestAlters(limit);
     }
 }

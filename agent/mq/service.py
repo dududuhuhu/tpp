@@ -174,7 +174,7 @@ class Service(Thread):
             except pika.exceptions.AMQPConnectionError as e:
                 logger.error("AMQP connection error: %s", e)
                 self.should_reconnect = True
-            except Exception as e:
-                import pdb
-                logger.error("Unexpected error: %s", e)
-                self.should_reconnect = True
+            # except Exception as e:
+            #     import pdb
+            #     logger.error("Unexpected error: %s", e)
+            #     self.should_reconnect = True

@@ -44,7 +44,7 @@ public class HostController {
     private SystemRiskService systemRiskService;
 
     @PostMapping("/host/list")
-    public ResponseResult hostList(@RequestBody MyParam param){
+    public ResponseResult hostList(MyParam param){
         return hostService.hostList(param);
     }
     @PostMapping("/host/delete")

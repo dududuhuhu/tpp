@@ -1,11 +1,7 @@
-from service.configure import *
-from mq.consumer import Consumer
-from mq.publisher import Publisher
+
 from service import *
 from service.loginService import LoginService
-from mq.service import Service
-from time import sleep
-from functools import partial
+
 from mq.timedService import TimedService
 from Logs.logRuleSave import request_log_rule
 
@@ -26,7 +22,7 @@ def startup():
     default_publisher.add_queue_key_pairs(PUBLISHER_ROUTING)
     default_publisher.add_timed_services([
         TimedService(func=request_log_rule, startup_delay=0, interval=3600, routing_key='inTimeRequest'),
-        TimedService(func=logDetector.detect, startup_delay=0, interval=60, routing_key='inTime')
+        TimedService(func=logDetector.detect, startup_delay=10, interval=60, routing_key='inTime')
     ])
 
     default_consumer.start()

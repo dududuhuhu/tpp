@@ -28,4 +28,6 @@ public interface InTimeMapper {
     InTime selectByMacAndEventIdAndEventTime(String mac, String eventId, Date eventTime);
 
     List<InTime> findAll();
+
+    List<InTime> getLatestAlters(int limit);
 }

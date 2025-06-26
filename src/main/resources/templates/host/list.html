@@ -84,7 +84,7 @@
 
             <div style="padding-bottom: 10px;">
                 <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
-<!--                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>-->
+                <!--                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>-->
                 <button class="layui-btn layuiadmin-btn-useradmin" data-type="refresh">刷新</button>
             </div>
 
@@ -151,26 +151,27 @@
             ,url:'/host/list' //后端接口
             ,headers: {
                 'Authorization': localStorage.getItem('token'),
-                'userId':localStorage.getItem('id')
+                'userId':localStorage.getItem('id'),
+                'Content-Type': 'application/json'
             }
             ,width: 'auto'// 自适应宽度
             ,cellMinWidth: 80 //全局定义常规单元格的最小宽度
             ,title: '主机数据表'
             ,cols: [
                 [
-                {type: 'checkbox', fixed: 'left'}
-                ,{field:'id',title:'ID',width: 45}
-                ,{field:'macAddress', title:'MAC地址',width: 150}
-                ,{field:'hostName', title:'主机名字',width: 120}
-                ,{field:'ipAddress', title:'IP地址',width: 130}
-                ,{field:'status', title:'状态',width: 70,templet: function (d){
+                    {type: 'checkbox', fixed: 'left'}
+                    ,{field:'id',title:'ID',width: 45}
+                    ,{field:'macAddress', title:'MAC地址',width: 150}
+                    ,{field:'hostName', title:'主机名字',width: 120}
+                    ,{field:'ipAddress', title:'IP地址',width: 130}
+                    ,{field:'status', title:'状态',width: 70,templet: function (d){
                         if (d.status == 1) {
                             return '<button class="layui-btn layui-btn-normal layui-btn-xs">上线</button>';
                         } else if (d.status == 0) {
                             return '<button class="layui-btn layui-btn-danger layui-btn-xs">下线</button>';
                         }
-                }}
-                ,{field:'osType', title:'系统类型',width: 100,templet: function (d){
+                    }}
+                    ,{field:'osType', title:'系统类型',width: 100,templet: function (d){
                         let osType = d.osType;
                         let buttonColor = '';
                         switch (osType) {
@@ -209,22 +210,22 @@
                         }
                         // 返回一个带有 Layui 按钮样式的按钮
                         return `<button class="layui-btn ${buttonClass} layui-btn-xs">${osType}</button>`;
-                }}
-                ,{field:'osName', title:'系统名字',width: 120}
-                ,{field:'osVersion', title:'系统版本',width: 120}
-                ,{field:'osBit', title:'位数',width: 100}
-                ,{field:'cpuName', title:'CPU',width: 100}
-                ,{field:'ram', title:'内存',width: 100}
+                    }}
+                    ,{field:'osName', title:'系统名字',width: 120}
+                    ,{field:'osVersion', title:'系统版本',width: 120}
+                    ,{field:'osBit', title:'位数',width: 100}
+                    ,{field:'cpuName', title:'CPU',width: 100}
+                    ,{field:'ram', title:'内存',width: 100}
 
-                ,{field:'createTime', title:'采集时间',width: 160, templet:function (d){
-                    return formatDate(d.createTime);
-                }}
-                ,{field:'updateTime', title:'上线时间',width: 160, templet: function (d){
-                    return d.updateTime==null? formatDate(d.createTime):formatDate(d.updateTime);
-                }}
+                    ,{field:'createTime', title:'采集时间',width: 160, templet:function (d){
+                        return formatDate(d.createTime);
+                    }}
+                    ,{field:'updateTime', title:'上线时间',width: 160, templet: function (d){
+                        return d.updateTime==null? formatDate(d.createTime):formatDate(d.updateTime);
+                    }}
 
-                ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser',width:352}
-            ]]
+                    ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-webuser',width:352}
+                ]]
             ,page: {
                 curr: 1 //设定初始在第 5 页
                 ,limit: 5 //设定初始每页显示 5 条
@@ -450,7 +451,7 @@
                 layer.confirm('确定删除吗？',function (){
                     var userIds = new Array();
                     $.each(checkData,function (index,item){
-                           userIds.push(item.id);
+                        userIds.push(item.id);
                     })
                     // 提交给后端
                     $.ajax({
