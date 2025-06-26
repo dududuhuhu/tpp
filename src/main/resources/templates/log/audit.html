@@ -1,358 +1,287 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>审计日志时间轴</title>
-    <link rel="stylesheet" href="/layui/css/layui.css">
-    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css">
-    <style>
-        body {
-            background-color: #f7f7f7;
-            font-family: "Microsoft YaHei", sans-serif;
-        }
-        .layui-container { margin-top: 20px; padding-bottom: 50px; }
-        .sticky-header {
-            position: sticky; top: 0; z-index: 100; background-color: #fff;
-            padding: 16px 20px; font-size: 18px; font-weight: bold;
-            color: #333; border-bottom: 1px solid #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-        }
-        .layui-card { margin: 16px 0; border-radius: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
-        .layui-card-header {
-            background-color: #fafafa; font-size: 16px; font-weight: bold;
-            padding: 14px 20px; border-bottom: 1px solid #eee;
-            border-top-left-radius: 12px; border-top-right-radius: 12px;
-        }
-        .layui-card-body {
-            background-color: white; padding: 20px;
-            border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
-        }
-        .no-data {
-            padding: 30px; text-align: center; color: #999;
-        }
-        .search-bar-sticky {
-            position: sticky; top: 60px; z-index: 99; background: #fff;
-            padding: 12px 20px; border-bottom: 1px solid #eee;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>审计日志列表</title>
+  <link rel="stylesheet" href="/layui/css/layui.css" />
+  <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" />
+  <style>
+    .layui-timeline-title {
+      font-weight: bold;
+      font-size: 14px;
+      color: #009688;
+    }
+    .layui-timeline-item {
+      margin-bottom: 25px;
+    }
+    .layui-timeline-content p {
+      font-size: 13px;
+      color: #555;
+      margin-top: 4px;
+    }
+    .layui-icon.layui-timeline-axis {
+      color: #009688;
+      font-size: 20px;
+      margin-top: 4px;
+    }
+  </style>
 </head>
 <body>
-
-<!-- 标题 + 搜索栏 -->
-<div class="layui-card sticky-header">
-    <div class="layui-card-header">
-        🕒 登录日志分析（含风险标记）
-        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
-            🔄 同步
-        </button>
-    </div>
-    <div class="layui-card-body">
-        <div class="layui-form">
-            <div class="layui-inline" style="margin-right: 10px;">
-                <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
-            </div>
-            <div class="layui-inline" style="margin-right: 10px;">
-                <input type="text" id="start-time" placeholder="开始时间" class="layui-input">
-            </div>
-            <div class="layui-inline" style="margin-right: 10px;">
-                <input type="text" id="end-time" placeholder="结束时间" class="layui-input">
-            </div>
-            <div class="layui-inline">
-                <button class="layui-btn layui-btn-normal" id="search-btn"><i class="layui-icon layui-icon-search"></i> 搜索</button>
-                <button class="layui-btn layui-btn-primary" id="reset-btn">重置</button>
-            </div>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <!-- 搜索栏 -->
+    <div class="layui-card-header layuiadmin-card-header-auto" style="border-radius: 0; border-top: 4px solid #d2d2d2;">
+      <form class="layui-form" lay-filter="auditSearchForm">
+        <div class="layui-form-item" style="margin-bottom:0;">
+          <div class="layui-inline">
+            <select name="searchType" lay-filter="auditSearchType">
+              <option value="mac">MAC地址</option>
+              <option value="username">用户名</option>
+            </select>
+          </div>
+          <div class="layui-inline">
+            <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input" />
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-audit-search">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
         </div>
+      </form>
     </div>
+
+    <!-- 按钮 + 表格 -->
+    <div class="layui-card-body">
+      <div style="padding-bottom: 10px;">
+        <button class="layui-btn layuiadmin-btn-useradmin" data-table="audit" data-type="refresh" title="刷新数据">刷新</button>
+        <button class="layui-btn layuiadmin-btn-useradmin" data-table="audit" data-type="sync" title="同步数据">同步</button>
+      </div>
+
+      <!-- 操作列模板，含操作详情和AI分析 -->
+      <script type="text/html" id="table-useradmin-webuser">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="action" style="margin-right:5px;" title="操作详情">
+          <i class="layui-icon layui-icon-edit"></i>操作详情
+        </a>
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="ai" title="AI分析">
+          <i class="layui-icon layui-icon-template-1"></i>AI分析
+        </a>
+      </script>
+
+      <table id="LAY-audit-manage" lay-filter="LAY-audit-manage"></table>
+    </div>
+  </div>
 </div>
 
-<!-- 时间轴展示 -->
-<div class="layui-container" id="timeline-container"></div>
-<div id="pagination" style="text-align: center; padding: 20px;"></div>
+<!-- 操作详情弹出层容器 -->
+<div id="operationDetailContainer" style="display: none; padding: 20px;"></div>
 
 <script src="/layui/layui.js"></script>
-<script>
-    layui.config({ base: '/layui/layuiAdmin/' }).extend({ index: 'lib/index' }).use(['layer', 'form', 'laydate', 'laypage'], function () {
-        var $ = layui.$,
-            form = layui.form,
-            layer = layui.layer,
-            laydate = layui.laydate,
-            laypage = layui.laypage;
+<script type="text/javascript" th:inline="none">
+  layui.use(['table', 'form', 'layer', 'jquery'], function () {
+    const table = layui.table, form = layui.form, layer = layui.layer, $ = layui.$;
+    let searchedMac = null;
 
-        laydate.render({ elem: '#start-time', type: 'datetime' });
-        laydate.render({ elem: '#end-time', type: 'datetime' });
+    // 格式化时间函数
+    function formatDate(str) {
+      if (!str) return '未知';
+      const d = new Date(str);
+      function pad(n) { return n < 10 ? '0' + n : n; }
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
 
-        function getRiskColor(event_id) {
-            if ([4720, 4726, 4738].includes(event_id)) return '#e74c3c';
-            if ([4670, 4723].includes(event_id)) return '#f39c12';
-            return '#5FB878';
-        }
-
-        function formatDateTime(isoString) {
-            if (!isoString) return '未知';
-            const date = new Date(isoString);
-            if (isNaN(date.getTime())) return '无效时间';
-            return new Date(date.getTime() + 8 * 60 * 60 * 1000)
-                .toISOString().replace('T', ' ').substring(0, 19);
-        }
-
-        function renderTimelines(data) {
-            if (data.length === 0) {
-                document.getElementById('timeline-container').innerHTML = '<p class="no-data">暂无匹配的审计日志</p>';
-                return;
-            }
-
-            let html = '';
-            data.forEach(user => {
-                let userHTML = `<div class="layui-card">
-            <div class="layui-card-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; line-height: 1.8; gap: 8px;">
-                <div style="font-weight: bold;">👤 ${user.username}</div>
-                <div style="flex: 1 1 auto;">
-                    💻 MAC: ${user.mac}　
-                    🟢 登录：<span style="color:green">${formatDateTime(user.loginTime)}</span>　
-                    🔴 注销：<span style="color:red">${formatDateTime(user.logoffTime)}</span>
-                </div>
-                <div style="flex-shrink: 0;">
-                    <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn"
-                            data-mac="${user.mac}"
-                            data-username="${user.username}"
-                            data-logintime="${user.loginTime}">
-                        🧠 查看AI分析
-                    </button>
-                </div>
-            </div>
-            <div class="layui-card-body">
-                <ul class="layui-timeline">`;
-
-                // ✅ 如果没有任何行为，显示提示
-                if (!user.actions || user.actions.length === 0) {
-                    userHTML += `<li class="layui-timeline-item">
-                <div class="layui-timeline-content layui-text">
-                    <p style="color: #999;">该用户在该时间段内无任何操作记录</p>
-                </div>
-            </li>`;
-                } else {
-                    user.actions.forEach(action => {
-                        userHTML += `<li class="layui-timeline-item">
-                    <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
-                    <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">${action.timestamp}</h3>
-                        <p><strong>${action.action}</strong>（事件ID: ${action.eventId}）<br>${action.details || '暂无详情'}</p>
-                    </div>
-                </li>`;
-                    });
-                }
-
-                userHTML += `</ul></div></div>`;
-                html += userHTML;
-            });
-
-            $('#timeline-container').html(html);
-        }
-
-
-        let page = 1;
-        let limit = 5;
-        let totalCount = 0;
-        let latestCreateTime = null;
-
-        function getMaxCreateTime(data) {
-            if (!Array.isArray(data)) return null;
-            const times = data
-                .map(item => {
-                    const ts = item.logoffTime || item.loginTime;
-                    const d = new Date(ts);
-                    return isNaN(d.getTime()) ? null : d;
-                })
-                .filter(d => d !== null);
-            return times.length ? new Date(Math.max(...times)).toISOString() : null;
-        }
-
-        function fetchData() {
-            const mac = $('#mac-search').val().trim();
-            const start = $('#start-time').val();
-            const end = $('#end-time').val();
-
-            $.ajax({
-                url: '/logs/audit',
-                type: 'POST',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
-                },
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    mac: mac || null,
-                    loginTime: start || null,
-                    logoffTime: end || null,
-                    page: page,
-                    limit: limit
-                }),
-                success: function (res) {
-                    if (res.code === 0) {
-                        totalCount = res.count || 0;
-                        const newMaxTime = getMaxCreateTime(res.data || []);
-                        if (newMaxTime !== latestCreateTime) {
-                            latestCreateTime = newMaxTime;
-                            renderTimelines(res.data || []);
-                            renderPagination();
-                        }
-                    } else {
-                        $('#timeline-container').html('<div class="no-data">加载失败</div>');
-                    }
-                },
-                error: function () {
-                    $('#timeline-container').html('<div class="no-data">接口异常</div>');
-                }
-            });
-        }
-
-        function renderPagination() {
-            laypage.render({
-                elem: 'pagination',
-                count: totalCount,
-                limit: limit,
-                curr: page,
-                layout: ['prev', 'page', 'next', 'count'],
-                jump: function (obj, first) {
-                    if (!first) {
-                        page = obj.curr;
-                        limit = obj.limit;
-                        fetchData();
-                    }
-                }
-            });
-        }
-
-        // AI 按钮点击事件
-        $(document).on('click', '.ai-btn', function () {
-            const mac = $(this).data('mac');
-            const username = $(this).data('username');
-            const loginTime = $(this).data('logintime');
-            layer.load(1, { shade: [0.1, '#fff'] });
-
-            $.ajax({
-                url: '/api/report/audit/analyze',
-                type: 'POST',
-                contentType: 'application/json',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
-                },
-                data: JSON.stringify({ mac, username, loginTime }),
-                success: function (res) {
-                    layer.closeAll('loading');
-                    if (res.code === 0) {
-                        const report = res.data[0];
-
-                        const formatTime = t => t ? new Date(t).toLocaleString() : '无';
-
-                        const html = `
-<div style="padding: 30px; font-family: 'Microsoft YaHei', sans-serif;">
-    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #333;">🧠 AI 登录行为分析报告</h2>
-    <div style="background: #fff; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow: hidden;">
-        <table class="layui-table" style="margin: 0; border: none;">
-            <colgroup>
-                <col style="width: 160px;">
-                <col>
-            </colgroup>
-            <tbody style="font-size: 15px; color: #555;">
-                <tr style="background-color: #f8f8f8;">
-                    <td><strong>👤 用户名</strong></td>
-                    <td>${report.username}</td>
-                </tr>
-                <tr>
-                    <td><strong>💻 MAC 地址</strong></td>
-                    <td>${report.mac}</td>
-                </tr>
-                <tr style="background-color: #f8f8f8;">
-                    <td><strong>🕒 登录时间</strong></td>
-                    <td>${formatTime(report.loginTime)}</td>
-                </tr>
-                <tr>
-                    <td><strong>📊 风险等级</strong></td>
-                    <td style="font-weight: bold; color: ${report.riskLevel === 'Safe' ? 'green' : report.riskLevel === 'High' ? 'red' : '#f39c12'};">
-                        ${report.riskLevel}
-                    </td>
-                </tr>
-                <tr style="background-color: #f8f8f8;">
-                    <td><strong>🚨 是否可疑</strong></td>
-                    <td>${report.suspicious ? '✅ 是' : '❎ 否'}</td>
-                </tr>
-                <tr>
-                    <td><strong>📌 风险原因</strong></td>
-                    <td style="line-height: 1.6;">${report.reason || '无'}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-`;
-
-
-                        layer.open({
-                            type: 1,
-                            title: 'AI 风险分析报告',
-                            area: ['100%', '100%'],
-                            offset: '0px',
-                            shadeClose: true,
-                            content: html
-                        });
-                    } else {
-                        layer.msg('AI分析失败：' + (res.msg || '服务异常'), { icon: 2 });
-                    }
-                },
-                error: function () {
-                    layer.closeAll('loading');
-                    layer.msg('AI分析接口异常', { icon: 2 });
-                }
-            });
-        });
-
-        // 同步按钮
-        $('#sync-btn').click(function () {
-            layer.load(1, { shade: [0.1, '#fff'] });
-
-            $.ajax({
-                url: '/logs/audit/sync',
-                type: 'POST',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
-                },
-                success: function (res) {
-                    layer.closeAll('loading');
-                    if (res.code === 0) {
-                        layer.msg('同步请求已发送，稍后自动刷新数据');
-                    } else {
-                        layer.msg('同步失败：' + res.msg, { icon: 2 });
-                    }
-                },
-                error: function () {
-                    layer.closeAll('loading');
-                    layer.msg('同步请求失败', { icon: 2 });
-                }
-            });
-        });
-
-        $('#search-btn').click(function () {
-            page = 1;
-            fetchData();
-        });
-
-        $('#reset-btn').click(function () {
-            $('#mac-search').val('');
-            $('#start-time').val('');
-            $('#end-time').val('');
-            page = 1;
-            fetchData();
-        });
-
-        // 初始化加载 + 定时轮询
-        fetchData();
-        setInterval(fetchData, 10000);
+    // 渲染表格
+    table.render({
+      elem: '#LAY-audit-manage',
+      method: 'post',
+      url: '/logs/audit',
+      contentType: 'application/json',
+      headers: {
+        'Authorization': localStorage.getItem('token'),
+        'userId': localStorage.getItem('id')
+      },
+      where: {},
+      title: '审计日志',
+      page: true,
+      limit: 10,
+      limits: [5, 10, 20, 50],
+      request: {
+        pageName: 'page',
+        limitName: 'limit'
+      },
+      parseData: function (res) {
+        return {
+          code: res.code,
+          msg: res.msg,
+          count: res.count,
+          data: res.data
+        };
+      },
+      cols: [[
+        { type: 'checkbox', fixed: 'left' },
+        { field: 'mac', title: 'MAC地址', width: 180 },
+        { field: 'username', title: '用户名', width: 120 },
+        { field: 'loginTime', title: '登录时间', width: 180, templet: d => formatDate(d.loginTime) },
+        { field: 'logoffTime', title: '注销时间', width: 180, templet: d => formatDate(d.logoffTime) },
+        { fixed: 'right', title: '操作', toolbar: '#table-useradmin-webuser', width: 200 }
+      ]]
     });
-</script>
 
+    // 搜索
+    form.on('submit(LAY-audit-search)', function (data) {
+      const { searchType, keywords } = data.field;
+      const whereObj = {};
+      if (searchType === 'mac') {
+        whereObj.mac = keywords.trim();
+        searchedMac = keywords.trim();
+      } else {
+        whereObj.username = keywords.trim();
+        searchedMac = null;
+      }
+      table.reload('LAY-audit-manage', { where: whereObj, page: { curr: 1 } });
+      return false;
+    });
+
+    // 表格操作事件监听
+    table.on('tool(LAY-audit-manage)', function (obj) {
+      const data = obj.data;
+
+      if (obj.event === 'action') {
+        if (!data.actions || !Array.isArray(data.actions) || data.actions.length === 0) {
+          return layer.msg('无操作记录');
+        }
+        let html = '<ul class="layui-timeline">';
+        data.actions.forEach(act => {
+          html += `
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis"></i>
+              <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">${formatDate(act.timestamp)}</h3>
+                <p><strong>${act.action}</strong>（事件ID: ${act.eventId}）<br>${act.details || '无详情'}</p>
+              </div>
+            </li>`;
+        });
+        html += '</ul>';
+
+        $('#operationDetailContainer').html(html);
+        layer.open({
+          type: 1,
+          title: '操作行为时间线',
+          skin: 'layui-layer-molv',
+          area: ['600px', '80%'],
+          shadeClose: true,
+          content: $('#operationDetailContainer')
+        });
+      }
+      else if (obj.event === 'ai') {
+        if (!data.mac) return layer.msg('无MAC地址，无法分析');
+        const { mac, username, loginTime } = data;
+        const $btn = $(this);
+        $btn.attr('disabled', true).addClass('layui-btn-disabled');
+        $.ajax({
+          url: '/api/report/audit/analyze',
+          method: 'POST',
+          contentType: 'application/json',
+          headers: {
+            'Authorization': localStorage.getItem('token'),
+            'userId': localStorage.getItem('id')
+          },
+          data: JSON.stringify({ mac, username, loginTime }),
+          success(res) {
+            if (res.code === 0) {
+              const r = res.data[0];
+              layer.open({
+                type: 1,
+                title: 'AI 审计分析报告',
+                area: ['600px', 'auto'], // 宽度600px，高度自动适应内容
+                shadeClose: true,
+                content: `
+        <div style="
+          padding: 30px 40px;
+          background-color: #fff;
+          border-radius: 12px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          color: #333;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          line-height: 1.8;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 520px; /* 最小宽度保证不太窄 */
+        ">
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">用户：<span style="font-weight: 400;">${r.username}</span></p>
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">MAC：<span style="font-weight: 400;">${r.mac}</span></p>
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">登录时间：<span style="font-weight: 400;">${formatDate(r.loginTime)}</span></p>
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">风险等级：<span style="font-weight: 400;">${r.riskLevel}</span></p>
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">是否可疑：
+            ${r.suspicious
+                        ? '<span style="color:#27ae60; font-weight: 700;">✅ 是</span>'
+                        : '<span style="color:#c0392b; font-weight: 700;">❎ 否</span>'}
+          </p>
+          <p style="font-size: 18px; font-weight: 600; color: #2c3e50;">风险原因：</p>
+          <p style="font-size: 16px; font-weight: 400; color: #555; margin-top: 8px; white-space: pre-wrap;">${r.reason}</p>
+        </div>
+      `
+              });
+            } else {
+              layer.msg(res.msg || 'AI分析失败', { icon: 2 });
+            }
+          },
+
+          error() {
+            layer.msg('AI接口失败', { icon: 2 });
+          },
+          complete() {
+            $btn.attr('disabled', false).removeClass('layui-btn-disabled');
+          }
+
+        });
+      }
+    });
+
+    // 按钮事件处理
+    const active = {
+      sync: function () {
+        layer.load(1, { shade: [0.1, '#fff'] });
+        $.post({
+          url: '/logs/audit/sync',
+          headers: {
+            'Authorization': localStorage.getItem('token'),
+            'userId': localStorage.getItem('id')
+          },
+          success(res) {
+            layer.closeAll('loading');
+            if (res.code === 0) {
+              layer.msg('同步请求已发送');
+              table.reload('LAY-audit-manage');
+            } else {
+              layer.msg(res.msg || '同步失败', { icon: 2 });
+            }
+          },
+          error() {
+            layer.closeAll('loading');
+            layer.msg('请求失败', { icon: 2 });
+          }
+        });
+      },
+      refresh: function () {
+        // 清空搜索框和下拉选择
+        form.val('auditSearchForm', {
+          searchType: 'mac',
+          keywords: ''
+        });
+        // 重新加载表格数据，无搜索条件
+        table.reload('LAY-audit-manage', {
+          where: {},
+          page: { curr: 1 }
+        });
+      }
+    };
+
+    $('.layuiadmin-btn-useradmin').on('click', function () {
+      const type = $(this).data('type'), tableName = $(this).data('table');
+      if (tableName === 'audit' && active[type]) active[type]();
+    });
+  });
+</script>
 </body>
 </html>

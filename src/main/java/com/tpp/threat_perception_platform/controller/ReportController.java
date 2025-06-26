@@ -131,4 +131,13 @@ public class ReportController {
         return baselineDetectService.analyzeAndSaveBaselineDetectReport(mac);
     }
 
+
+    @PostMapping("/baseline/analyze")
+    public ResponseResult analyzeBaselineReport(@RequestBody SystemRiskParam param) {
+        String mac = param.getMacAddress();
+        System.out.println("sysreportMac:"+mac);
+        return systemRiskService.analyzeAndSaveSystemRiskReport(mac);
+    }
+
+
 }

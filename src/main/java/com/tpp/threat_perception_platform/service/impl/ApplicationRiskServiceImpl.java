@@ -11,7 +11,7 @@ import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskAiReport;
-import com.tpp.threat_perception_platform.pojo.User;
+import com.tpp.threat_perception_platform.pojo.SystemRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.ApplicationRiskService;
 import com.tpp.threat_perception_platform.utils.AIUtils;

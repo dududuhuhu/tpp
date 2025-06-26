@@ -8,7 +8,6 @@ import com.github.pagehelper.PageInfo;
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.ServiceInfoMapper;
 import com.tpp.threat_perception_platform.param.MyParam;
-import com.tpp.threat_perception_platform.pojo.AccountInfo;
 import com.tpp.threat_perception_platform.pojo.Host;
 import com.tpp.threat_perception_platform.pojo.ServiceInfo;
 import com.tpp.threat_perception_platform.response.ResponseResult;

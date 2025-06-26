@@ -56,6 +56,7 @@ public class SecurityConfig {
                     // 对于控制台接口，所有都能访问
                     auth.requestMatchers("/console/**").permitAll();
                     auth.requestMatchers("/api/**").permitAll();
+                    auth.requestMatchers("/baseline/**").permitAll();
                     // 对于登录接口 允许匿名访问
                     auth.requestMatchers("/user/login").anonymous();
                     // 退出登录接口

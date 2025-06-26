@@ -4,10 +4,13 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.tpp.threat_perception_platform.dao.AcctChgLogMapper;
+import com.tpp.threat_perception_platform.dao.AcctChgLogReportMapper;
 import com.tpp.threat_perception_platform.param.ReportParam;
 import com.tpp.threat_perception_platform.pojo.AcctChgLog;
+import com.tpp.threat_perception_platform.pojo.AcctChgLogReport;
 import com.tpp.threat_perception_platform.service.AccChgReportService;
 import com.tpp.threat_perception_platform.utils.AIUtils;
+import com.tpp.threat_perception_platform.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,25 +22,45 @@ public class AccChgReportServiceImpl implements AccChgReportService {
 
     @Autowired
     private AcctChgLogMapper acctChgLogMapper;
+    @Autowired
+    private AcctChgLogReportMapper acctChgLogReportMapper;
 
     @Override
     public JSONObject analyzeAndGenerateReportByMac(String mac) {
-        // 查找该 MAC 的所有日志（按时间升序）
+        // 1. 查找该 MAC 的所有日志（按时间升序）
         List<AcctChgLog> logs = acctChgLogMapper.selectByMacOrderedByTime(mac);
 
         if (logs == null || logs.isEmpty()) {
             throw new RuntimeException("未找到账号变更日志，MAC: " + mac);
         }
 
-        // 拼接日志信息
+        // 2. 拼接日志信息（供AI分析）
         StringBuilder logInfoBuilder = new StringBuilder();
+        // 同时拼接摘要字符串，用于计算哈希
+        StringBuilder summaryBuilder = new StringBuilder();
         for (AcctChgLog log : logs) {
-            logInfoBuilder.append(String.format(
+            String logEntry = String.format(
                     "事件ID：%s\n事件时间：%s\n操作行为：%s\n被操作用户：%s\n操作用户：%s\n\n",
                     log.getEventId(), log.getEventTime(), log.getAction(), log.getTargetUser(), log.getOperatorUser()
-            ));
-        }
+            );
+            logInfoBuilder.append(logEntry);
 
+            // 摘要拼接尽量简洁稳定
+            summaryBuilder.append(log.getEventId())
+                    .append(log.getEventTime())
+                    .append(log.getAction())
+                    .append(log.getTargetUser())
+                    .append(log.getOperatorUser());
+        }
+        // 3. 计算摘要字符串的哈希
+        String logSummary = summaryBuilder.toString();
+        String riskHash = HashUtils.generateSHA256(logSummary);
+        // 4. 查询数据库看是否已有相同hash的报告
+        AcctChgLogReport existingReport = acctChgLogReportMapper.selectByMac(mac);
+        if (existingReport != null && riskHash.equals(existingReport.getRiskHash())) {
+            // 若已有相同hash报告，直接返回已存内容，避免重复调用AI
+            return JSON.parseObject(existingReport.getReportContent());
+        }
         // AI 提示词模板
         String promptTemplate =
                 "作为专业的日志数据风险分析师，我将根据您提供的账号变更日志信息，生成一个包含关键指标的风险分析报告。请仔细阅读以下日志信息，并根据您的专业知识和经验进行风险评估。\n" +
@@ -102,8 +125,36 @@ public class AccChgReportServiceImpl implements AccChgReportService {
                     .replaceAll("```", "")
                     .trim();
 
-            // 直接解析为 JSONObject 返回
-            return JSON.parseObject(content);
+            JSONObject json = JSON.parseObject(content);
+
+            // 8. 构造报告实体，保存或更新数据库
+            AcctChgLogReport report = existingReport != null ? existingReport : new AcctChgLogReport();
+            report.setMacAddress(mac);
+            report.setRiskHash(riskHash);
+            report.setReportContent(content);
+            report.setOverallRiskLevel(json.getString("overall_risk_level"));
+            report.setHighRiskEventCount(json.getInteger("high_risk_event_count"));
+            report.setHighRiskEvents(json.getJSONArray("high_risk_events").toJSONString());
+            report.setRiskScores(json.getJSONArray("risk_scores").toJSONString());
+            report.setOperationFrequencies(json.getJSONArray("operation_frequencies").toJSONString());
+            report.setRiskDescription(json.getString("risk_description"));
+            report.setSuggestedAction(json.getString("suggested_action"));
+
+            Date now = new Date();
+            if (existingReport == null) {
+                // 新增
+                report.setCreatedAt(now);
+                report.setUpdatedAt(now);
+                acctChgLogReportMapper.insert(report);
+            } else {
+                // 更新，确保ID不为null
+                report.setId(existingReport.getId());
+                report.setUpdatedAt(now);
+                acctChgLogReportMapper.updateById(report);
+            }
+            System.out.println("json:"+json);
+            // 9. 返回AI解析结果
+            return json;
 
         } catch (Exception e) {
             // 如果 AI 失败，返回默认报告

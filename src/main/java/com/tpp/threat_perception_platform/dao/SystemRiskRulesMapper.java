@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.param.RuleParam;
 import com.tpp.threat_perception_platform.pojo.SystemRiskRules;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public interface SystemRiskRulesMapper {
     List<SystemRiskRules> findAll();
 
     void delete(Integer[] ids);
+
+    List<RuleParam> getRulesByPlatform(String platform);
 }

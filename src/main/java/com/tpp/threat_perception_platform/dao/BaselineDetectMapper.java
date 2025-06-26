@@ -36,4 +36,10 @@ public interface BaselineDetectMapper {
      */
     List<BaselineDetect> selectByMac(String mac);
 
+
+    List<BaselineDetect> findByMac(String mac);
+
+    List<BaselineDetect> findByTaskId(Integer taskId);
+
+    BaselineDetect selectByTaskIdAndName(Integer taskId,String name);
 }
