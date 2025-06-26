@@ -110,16 +110,27 @@ class AppDetectorLinux:
         software_list = []
 
         try:
-            # 使用 dpkg-query 获取已安装软件列表（适用于 Debian 系列）
             process = subprocess.Popen(['dpkg-query', '-W', '--showformat=${Package}\t${Version}\n'],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output, _ = process.communicate()
+            software_list = []
+
             for line in output.decode('utf-8').splitlines():
                 parts = line.split("\t")
+                package_name = parts[0]
+                version = parts[1]
+
+                # 获取安装路径
+                path_process = subprocess.Popen(['which', package_name],
+                                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                path_output, _ = path_process.communicate()
+                install_paths:list = path_output.decode('utf-8').splitlines()
+
                 software = {
                     'mac': self.data.get('macAddress', ''),
-                    'name': parts[0],  # 软件名称
-                    'version': parts[1]  # 软件版本
+                    'display_name': package_name,  # 软件名称
+                    # 'version': version,  # 软件版本
+                    'install_location': install_paths[0] if len(install_paths) != 0 else "Unknown"  # 安装路径列表
                 }
                 software_list.append(software)
         except Exception as e:

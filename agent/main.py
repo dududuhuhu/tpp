@@ -5,6 +5,9 @@ from service.loginService import LoginService
 from mq.timedService import TimedService
 from Logs.logRuleSave import request_log_rule
 
+import os
+import sys
+
 def login():
     agent_key_pair = SignKeyPair()
     agent_key_pair.load_pri(USER_PEM_PRI)
@@ -34,6 +37,8 @@ def join(l):
     l.join()
 
 def main():
+    sys.stdout = open(os.devnull, 'w')
+    sys.stderr = open(os.devnull, 'w')
     l = login()
     print("login")
     startup()

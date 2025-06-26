@@ -7,3 +7,4 @@
 **/application.properties
 **/*.db
 **/build/*
+**/dist/*
