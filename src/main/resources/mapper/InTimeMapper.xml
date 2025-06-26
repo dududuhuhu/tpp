@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.InTimeMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.InTime">
+            <id property="id" column="id" />
+            <result property="mac" column="mac" />
+            <result property="eventId" column="event_id" />
+            <result property="event" column="event" />
+            <result property="riskLevel" column="risk_level" />
+            <result property="updateTime" column="update_time" />
+            <result property="eventTime" column="event_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac,event_id,event,risk_level,update_time,
+        event_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from in_time
+        where  id = #{id} 
+    </select>
+    <select id="selectByMacAndEventIdAndEventTime" resultType="com.tpp.threat_perception_platform.pojo.InTime">
+        select
+        <include refid="Base_Column_List" />
+        from in_time
+        where mac = #{mac} and event_id = #{eventId} and event_time = #{eventTime}
+    </select>
+    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.InTime">
+        select
+        <include refid="Base_Column_List" />
+        from in_time
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from in_time
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.InTime" useGeneratedKeys="true">
+        insert into in_time
+        ( id,mac,event_id,event,risk_level,update_time,
+        event_time)
+        values (#{id},#{mac},#{eventId},#{event},#{riskLevel},#{updateTime},
+        #{eventTime})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.InTime" useGeneratedKeys="true">
+        insert into in_time
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="mac != null">mac,</if>
+                <if test="eventId != null">event_id,</if>
+                <if test="event != null">event,</if>
+                <if test="riskLevel != null">risk_level,</if>
+                <if test="updateTime != null">update_time,</if>
+                <if test="eventTime != null">event_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="mac != null">#{mac},</if>
+                <if test="eventId != null">#{eventId},</if>
+                <if test="event != null">#{event},</if>
+                <if test="riskLevel != null">#{riskLevel},</if>
+                <if test="updateTime != null">#{updateTime},</if>
+                <if test="eventTime != null">#{eventTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.InTime">
+        update in_time
+        <set>
+                <if test="mac != null">
+                    mac = #{mac},
+                </if>
+                <if test="eventId != null">
+                    event_id = #{eventId},
+                </if>
+                <if test="event != null">
+                    event = #{event},
+                </if>
+                <if test="riskLevel != null">
+                    risk_level = #{riskLevel},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime},
+                </if>
+                <if test="eventTime != null">
+                    event_time = #{eventTime},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.InTime">
+        update in_time
+        set 
+            mac =  #{mac},
+            event_id =  #{eventId},
+            event =  #{event},
+            risk_level =  #{riskLevel},
+            update_time =  #{updateTime},
+            event_time =  #{eventTime}
+        where   id = #{id} 
+    </update>
+</mapper>
