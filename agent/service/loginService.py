@@ -95,7 +95,6 @@ class LoginService(Service):
         body = json.dumps(data)
 
         while True:
-            print("execute")
             connection = pika.BlockingConnection(pika.URLParameters(self._amqp_url))
             channel = connection.channel()
             channel.basic_publish(

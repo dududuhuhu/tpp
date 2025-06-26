@@ -21,10 +21,6 @@ class AcountDetectorLinux:
                     user_dict = {
                         "mac": self.data.get("macAddress", ""),
                         "name": parts[0],  # 用户名
-                        # "uid": parts[2],   # 用户ID
-                        # "gid": parts[3],   # 组ID
-                        # "home": parts[5],  # 主目录
-                        # "shell": parts[6]  # 登录 shell
                     }
                     account_list.append(user_dict)
         except Exception as e:
