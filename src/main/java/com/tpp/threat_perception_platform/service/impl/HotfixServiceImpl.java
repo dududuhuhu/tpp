@@ -43,11 +43,9 @@ public class HotfixServiceImpl implements HotfixService {
      */
     @Override
     public ResponseResult<List<Hotfix>> hotfixList(HotfixParam param) {
-//        int page = param.getPage() != null ? param.getPage() : 1;
-//        int limit = param.getLimit() != null ? param.getLimit() : 10;
         String mac= param.getMacAddress();
 //        // 设置分页参数
-//        PageHelper.startPage(param.getPage(), param.getLimit());
+ //       PageHelper.startPage(param.getPage(), param.getLimit());
         List<Hotfix> hotfixList = hotfixMapper.findByMac(mac);
         // 构架pageInfo
         PageInfo<Hotfix> pageInfo = new PageInfo<>(hotfixList);

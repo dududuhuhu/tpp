@@ -1,5 +1,6 @@
 package com.tpp.threat_perception_platform.dao;
 
+import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.BaselineDetect;
 
 import java.util.List;
@@ -27,6 +28,14 @@ public interface BaselineDetectMapper {
     BaselineDetect selectByMacAndName(String mac, String name);
 
     List<BaselineDetect> findAll();
+
+    /**
+     * 根据 MAC 地址查询该主机的全部基线探测记录
+     * @param mac 主机 MAC 地址
+     * @return 风险记录列表
+     */
+    List<BaselineDetect> selectByMac(String mac);
+
 
     List<BaselineDetect> findByMac(String mac);
 
