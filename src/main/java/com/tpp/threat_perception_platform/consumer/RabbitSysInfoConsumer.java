@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.rabbitmq.client.Channel;
 
+import com.tpp.threat_perception_platform.dao.BaselineDetectMapper;
+import com.tpp.threat_perception_platform.dao.BaselineTaskMapper;
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.LogRulesMapper;
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
@@ -92,6 +94,10 @@ public class RabbitSysInfoConsumer {
     private HostMapper hostMapper;
     @Autowired
     private LogRulesMapper logRulesMapper;
+    @Autowired
+    private BaselineTaskMapper baselineTaskMapper;
+    @Autowired
+    private BaselineDetectMapper baselineDetectMapper;
 
     <T> T validateAndParseObject(String message, Class<T> clazz) {
         try {
@@ -771,7 +777,7 @@ public class RabbitSysInfoConsumer {
     }
 
     // 基线检查
-//    @RabbitListener(queues = "baselineDetect_queue")
+    @RabbitListener(queues = "baselineDetect_queue")
     public void receiveBaselineDetect(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
         System.out.println("Received BaselineDetect message: " + message);
         try {
@@ -790,6 +796,22 @@ public class RabbitSysInfoConsumer {
                 ResponseResult result = baselineDetectService.saveBaselineDetect(baselineDetect,now);
                 System.out.println("Save result: " + result.getMsg());
             }
+
+            // 查询检测结果表中该任务的检测记录
+
+            Integer id =baselineDetectList.get(0).getId();
+            List<BaselineDetect> db_resultList = baselineDetectMapper.findByTaskId(id);
+            BaselineTask task =baselineTaskMapper.selectByPrimaryKey(Long.valueOf(id));
+            if (db_resultList.size() > 0) {
+                // 如果检测结果存在，说明任务执行成功
+                task.setTaskStatus(1);  // 已执行成功
+            } else {
+                // 如果没查到检测结果，任务状态维持未执行状态（0）
+                task.setTaskStatus(0);
+            }
+
+            // 更新任务状态
+            baselineTaskMapper.update(task);
 
             // 手动 ack
             Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);

@@ -114,6 +114,8 @@
                             return "<button class='layui-btn layui-btn-normal layui-btn-xs'>已完成</button>";
                         }else if(d.taskStatus === 0){
                             return "<button class='layui-btn layui-btn-danger layui-btn-xs'>未完成</button>";
+                        }else if(d.taskStatus === 2){
+                            return "<button class='layui-btn layui-btn-danger layui-btn-xs'>异常</button>";
                         }
                     }}
                     ,{field:'taskHosts', title:'任务主机MAC地址',width: 160}

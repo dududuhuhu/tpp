@@ -28,7 +28,7 @@
         from baseline_task
         <where>
             <if test="param.keywords != null and param.keywords != ''">
-                and task_hosts =#{param.keywords}
+                task_hosts = #{param.keywords}
             </if>
         </where>
         order by id
@@ -39,7 +39,11 @@
         from baseline_task
         where task_name=#{taskName}
     </select>
-
+    <select id="findPendingTasks" resultType="com.tpp.threat_perception_platform.pojo.BaselineTask" parameterType="java.time.LocalDateTime">
+        SELECT * FROM baseline_task
+        WHERE (task_status IS NULL OR task_status = 0)
+          AND task_time &lt;= #{now}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from baseline_task
         where  id = #{id} 
@@ -86,7 +90,7 @@
                     task_status = #{taskStatus},
                 </if>
                 <if test="taskHosts != null">
-                    task_hosts = #{taskHosts},
+                    task_hosts = #{taskHosts}
                 </if>
         </set>
         where   id = #{id} 
@@ -99,5 +103,14 @@
             task_status =  #{taskStatus},
             task_hosts =  #{taskHosts}
         where   id = #{id} 
+    </update>
+    <update id="update" parameterType="com.tpp.threat_perception_platform.pojo.BaselineTask">
+        UPDATE baseline_task
+        SET
+            task_name = #{taskName},
+            task_time = #{taskTime},
+            task_status = #{taskStatus},
+            task_hosts = #{taskHosts}
+        WHERE id = #{id}
     </update>
 </mapper>

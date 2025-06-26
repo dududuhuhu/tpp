@@ -12,24 +12,25 @@ class BaselineCheckDetect:
         # 可扩展初始化参数（如扫描目标等）
         self.results = []
         self.mac=':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))
+        self.taskId=data['taskId']
 
     def detect(self) -> str:
         """
         外部调用接口：执行漏洞探测，返回 JSON 字符串
         """
-        self.__BaselineCheck_detect(self.mac)
+        self.__BaselineCheck_detect(self.mac,self.taskId)
         result=json.dumps(self.results, ensure_ascii=False)
         print(result)
         return result
 
-    def __BaselineCheck_detect(self,mac):
+    def __BaselineCheck_detect(self,mac,taskId):
         """
         内部实际探测逻辑
         """
         print("开始基线核查..............!")
         # 创建扫描器实例并执行
         # mac=self.mac
-        self.results = BaselineCheck(mac)
+        self.results = BaselineCheck(mac,taskId)
 
         print("基线核查结束！")
         return self.results

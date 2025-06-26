@@ -34,7 +34,7 @@ baseLine.log每一行数据为：Registry::ScreenSaveTimeOut    [合格项]|300|
 
 """
 
-def BaselineCheck(mac):
+def BaselineCheck(mac,taskId):
     set_policy_cmd = [
         'powershell',
         '-Command',
@@ -81,6 +81,7 @@ def BaselineCheck(mac):
                 description = parts[3].strip()
 
                 entry = {
+                    "taskId":taskId,
                     "mac": mac,
                     "name": name,
                     "result": result_raw,

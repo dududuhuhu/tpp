@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tpp.threat_perception_platform.dao.AcctChgLogReportMapper">
+
+    <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.AcctChgLogReport">
+            <id property="id" column="id" />
+            <result property="macAddress" column="mac_address" />
+            <result property="riskHash" column="risk_hash" />
+            <result property="overallRiskLevel" column="overall_risk_level" />
+            <result property="highRiskEventCount" column="high_risk_event_count" />
+            <result property="highRiskEvents" column="high_risk_events" />
+            <result property="riskScores" column="risk_scores" />
+            <result property="operationFrequencies" column="operation_frequencies" />
+            <result property="riskDescription" column="risk_description" />
+            <result property="suggestedAction" column="suggested_action" />
+            <result property="reportContent" column="report_content" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mac_address,risk_hash,overall_risk_level,high_risk_event_count,high_risk_events,
+        risk_scores,operation_frequencies,risk_description,suggested_action,report_content,
+        created_at,updated_at
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from acct_chg_log_report
+        where  id = #{id} 
+    </select>
+    <select id="selectByMac" resultType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport">
+        select
+        <include refid="Base_Column_List" />
+        from acct_chg_log_report
+        where  mac_address = #{mac}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from acct_chg_log_report
+        where  id = #{id} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport" useGeneratedKeys="true">
+        insert into acct_chg_log_report
+        ( id,mac_address,risk_hash,overall_risk_level,high_risk_event_count,high_risk_events,
+        risk_scores,operation_frequencies,risk_description,suggested_action,report_content,
+        created_at,updated_at)
+        values (#{id},#{macAddress},#{riskHash},#{overallRiskLevel},#{highRiskEventCount},#{highRiskEvents},
+        #{riskScores},#{operationFrequencies},#{riskDescription},#{suggestedAction},#{reportContent},
+        #{createdAt},#{updatedAt})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport" useGeneratedKeys="true">
+        insert into acct_chg_log_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="macAddress != null">mac_address,</if>
+                <if test="riskHash != null">risk_hash,</if>
+                <if test="overallRiskLevel != null">overall_risk_level,</if>
+                <if test="highRiskEventCount != null">high_risk_event_count,</if>
+                <if test="highRiskEvents != null">high_risk_events,</if>
+                <if test="riskScores != null">risk_scores,</if>
+                <if test="operationFrequencies != null">operation_frequencies,</if>
+                <if test="riskDescription != null">risk_description,</if>
+                <if test="suggestedAction != null">suggested_action,</if>
+                <if test="reportContent != null">report_content,</if>
+                <if test="createdAt != null">created_at,</if>
+                <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="macAddress != null">#{macAddress},</if>
+                <if test="riskHash != null">#{riskHash},</if>
+                <if test="overallRiskLevel != null">#{overallRiskLevel},</if>
+                <if test="highRiskEventCount != null">#{highRiskEventCount},</if>
+                <if test="highRiskEvents != null">#{highRiskEvents},</if>
+                <if test="riskScores != null">#{riskScores},</if>
+                <if test="operationFrequencies != null">#{operationFrequencies},</if>
+                <if test="riskDescription != null">#{riskDescription},</if>
+                <if test="suggestedAction != null">#{suggestedAction},</if>
+                <if test="reportContent != null">#{reportContent},</if>
+                <if test="createdAt != null">#{createdAt},</if>
+                <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport">
+        update acct_chg_log_report
+        <set>
+                <if test="macAddress != null">
+                    mac_address = #{macAddress},
+                </if>
+                <if test="riskHash != null">
+                    risk_hash = #{riskHash},
+                </if>
+                <if test="overallRiskLevel != null">
+                    overall_risk_level = #{overallRiskLevel},
+                </if>
+                <if test="highRiskEventCount != null">
+                    high_risk_event_count = #{highRiskEventCount},
+                </if>
+                <if test="highRiskEvents != null">
+                    high_risk_events = #{highRiskEvents},
+                </if>
+                <if test="riskScores != null">
+                    risk_scores = #{riskScores},
+                </if>
+                <if test="operationFrequencies != null">
+                    operation_frequencies = #{operationFrequencies},
+                </if>
+                <if test="riskDescription != null">
+                    risk_description = #{riskDescription},
+                </if>
+                <if test="suggestedAction != null">
+                    suggested_action = #{suggestedAction},
+                </if>
+                <if test="reportContent != null">
+                    report_content = #{reportContent},
+                </if>
+                <if test="createdAt != null">
+                    created_at = #{createdAt},
+                </if>
+                <if test="updatedAt != null">
+                    updated_at = #{updatedAt},
+                </if>
+        </set>
+        where   id = #{id} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport">
+        update acct_chg_log_report
+        set 
+            mac_address =  #{macAddress},
+            risk_hash =  #{riskHash},
+            overall_risk_level =  #{overallRiskLevel},
+            high_risk_event_count =  #{highRiskEventCount},
+            high_risk_events =  #{highRiskEvents},
+            risk_scores =  #{riskScores},
+            operation_frequencies =  #{operationFrequencies},
+            risk_description =  #{riskDescription},
+            suggested_action =  #{suggestedAction},
+            report_content =  #{reportContent},
+            created_at =  #{createdAt},
+            updated_at =  #{updatedAt}
+        where   id = #{id} 
+    </update>
+    <update id="updateById" parameterType="com.tpp.threat_perception_platform.pojo.AcctChgLogReport">
+        UPDATE acct_chg_log_report
+        SET
+            mac_address = #{macAddress},
+            risk_hash = #{riskHash},
+            report_content = #{reportContent},
+            overall_risk_level = #{overallRiskLevel},
+            high_risk_event_count = #{highRiskEventCount},
+            high_risk_events = #{highRiskEvents},
+            risk_scores = #{riskScores},
+            operation_frequencies = #{operationFrequencies},
+            risk_description = #{riskDescription},
+            suggested_action = #{suggestedAction},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

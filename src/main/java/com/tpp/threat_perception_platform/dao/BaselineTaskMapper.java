@@ -4,6 +4,7 @@ import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.pojo.BaselineTask;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -31,4 +32,8 @@ public interface BaselineTaskMapper {
     BaselineTask selectByName(String taskName);
 
     void delete(Integer[] ids);
+
+    List<BaselineTask> findPendingTasks(@Param("now") LocalDateTime now);
+
+    void update(BaselineTask task);
 }
