@@ -155,10 +155,10 @@
                         'userId': localStorage.getItem('id')
                     },
                     contentType: 'application/json',
-                    data: JSON.stringify({ macAddress: mac }),
+                    data: JSON.stringify({ mac: mac }),
                     success: function (res) {
                         if (res.code === 0) {
-                            reportUtils.showReportDialog('漏洞检测分析报告', res.data);
+                            reportUtils.showReportDialog('基线核查结果分析报告', res.data);
                         } else {
                             layer.msg(res.msg || '分析失败', {icon: 5});
                         }

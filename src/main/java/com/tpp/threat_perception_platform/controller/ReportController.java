@@ -125,19 +125,11 @@ public class ReportController {
      * @param mac JSON请求体，包含 mac 字段
      * @return 响应结果，包含分析报告内容
      */
-    @PostMapping("/baselineDetect/analyze")
-    public ResponseResult analyzeBaselineDetectReport(@RequestParam("mac") String mac) {
+    @PostMapping("/baseline/analyze")
+    public ResponseResult analyzeBaselineDetectReport(@RequestBody BaselineDetectParam param) {
+        String mac = param.getMac();
         System.out.println("BaselineDetectAnalyzeMac: " + mac);
         return baselineDetectService.analyzeAndSaveBaselineDetectReport(mac);
     }
-
-
-    @PostMapping("/baseline/analyze")
-    public ResponseResult analyzeBaselineReport(@RequestBody SystemRiskParam param) {
-        String mac = param.getMacAddress();
-        System.out.println("sysreportMac:"+mac);
-        return systemRiskService.analyzeAndSaveSystemRiskReport(mac);
-    }
-
 
 }
