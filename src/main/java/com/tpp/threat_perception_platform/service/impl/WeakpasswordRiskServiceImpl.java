@@ -7,10 +7,7 @@ import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.WeakpasswordRiskMapper;
 import com.tpp.threat_perception_platform.param.MyParam;
 import com.tpp.threat_perception_platform.param.WeakpasswordParam;
-import com.tpp.threat_perception_platform.pojo.AccountInfo;
-import com.tpp.threat_perception_platform.pojo.AppInfo;
-import com.tpp.threat_perception_platform.pojo.Host;
-import com.tpp.threat_perception_platform.pojo.WeakpasswordRisk;
+import com.tpp.threat_perception_platform.pojo.*;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.WeakpasswordRiskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +31,17 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
      * 保存
      */
     @Override
-    public ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk) {
-
-        Date date = new Timestamp(System.currentTimeMillis());
+    public ResponseResult saveWeakpasswordRisk(WeakpasswordRisk weakpasswordRisk, Timestamp now) {
         // 先查询是否已存在
         WeakpasswordRisk db = weakpasswordRiskMapper.selectByMacAndUsername(weakpasswordRisk.getMac(),weakpasswordRisk.getUsername());
+
+        weakpasswordRisk.setUpdatedTime(now);
         if (db != null) {
             // 重新更新时间
-            db.setUpdatedTime(date);
-            weakpasswordRiskMapper.updateByPrimaryKeySelective(db);
+            weakpasswordRisk.setId(db.getId());
+            weakpasswordRiskMapper.updateByPrimaryKey(weakpasswordRisk);
             return new ResponseResult<>(1003, "该弱密码风险记录已存在，更新时间！");
         }
-        weakpasswordRisk.setUpdatedTime(date);
 
         // 更新账号信息的风险标识
         String username = weakpasswordRisk.getUsername();
@@ -69,7 +65,13 @@ public class WeakpasswordRiskServiceImpl implements WeakpasswordRiskService {
         // 设置分页参数
         PageHelper.startPage(param.getPage(), param.getLimit());
         // 查询weak = true
-        List<WeakpasswordRisk> weakpasswordRiskList = weakpasswordRiskMapper.findAll();
+
+        List<WeakpasswordRisk> weakpasswordRiskList;
+        if (mac!= null && !mac.isEmpty()) {
+            weakpasswordRiskList=weakpasswordRiskMapper.findByMac(mac);
+        }else{
+            weakpasswordRiskList=weakpasswordRiskMapper.findAll();
+        }
         // 构架pageInfo
         PageInfo<WeakpasswordRisk> pageInfo = new PageInfo<>(weakpasswordRiskList);
 

@@ -41,7 +41,7 @@
         from account_info
         WHERE mac = #{param.macAddress}
         AND updated_at = (SELECT MAX(updated_at) FROM account_info WHERE mac=#{param.macAddress})
-        order by id
+        order by is_harmful DESC
     </select>
     <select id="selectAllNamesByMac" resultType="java.lang.String">
         SELECT name

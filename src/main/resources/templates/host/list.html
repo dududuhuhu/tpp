@@ -84,7 +84,7 @@
 
             <div style="padding-bottom: 10px;">
                 <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
-                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+<!--                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>-->
                 <button class="layui-btn layuiadmin-btn-useradmin" data-type="refresh">刷新</button>
             </div>
 
@@ -473,49 +473,6 @@
                         }
                     })
                 })
-            }
-            ,add: function(){
-                layer.open({
-                    type: 2
-                    ,title: '添加主机'
-                    ,skin: 'layui-layer-molv'
-                    ,content: '/page/host/add'
-                    ,maxmin: true
-                    ,area: ['580px', '350px']
-                    ,btn: ['确定', '取消']
-                    ,yes: function (index,layero){
-                        var iframeWindow = window['layui-layer-iframe'+ index]
-                            ,submitID = 'LAY-user-front-submit'
-                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
-                            //监听提交--隐藏按钮
-                            iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                                var field = data.field; //获取提交的字段
-                                // 通过Ajax方式将参数提交到后端--保存数据库中
-                                $.ajax({
-                                    url:"/host/save",
-                                    type:"post",
-                                    headers: {
-                                        'Authorization': localStorage.getItem('token'),
-                                        'userId':localStorage.getItem('id')
-                                    },
-                                    data:JSON.stringify(field),
-                                    contentType: "application/json;charset=utf-8", //提交参数类型为json格式
-                                    dataType:"json",
-                                    success:function (res){
-                                        if(res.code === 0){//成功
-                                            layer.msg(res.msg);//弹出提示
-                                            table.reload('LAY-user-manage'); //数据刷新
-                                            layer.close(index); //关闭弹层
-                                        }else{//系统出问题
-                                            layer.msg(res.msg,{icon: 5});//弹出提示
-                                        }
-                                    }
-                                })
-                            });
-                            submit.trigger('click');
-                    }
-
-                });
             }
             ,refresh: function(){
                 table.reload('LAY-user-manage',{

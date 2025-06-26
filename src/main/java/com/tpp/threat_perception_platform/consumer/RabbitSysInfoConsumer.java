@@ -11,7 +11,10 @@ import com.rabbitmq.client.Channel;
 
 import com.tpp.threat_perception_platform.dao.HostMapper;
 import com.tpp.threat_perception_platform.dao.LogRulesMapper;
+<<<<<<< HEAD
 import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
+=======
+>>>>>>> demo
 import com.tpp.threat_perception_platform.param.AgentMessageParam;
 import com.tpp.threat_perception_platform.param.BaselineDetectParam;
 import com.tpp.threat_perception_platform.param.HotfixParam;
@@ -55,10 +58,6 @@ public class RabbitSysInfoConsumer {
 
     @Autowired
     private ApplicationRiskService applicationRiskService;
-
-    @Autowired
-    private ApplicationRiskRulesMapper applicationRiskRulesMapper;
-
 
 
     @Autowired
@@ -202,7 +201,7 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "status_queue")
     public void receiveStatus(String message, @Headers Map<String,Object> headers,
-                        Channel channel) throws IOException {
+                              Channel channel) throws IOException {
         System.out.println("Received message: " + message);
         // 反序列化数据
         try {
@@ -442,60 +441,50 @@ public class RabbitSysInfoConsumer {
         boolean allSuccess = true;
 
         try {
-            // 解析消息为 ApplicationRisk 简化版列表（只含 ruleId 和 mac）
+            // 解析消息为参数列表
+            // List<ApplicationRisk> paramList = JSON.parseArray(message, ApplicationRisk.class);
             List<ApplicationRisk> paramList = validateAndParseList(message, ApplicationRisk.class);
-            if (paramList == null || paramList.isEmpty()) {
-                System.err.println("No valid risk params found in message.");
-                channel.basicAck(deliveryTag, false);
+            if (paramList == null) {
                 return;
             }
-
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             for (ApplicationRisk param : paramList) {
                 try {
+                    // 转换并赋值检测时间
                     ApplicationRisk appRisk = new ApplicationRisk();
                     BeanUtils.copyProperties(param, appRisk);
                     appRisk.setDetectionTime(new Date());
-
-                    // 查 risk_name
-                    String riskName = applicationRiskRulesMapper.selectRiskNameById(param.getRuleId());
-                    if (riskName == null || riskName.trim().isEmpty()) {
-                        riskName = "未知风险";
-                    }
-                    appRisk.setRiskName(riskName);
-
-                    // 保存
-                    ResponseResult result = applicationRiskService.saveAppRisk(appRisk);
-                    System.out.printf("Risk detection result: ruleId=%d, mac=%s, code=%d, msg=%s%n",
-                            param.getRuleId(), param.getMac(), result.getCode(), result.getMsg());
+                    appRisk.setMac(param.getMac());
+                    // 保存到数据库
+                    ResponseResult result = applicationRiskService.saveAppRisk(appRisk, now);
+                    System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
+                            param, result.getCode(), result.getMsg());
 
                     if (result.getCode() != 0) {
                         allSuccess = false;
-                        System.err.printf("Failed to save risk info for ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
+                        System.err.printf("Failed to save risk info for param: %s%n", param);
                     }
-
                 } catch (Exception e) {
                     allSuccess = false;
-                    System.err.printf("Exception while saving risk info: ruleId=%d, mac=%s%n", param.getRuleId(), param.getMac());
+                    System.err.printf("Exception while saving risk info for param %s:%n", param);
                     e.printStackTrace();
                 }
             }
-
         } catch (Exception e) {
             allSuccess = false;
             System.err.println("Exception while processing risk message:");
             e.printStackTrace();
-
         } finally {
             if (allSuccess) {
                 channel.basicAck(deliveryTag, false);
-                System.out.println("All ApplicationRisk messages processed successfully, ACKed.");
+                System.out.println("All risk messages processed successfully, ACKed.");
             } else {
+                // 出错时决定是否重试，这里设为重试
                 channel.basicNack(deliveryTag, false, true);
-                System.err.println("Some ApplicationRisk messages failed, message NACKed and requeued.");
+                System.err.println("Some risk messages failed, message NACKed and requeued.");
             }
         }
     }
-
 
     @RabbitListener(queues = "systemRisk_queue")
     public void receiveSystemRisk(String message, @Headers Map<String, Object> headers, Channel channel) throws IOException {
@@ -509,6 +498,7 @@ public class RabbitSysInfoConsumer {
             List<SystemRisk> paramList = validateAndParseList(message, SystemRisk.class);
             if (paramList == null) return;
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             for (SystemRisk param : paramList) {
                 try {
                     // 创建新对象并赋值检测时间
@@ -517,7 +507,7 @@ public class RabbitSysInfoConsumer {
                     systemRisk.setUpdatedAt(new Date());
 
                     // 保存到数据库
-                    ResponseResult result = systemRiskService.saveSystemRisk(systemRisk);
+                    ResponseResult result = systemRiskService.saveSystemRisk(systemRisk, now);
                     System.out.printf("Risk detection result for param [%s]: code=%d, msg=%s%n",
                             param, result.getCode(), result.getMsg());
 
@@ -569,7 +559,7 @@ public class RabbitSysInfoConsumer {
                 // test: 提取危险补丁并输出
                 if (!hotfixList.isEmpty()) {
                     String mac = hotfix.getMac();
-                    HotfixParam param=null;
+                    HotfixParam param = new HotfixParam();
                     param.setMacAddress(mac);
 //                    ResponseResult<List<DangerousHotfix>> response = hotfixService.getDangerousPatches(param);
 //                    List<DangerousHotfix> dangerousList = response.getData();
@@ -604,9 +594,10 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (WeakpasswordRisk weakpasswordRisk: weakpasswordRiskList) {
-                ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk);
+                ResponseResult result = weakpasswordRiskService.saveWeakpasswordRisk(weakpasswordRisk, now);
                 System.out.println("Save weakpasswordsRisk result: " + result.getMsg());
             }
 
@@ -636,9 +627,11 @@ public class RabbitSysInfoConsumer {
                 return;
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             // 循环保存每一个
             for (VulnerabilityRisk vulnerabilityRisk: vulnerabilityRiskList) {
-                ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk);
+                vulnerabilityRisk.setIsExit(1);
+                ResponseResult result = vulnerabilityService.saveVulnerabilityRisk(vulnerabilityRisk, now);
                 System.out.println("Save result: " + result.getMsg());
             }
 
@@ -887,6 +880,7 @@ public class RabbitSysInfoConsumer {
         }
     }
 
+<<<<<<< HEAD
     public static class InTimeRequest {
         private String mac;
         public InTimeRequest() {}
@@ -901,10 +895,15 @@ public class RabbitSysInfoConsumer {
 
     @RabbitListener(queues = "inTimeRequest_queue")
     public void receiveInTimeRequest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+=======
+    @RabbitListener(queues = "inTimeRequest_queue")
+    public void receiveInTimeReauest(String message, @Headers Map<String,Object> headers, Channel channel) throws IOException {
+>>>>>>> demo
         System.out.println("接收到的消息: " + message);
         Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
 
         try {
+<<<<<<< HEAD
             InTimeRequest inTimeRequest = validateAndParseObject(message, InTimeRequest.class);
             if (inTimeRequest == null) {
                 channel.basicAck(deliveryTag, false);
@@ -925,6 +924,23 @@ public class RabbitSysInfoConsumer {
             //     channel.basicAck(deliveryTag, false);
             //     return;
             // }
+=======
+//            String mac = validateAndParseObject(message,String.class);
+//            if (mac == null) {
+//                channel.basicAck(deliveryTag, false);
+//                System.out.println("实时信息验证失败");
+//                return;
+//            }
+
+            // 直接解析为 JSONObject
+            JSONObject jsonObject = JSON.parseObject(message);
+            String mac = jsonObject.getString("mac");
+            if (mac == null || mac.trim().isEmpty()) {
+                System.out.println("消息中缺少 MAC 字段，丢弃消息");
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+>>>>>>> demo
 
             System.out.println("提取到的 MAC: " + mac);
 

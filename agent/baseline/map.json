@@ -1,0 +1,234 @@
+[
+    {
+        "name": "SysAccountPolicy::MinimumPasswordAge",
+        "recommended_value": "30"
+    },
+    {
+        "name": "SysAccountPolicy::MaximumPasswordAge",
+        "recommended_value": "90"
+    },
+    {
+        "name": "SysAccountPolicy::MinimumPasswordLength",
+        "recommended_value": "14"
+    },
+    {
+        "name": "SysAccountPolicy::PasswordComplexity",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysAccountPolicy::PasswordHistorySize",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysAccountPolicy::LockoutBadCount",
+        "recommended_value": "6"
+    },
+    {
+        "name": "SysAccountPolicy::RequireLogonToChangePassword",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysAccountPolicy::ForceLogoffWhenHourExpire",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysAccountPolicy::NewAdministratorName",
+        "recommended_value": "\"Administrator\""
+    },
+    {
+        "name": "SysAccountPolicy::NewGuestName",
+        "recommended_value": "\"Guest\""
+    },
+    {
+        "name": "SysAccountPolicy::ClearTextPassword",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysAccountPolicy::LSAAnonymousNameLookup",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysAccountPolicy::EnableAdminAccount",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysAccountPolicy::EnableGuestAccount",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditSystemEvents",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditLogonEvents",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditObjectAccess",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditPrivilegeUse",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditPolicyChange",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditAccountManage",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditProcessTracking",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditDSAccess",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysEventAuditPolicy::AuditAccountLogon",
+        "recommended_value": "3"
+    },
+    {
+        "name": "SysUserPrivilegePolicy::SeProfileSingleProcessPrivilege",
+        "recommended_value": "*S-1-5-32-544"
+    },
+    {
+        "name": "SysUserPrivilegePolicy::SeNetworkLogonRight",
+        "recommended_value": "*S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551"
+    },
+    {
+        "name": "SysUserPrivilegePolicy::SeRemoteShutdownPrivilege",
+        "recommended_value": "*S-1-5-32-544"
+    },
+    {
+        "name": "SysUserPrivilegePolicy::SeShutdownPrivilege",
+        "recommended_value": "*S-1-5-32-544"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::MaxDevicePasswordFailedAttempts",
+        "recommended_value": "10"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::NoLMHash",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::InactivityTimeoutSecs",
+        "recommended_value": "600"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::LimitBlankPasswordUse",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::LegalNoticeText",
+        "recommended_value": "请谨慎的操作服务器中数据"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::DontDisplayUserName",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::RestrictAnonymous",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::LegalNoticeCaption",
+        "recommended_value": "\"安全登陆\""
+    },
+    {
+        "name": "SysSecurityOptionPolicy::DontDisplayLastUserName",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::DisableCAD",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::RestrictAnonymousSAM",
+        "recommended_value": "1"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::AutoDisconnect",
+        "recommended_value": "15"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::EnablePlainTextPassword",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::ClearPageFileAtShutdown",
+        "recommended_value": "0"
+    },
+    {
+        "name": "SysSecurityOptionPolicy::DontDisplayLockedUserId",
+        "recommended_value": "3"
+    },
+    {
+        "name": "Registry::restrictanonymous",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::EnableFirewall",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::DisableAutoplay",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::MaxSize",
+        "recommended_value": "41943040"
+    },
+    {
+        "name": "Registry::AutoShareWks",
+        "recommended_value": "0"
+    },
+    {
+        "name": "Registry::ScreenSaverIsSecure",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::EnableFirewall",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::EnableFirewall",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::AutoShareServer",
+        "recommended_value": "0"
+    },
+    {
+        "name": "Registry::ScreenSaveTimeOut",
+        "recommended_value": "600"
+    },
+    {
+        "name": "Registry::MaxSize",
+        "recommended_value": "41943040"
+    },
+    {
+        "name": "Registry::restrictanonymoussam",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::NoDriveTypeAutoRun",
+        "recommended_value": "255"
+    },
+    {
+        "name": "Registry::MaxSize",
+        "recommended_value": "31457280"
+    },
+    {
+        "name": "Registry::ScreenSaveActive",
+        "recommended_value": "1"
+    },
+    {
+        "name": "Registry::MaxSize",
+        "recommended_value": "41943040"
+    }
+]

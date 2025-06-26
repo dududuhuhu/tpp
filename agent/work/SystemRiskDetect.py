@@ -10,7 +10,6 @@ import requests
 # 风险等级映射：数字 → 文字标签
 RISK_LEVEL_MAP = {1: "低", 2: "中", 3: "高"}
 
-
 class SystemRiskDetect:
     """
     Windows 平台的系统风险扫描器（支持注册表、NTP、命令检测）

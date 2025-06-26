@@ -3,7 +3,7 @@ from mq.publisher import Publisher
 from mq import get_amqp_url
 from service.configure import *
 from utils.crypto.src.asymmetric import SignKeyPair
-from service.configure import SERVER_PEM_PUB
+from service.configure import SERVER_PEM_PUB,MAC,PLATFORM
 from user.userConfig import USER_PEM_PRI
 
 from linux.logDetect import LogDetect

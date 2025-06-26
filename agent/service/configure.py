@@ -1,5 +1,6 @@
 from mq.consumer import Consumer
 import uuid
+import platform as _platform
 from service.consumerService import agent_mac_queue_callback
 from Logs.logRuleSave import save_log_rule
 all = ['HOST', 'PORT', 'USERNAME', 'PASSWORD', 'VHOST', 'consumer_routing', 'publisher_routing']
@@ -10,6 +11,13 @@ PASSWORD = 'hello123456'
 VHOST = 'my_vhost'
 
 MAC = ':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))
+if _platform.system() == "Linux":
+    PLATFORM = "Linux"
+elif _platform.system() == "Windows":
+    PLATFORM = "Windows"
+else:
+    PLATFORM = "Unknown"
+
 CONSUMER_EXCHANGE_NAME = f'agent_{MAC.replace(":", "")}_exchange'
 PUBLISHER_EXCHANGE_NAME = 'sysinfo_exchange'
 
@@ -44,5 +52,7 @@ PUBLISHER_ROUTING = {
     'accountChangeLog_queue':'accountChangeLog',
     'inTime_queue':'inTime',
     'inTimeRequest_queue':'inTimeRequest',
+    'baselineDetect_queue':'baselineDetect',
+    'baselineHardening_queue':'baselineHardening',
 }
 

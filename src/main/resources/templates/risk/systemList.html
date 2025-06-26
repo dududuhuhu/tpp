@@ -66,7 +66,6 @@
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
                                     <option  value="macAddress">MAC地址</option>
-                                    <option value="riskLevel">风险等级</option>
                                 </select>
                             </div>
                             <div class="layui-inline">
@@ -82,6 +81,7 @@
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
                             <button class="layui-btn layuiadmin-btn-useradmin" data-table="user" data-type="refresh">刷新</button>
+                            <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="user" data-type="AI" disabled>AI辅助分析</button>
                         </div>
                         <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
 
@@ -102,13 +102,21 @@
                         <div class="layui-form-item">
                             <div class="layui-inline">
                                 <select name="searchType" lay-filter="searchType">
-                                    <option  value="riskType">风险类型</option>
+                                    <option value="riskName">风险名称</option>
                                     <option value="riskLevel">风险等级</option>
-                                    <option value="method">检测方法</option>
                                 </select>
                             </div>
-                            <div class="layui-inline">
-                                <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                            <div class="layui-inline" id="keywords-input-group">
+                                <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input" id="keywords-text">
+                            </div>
+                            <div class="layui-inline" id="keywords-select-group" style="display: none;">
+                                <select name="keywordsLevel" id="keywords-select">
+                                    <option value="">请选择风险等级</option>
+                                    <option value="1">低</option>
+                                    <option value="2">中</option>
+                                    <option value="3">高</option>
+                                    <option value="4">严重</option>
+                                </select>
                             </div>
                             <div class="layui-inline">
                                 <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-sysrule-front-search">
@@ -144,6 +152,7 @@
 
 <!-- Layui 核心 JS -->
 <script src="/layui/layui.js"></script>
+<script src="/js/reportUtils.js"></script>  <!-- 确保路径正确 -->
 
 <!-- 工具函数：时间格式化 -->
 <script>
@@ -176,6 +185,9 @@
             ,element=layui.element
             ,table = layui.table;
 
+        // 页面初始化时禁用按钮并移除搜索标记
+        $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+        let searchedMac = null;
         table.render({
             elem: '#LAY-user-manage',
             method: 'post',
@@ -188,6 +200,19 @@
             }
             ,cellMinWidth: 80
             ,title: '系统风险探测数据表'
+            ,where: {} // 初始空
+            ,request: {
+                pageName: 'page',
+                limitName: 'limit'
+            }
+            ,parseData: function(res){
+                return {
+                    code: res.code,
+                    msg: res.msg,
+                    count: res.total,
+                    data: res.data
+                };
+            }
             ,cols: [[
                 {type: 'checkbox', fixed: 'left'}
                 ,{field:'mac', title:'MAC地址',width: 150}
@@ -237,10 +262,17 @@
                 {field: 'id', title: 'ID', width: 60},
                 {field: 'riskName', title: '风险名称', width: 200},
                 {field: 'riskType', title: '风险类型', width: 120},
-                {field: 'riskLevel', title: '风险等级', width: 100, templet: function(d){
-                        let map = {1: '低', 2: '中', 3: '高', 4: '严重'};
-                        return map[d.riskLevel] || '未知';
-                    }},
+                {field: 'riskLevel', title: '风险等级', width: 100, templet: function (d) {
+                        const levelMap = {
+                            1: {text: '低', color: '#5FB878'},       // 绿色
+                            2: {text: '中', color: '#FFB800'},       // 橙色
+                            3: {text: '高', color: '#FF5722'},       // 红色
+                            4: {text: '严重', color: '#FF0000'}      // 深红
+                        };
+                        const level = levelMap[d.riskLevel] || {text: '未知', color: '#909399'};
+                        return `<span class="layui-btn layui-btn-xs" style="background-color:${level.color};">${level.text}</span>`;
+
+                }},
                 {field: 'detectionMethod', title: '检测方式', width: 100},
                 {field: 'rulePath', title: '路径', width: 150},
                 {field: 'rulePayload', title: '路径负载', width: 150},
@@ -249,37 +281,11 @@
                         let map = {0:'不活跃',1: '活跃'};
                         return map[d.isActive] || '未知';
                     }},
+                {field: 'platform', title:'适用平台', width: 90}
                 ,{fixed: 'right', title:'操作', toolbar: '#table-rule-webuser', width:150}
             ]],
             page: { curr: 1, limit: 5 },
             limits: [5, 10, 15, 20]
-        });
-
-
-
-        table.on('tool(LAY-user-manage)', function(obj){
-            var data = obj.data;
-            if(obj.event === 'del'){
-                layer.confirm('真的删除吗?', function(index){
-                    $.ajax({
-                        url:"/rule/system/delete",
-                        type:"post",
-                        headers: { 'Authorization': localStorage.getItem('token'),
-                            'userId':localStorage.getItem('id') },
-                        data:{ids:[data.id]},
-                        dataType:"json",
-                        success:function (res){
-                            if(res.code == 0){
-                                layer.msg(res.msg);
-                                table.reload('LAY-user-manage');
-                                layer.close(index);
-                            }else {
-                                layer.msg(res.msg,{icon: 5});
-                            }
-                        }
-                    })
-                });
-            }
         });
 
         table.on('tool(LAY-rule-manage)', function(obj){
@@ -307,47 +313,95 @@
             }
         });
 
-        //监听探测情况搜索
+        // 搜索事件绑定
         form.on('submit(LAY-sysuser-front-search)', function(data){
-            var field = data.field;
-            console.log(field);
-            //执行重载
+            searchedMac = 1;
+            var mac = data.field.keywords;
+
             table.reload('LAY-user-manage', {
-                url: '/host/systemRisk',
-                method: "post",
-                contentType: 'application/json',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId':localStorage.getItem('id'),
-                    'Content-Type': 'application/json'
+                where: {
+                    macAddress: mac
                 },
-                data: JSON.stringify(field), // 发送JSON格式的数据
-                where: field
+                page: { curr: 1 }
             });
+
+            $('#btn-ai-analyze').removeClass('layui-btn-disabled').attr('disabled', false);
+            return false;
         });
 
         //监听规则表搜索
         form.on('submit(LAY-sysrule-front-search)', function(data){
             var field = data.field;
+            // 根据搜索类型切换实际的 keywords 值
+            if (field.searchType === 'riskLevel') {
+                field.keywords = $('#keywords-select').val(); // 或 field.keywordsLevel
+            } else {
+                field.keywords = $('#keywords-text').val();
+            }
+
             console.log(field);
             //执行重载
             table.reload('LAY-rule-manage', {
                 url: '/rule/system/list',
-                contentType: 'application/json',
                 method: "post",
                 headers: {
                     'Authorization': localStorage.getItem('token'),
                     'userId':localStorage.getItem('id')
                 },
-                data: JSON.stringify(field), // 发送JSON格式的数据
-                where: field
+                where: field,
+                page: { curr: 1 }
             });
+            return false;
         });
 
 
         var active = {
+            host_AI: function () {
+                if (!searchedMac) {
+                    return layer.msg('请先通过 MAC 地址进行搜索后再使用 AI 辅助分析');
+                }
+
+                var checkStatus = table.checkStatus('LAY-user-manage');
+                var data = checkStatus.data;
+
+                if (data.length === 0) {
+                    return layer.msg('请至少选择一条主机记录');
+                }
+                // 只取第一个 MAC 地址
+                var mac = data[0].mac;
+                console.log("systemmac:",mac);
+
+                // 发送 AI 分析请求...
+                $.ajax({
+                    url: '/api/report/system-risk/analyze',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('token'),
+                        'userId': localStorage.getItem('id')
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ macAddress: mac }),
+                    success: function (res) {
+                        if (res.code === 0) {
+                            reportUtils.showReportDialog('系统风险分析报告', res.data);
+                        } else {
+                            layer.msg(res.msg || '分析失败', {icon: 5});
+                        }
+                    },
+                    error: function () {
+                        layer.msg('请求失败，请检查接口或网络连接', {icon: 2});
+                    }
+                });
+            },
+
             // 探测情况刷新
             host_refresh: function(){
+                // 清空搜索输入框
+                $('input[name="keywords"]').val('');
+                // 清空搜索类型（如果需要，也可以清空或重置select）
+                $('select[name="searchType"]').val('macAddress');
+                form.render('select'); // 重新渲染select，否则界面不会更新
+
                 table.reload('LAY-user-manage', {
                     url: '/host/systemRisk',
                     contentType: 'application/json',
@@ -355,8 +409,12 @@
                     headers: {
                         'Authorization': localStorage.getItem('token'),
                         'userId':localStorage.getItem('id')
-                    }
+                    },
+                    where: {},  // 传空对象，重置所有搜索条件
+                    page: {curr: 1} // 刷新时重置页码到第一页
                 });
+                // 禁用按钮并清除搜索标记
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
             },
 
             // 规则相关
@@ -386,13 +444,20 @@
                 });
             },
             rule_refresh: function(){
+                $('#keywords-select-group').hide();
+                $('#keywords-input-group').show();
+                $('#keywords-text').val('');
+                $('select[name="searchType"]').val('riskName');
+                form.render('select'); // 放最后
                 table.reload('LAY-rule-manage', {
                     url: '/rule/system/list',
                     method: 'post',
                     headers: {
                         'Authorization': localStorage.getItem('token'),
                         'userId':localStorage.getItem('id')
-                    }
+                    },
+                    where: {},
+                    page: {curr: 1}
                 });
             },
             rule_add: function(){
@@ -401,15 +466,17 @@
                     title: '添加规则',
                     skin: 'layui-layer-molv',
                     content: '/page/risk/systemRiskRulesAdd',
-                    maxmin: true,
                     area: ['580px', '600px'],
                     btn: ['确定', '取消'],
                     yes: function (index,layero){
                         var iframeWindow = window['layui-layer-iframe'+ index],
                             submitID = 'LAY-user-front-submit',
                             submit = layero.find('iframe').contents().find('#'+ submitID);
+
+                        // 确保监听已绑定后再触发
                         iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                             var field = data.field;
+                            console.log("field:", field);  // 检查是否包含 riskName 等字段
                             $.ajax({
                                 url:"/rule/system/save",
                                 type:"post",
@@ -429,14 +496,30 @@
                                         layer.msg(res.msg,{icon: 5});
                                     }
                                 }
-                            })
+                            });
+                            return false; // 阻止默认提交
                         });
-                        submit.trigger('click');
+
+                        // ✅ 使用 setTimeout 或 defer 来确保触发在绑定之后
+                        setTimeout(function () {
+                            submit.trigger('click');
+                        }, 50);
                     }
+
                 });
             }
         };
 
+        form.on('select(searchType)', function(data) {
+            const type = data.value;
+            if (type === 'riskLevel') {
+                $('#keywords-input-group').hide();
+                $('#keywords-select-group').show();
+            } else {
+                $('#keywords-input-group').show();
+                $('#keywords-select-group').hide();
+            }
+        });
 
         $('.layuiadmin-btn-useradmin').on('click', function(){
             var type = $(this).data('type');

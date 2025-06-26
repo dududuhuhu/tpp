@@ -55,15 +55,13 @@
             <if test="searchType != null and searchType != '' and keywords != null and keywords != ''">
                 and (
                 <choose>
-                    <when test="searchType == 'riskType'">
-                        risk_type like concat('%',#{keywords},'%')
+                    <when test="searchType == 'riskName'">
+                        risk_name like concat('%',#{keywords},'%')
                     </when>
                     <when test="searchType == 'riskLevel'">
-                        risk_level like concat('%',#{keywords},'%')
+                        risk_level =#{keywords}
                     </when>
-                    <when test="searchType == 'method'">
-                        detection_method like concat('%',#{keywords},'%')
-                    </when>
+
                 </choose>
                 )
             </if>

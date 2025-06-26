@@ -4,13 +4,10 @@ import time
 import socket
 from datetime import datetime
 from typing import List, Dict
-
-
 class ApplicationRiskScanner:
     """
     应用风险扫描器（适配驼峰命名规则字段，isRisky 为 0/1）
     """
-
     def __init__(self):
         pass
 

@@ -43,7 +43,10 @@ public class AccountInfoServiceImpl implements AccountInfoService {
             if (!isChanged && existing.getIsHarmful() != null && existing.getHarmfulKey() != null) {
                 System.out.println("Account info unchanged, skip AI analysis.");
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> demo
             accountInfo.setId(existing.getId());
             accountInfo.setCreatedAt(existing.getCreatedAt()); // 保留原创建时间
             accountInfo.setUpdatedAt(now);
@@ -114,7 +117,14 @@ public class AccountInfoServiceImpl implements AccountInfoService {
 
         accountInfo.setCreatedAt(now);
         accountInfo.setUpdatedAt(now);
+<<<<<<< HEAD
         return accountInfoMapper.insert(accountInfo);
+=======
+
+        return accountInfoMapper.insert(accountInfo);
+
+
+>>>>>>> demo
     }
 
     @Override
