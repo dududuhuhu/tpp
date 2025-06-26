@@ -42,7 +42,7 @@
         FROM service_info
         WHERE host_id = #{hostId}
         )
-        ORDER BY id
+        order by is_harmful DESC
     </select>
 
 

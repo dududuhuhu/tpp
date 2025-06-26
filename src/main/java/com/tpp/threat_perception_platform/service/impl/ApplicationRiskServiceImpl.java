@@ -50,31 +50,34 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
     }
 
     @Override
-    public ResponseResult saveAppRisk(ApplicationRisk appRisk) {
+    public ResponseResult saveAppRisk(ApplicationRisk appRisk, Timestamp now) {
         try {
-            appRisk.setDetectionTime(appRisk.getDetectionTime() != null ? appRisk.getDetectionTime() : new Date());
+            // 先查询是否已存在
+            ApplicationRisk db = applicationRiskMapper.selectByMacAndRuleId(appRisk.getMac(),appRisk.getRuleId());
 
-            // 先根据 ruleId 和 mac 查询是否存在记录
-            ApplicationRisk existing = applicationRiskMapper.selectByRuleIdAndMac(appRisk.getRuleId(), appRisk.getMac());
+            appRisk.setDetectionTime(now);
 
-            if (existing != null) {
-                // 已存在，更新 detectionTime 和 riskName（可根据需求更新其他字段）
-                existing.setDetectionTime(appRisk.getDetectionTime());
-                existing.setRiskName(appRisk.getRiskName());
-                int updateResult = applicationRiskMapper.updateByPrimaryKeySelective(existing);
-                System.out.println("更新结果: " + updateResult);
-                return new ResponseResult<>(0, "更新成功");
-            } else {
-                // 不存在，插入新记录
-                int insertResult = applicationRiskMapper.insertSelective(appRisk);
-                System.out.println("插入结果: " + insertResult);
-                return new ResponseResult<>(0, "插入成功");
+            // 设置创建时间，如果为空
+            if (appRisk.getCreatedAt() == null) {
+                appRisk.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             }
+
+            if (db != null) {
+                // 若已存在，更新字段（只更新 updated_time 或者所有字段）
+                appRisk.setId(db.getId()); // 设置主键，用于 where 条件
+                applicationRiskMapper.updateByPrimaryKey(appRisk);
+                return new ResponseResult<>(1003, "该记录已存在！");
+            }
+
+            int insertResult = applicationRiskMapper.insert(appRisk);
+            System.out.println("插入结果: " + insertResult);
+            return new ResponseResult<>(0, "插入成功");
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult<>(-1, "保存失败: " + e.getMessage());
         }
     }
+
 
 
 
@@ -217,12 +220,11 @@ public class ApplicationRiskServiceImpl implements ApplicationRiskService {
         StringBuilder sb = new StringBuilder();
         for (ApplicationRisk risk : risks) {
             sb.append(String.format(
-                    "风险名称: %s\n风险类型: %s\n风险等级: %s\n目标主机: %s\n目标URL: %s\n探测时间: %s\n风险详情: %s\n\n",
+                    "风险名称: %s\n风险类型: %s\n风险等级: %s\n目标服务: %s\n探测时间: %s\n风险详情: %s\n\n",
                     risk.getRiskName(),
                     risk.getRiskType(),
                     risk.getRiskLevel(),
                     risk.getTargetHost(),
-                    risk.getTargetUrl(),
                     risk.getDetectionTime(),
                     risk.getRiskDetail()
             ));

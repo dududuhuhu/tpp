@@ -47,17 +47,26 @@ public class SystemRiskServiceImpl implements SystemRiskService {
     }
 
     @Override
-    public ResponseResult saveSystemRisk(SystemRisk systemRisk) {
+    public ResponseResult saveSystemRisk(SystemRisk systemRisk, Timestamp now) {
         try {
+            // 先查询是否已存在
+            SystemRisk db = systemRiskMapper.selectByMacAndRuleId(systemRisk.getMac(),systemRisk.getRuleId());
+
+            systemRisk.setUpdatedAt(now);
+
             // 设置创建时间，如果为空
             if (systemRisk.getCreatedAt() == null) {
                 systemRisk.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             }
 
-            // 更新时间直接设当前时间
-            systemRisk.setUpdatedAt(new Date());
+            if (db != null) {
+                // 若已存在，更新字段（只更新 updated_time 或者所有字段）
+                systemRisk.setId(db.getId()); // 设置主键，用于 where 条件
+                systemRiskMapper.updateByPrimaryKey(systemRisk);
+                return new ResponseResult<>(1003, "该记录已存在！");
+            }
 
-            int insertResult = systemRiskMapper.insertSelective(systemRisk);
+            int insertResult = systemRiskMapper.insert(systemRisk);
             System.out.println("插入结果: " + insertResult);
             return new ResponseResult<>(0, "插入成功");
         } catch (Exception e) {
