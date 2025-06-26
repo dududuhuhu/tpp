@@ -2,6 +2,12 @@ import json
 import uuid
 from datetime import datetime, timedelta
 from Logs.logs import get_log_info, EVENT_ACTION_MAP
+import sqlite3
+import os
+import json
+from utils.logParser import LogParser
+from service import MAC
+from db.tpp import get_log_rules
 
 
 def to_beijing_time(utc_str):
@@ -272,3 +278,87 @@ class AccountChangeLogDetector:
         data=json.dumps(data, indent=4, ensure_ascii=False)
         print(data)
         return data
+
+
+class LogDetect(object):
+    def __init__(self, log_path: str, logger_config: str = 'utils/config.yml'):
+        """
+        初始化日志检测器（Windows版）
+
+        :param log_path: Windows 日志文件路径
+        :param logger_config: 日志解析器配置文件路径
+        """
+        # 使用os.path兼容Windows路径
+        self._log_path = os.path.normpath(log_path)
+        self._parser = LogParser(os.path.normpath(logger_config))
+
+    def _get_obj_events(self) -> dict:
+        """
+        从规则数据库中获取事件映射（适配 Windows 日志规则）
+        :return: 事件字典，格式为 {event_key: [rule_id, risk_level]}
+        """
+        try:
+            events = {}
+            for rule in get_log_rules():
+                # rule[2] 代表事件ID或关键字段，如 SourceName、EventID、类别等
+                if rule[2]:
+                    events[rule[2]] = [rule[0], rule[3]]
+        except sqlite3.Error as e:
+            print(f"[规则加载错误] SQLite error: {e}")
+            events = {}
+        return events
+
+    def _parse(self, events: dict) -> list[dict] | None:
+        """
+        解析 Windows 日志文件
+        :param events: 规则事件映射
+        :return: 匹配的日志项列表
+        """
+        results = []
+
+        # Windows 日志可能为 UTF-16 或 GBK 编码
+        try_encodings = ['utf-8', 'utf-16', 'gbk']
+        for encoding in try_encodings:
+            try:
+                with open(self._log_path, 'r', encoding=encoding) as file:
+                    keys = events.keys()
+                    for line in file:
+                        try:
+                            parsed = self._parser.parseLine(line)
+                            if parsed.get('appname') in keys:
+                                results.append({
+                                    'mac': MAC,
+                                    'id': events[parsed.get('appname')][0],
+                                    'event_id': parsed.get('appname'),
+                                    'event': line.strip(),
+                                    'risk_level': events[parsed.get('appname')][1],
+                                })
+                        except Exception as e:
+                            print(f"[日志解析错误] {e}")
+                            continue
+                break  # 成功解析后跳出编码尝试
+            except UnicodeDecodeError:
+                continue  # 尝试下一种编码
+            except FileNotFoundError:
+                print(f"[错误] 未找到日志文件：{self._log_path}")
+                return None
+
+        return results
+
+    def detect(self):
+        """
+        执行日志检测（Windows 版）
+
+        :return: 检测结果的 JSON 字符串或 None
+        """
+        events = self._get_obj_events()
+        if not events:
+            print("[警告] 未加载到任何事件规则。")
+            return []
+
+        results = self._parse(events)
+        if not results:
+            print("[信息] 日志中未发现匹配的事件。")
+            return None
+
+        return json.dumps(results, ensure_ascii=False, indent=2)
