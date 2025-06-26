@@ -27,6 +27,7 @@ from threading import Thread
 from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
 from work.BaselineCheckDetect import BaselineCheckDetect
 from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
+from work.BaselineHardenDetect import BaselineHardenDetect
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
         publisher.publish_message(routing_key=routing_key, message=detector.detect())
