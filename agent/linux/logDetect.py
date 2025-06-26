@@ -58,6 +58,7 @@ class LogDetect(object):
                             'id':events[parsed.get('appname')][0],
                             'event_id':parsed.get('appname'),
                             'event':line,
+                            'event_time':parsed.get('timestamp', ''),
                             'risk_level':events[parsed.get('appname')][1],
                         })
                 except Exception as e:
@@ -73,7 +74,7 @@ class LogDetect(object):
         events = self._get_obj_events()
         if not events:
             print("No events found in the rule database.")
-            return []
+            return None
         
         results = self._parse(events)
         self._time = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)

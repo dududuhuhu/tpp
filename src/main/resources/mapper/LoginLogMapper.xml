@@ -33,10 +33,12 @@
         from login_log
         where mac = #{mac} and username = #{username} and login_time = #{loginTime}
     </select>
-    <select id="findAll" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
-        select
-        <include refid="Base_Column_List" />
-        from login_log
+    <select id="findAllForLogin" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        SELECT t.*
+        FROM login_log t
+        INNER JOIN (
+        SELECT mac, MAX(create_time) AS max_create_time
+        FROM login_log
         <where>
             <if test="mac != null and mac != ''">
                 AND mac = #{mac}
@@ -47,9 +49,33 @@
             <if test="logoffTime != null">
                 AND logoff_time &lt;= #{logoffTime}
             </if>
-            <!-- 限定最新的一次创建时间 -->
-            AND create_time = (SELECT MAX(create_time) FROM login_log)
+            <if test="username != null">
+                AND username = #{username}
+            </if>
+            <!-- 新增只取is_risk_user和is_risk_time不为空的数据 -->
+            AND is_risk_user IS NOT NULL
+            AND is_risk_time IS NOT NULL
         </where>
+        GROUP BY mac
+        ) tm ON t.mac = tm.mac AND t.create_time = tm.max_create_time
+        <where>
+            <if test="mac != null and mac != ''">
+                AND t.mac = #{mac}
+            </if>
+            <if test="loginTime != null">
+                AND t.login_time &gt;= #{loginTime}
+            </if>
+            <if test="logoffTime != null">
+                AND t.logoff_time &lt;= #{logoffTime}
+            </if>
+            <if test="username != null">
+                AND t.username = #{username}
+            </if>
+            <!-- 外层也加上同样的过滤 -->
+            AND t.is_risk_user IS NOT NULL
+            AND t.is_risk_time IS NOT NULL
+        </where>
+        ORDER BY t.login_time DESC
     </select>
     <select id="selectByCondition" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
         SELECT * FROM login_log
@@ -70,16 +96,54 @@
         SELECT '风险用户登录' AS name, COUNT(*) AS value
         FROM login_log
         WHERE is_risk_user = 1
-
         UNION ALL
-
         SELECT '非正常时间登录' AS name, COUNT(*) AS value
         FROM login_log
         WHERE is_risk_time = 1
-
         UNION ALL
-
         SELECT '正常登录' AS name, 0 AS value
+    </select>
+
+    <select id="findAllForAudit" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
+        SELECT t.*
+        FROM login_log t
+        INNER JOIN (
+        SELECT mac, MAX(create_time) AS max_create_time
+        FROM login_log
+        <where>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="loginTime != null">
+                AND login_time &gt;= #{loginTime}
+            </if>
+            <if test="logoffTime != null">
+                AND logoff_time &lt;= #{logoffTime}
+            </if>
+            <if test="username != null and username != ''">
+                AND username = #{username}
+            </if>
+        </where>
+        GROUP BY mac
+        ) tm ON t.mac = tm.mac AND t.create_time = tm.max_create_time
+        <where>
+            t.is_risk_user IS NULL
+            AND t.is_risk_time IS NULL
+            AND t.logoff_time IS NOT NULL
+            <if test="mac != null and mac != ''">
+                AND t.mac = #{mac}
+            </if>
+            <if test="loginTime != null">
+                AND t.login_time &gt;= #{loginTime}
+            </if>
+            <if test="logoffTime != null">
+                AND t.logoff_time &lt;= #{logoffTime}
+            </if>
+            <if test="username != null and username != ''">
+                AND t.username = #{username}
+            </if>
+        </where>
+        ORDER BY t.login_time DESC
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

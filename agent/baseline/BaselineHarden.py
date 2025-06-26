@@ -143,58 +143,60 @@ class BaselineHardening:
     def execute_hardening(self, request_data):
         """
         执行基线加固
-        :param request_data: 请求数据 {"type":"baselineHardening","name": [...]}
-        :return: 执行结果
+        :param request_data: 请求数据 {"type":"baselineHardening","name": [...], "taskId": "1"}
+        :return: 每项加固结果的列表
         """
         try:
             # 检查请求类型
             if request_data.get("type") != "baselineHardening":
-                return {
+                return [{
                     "mac": self.get_mac_address(),
+                    "taskId": request_data.get("taskId", ""),
                     "name": "Invalid request type",
                     "result": "失败"
-                }
+                }]
 
             hardening_items = request_data.get("name", [])
+            task_id = request_data.get("taskId", "")
+            mac_address = self.get_mac_address()
+
             if not hardening_items:
-                return {
-                    "mac": self.get_mac_address(),
+                return [{
+                    "mac": mac_address,
+                    "taskId": task_id,
                     "name": "No hardening items provided",
                     "result": "失败"
-                }
+                }]
 
-            # 生成PowerShell命令
+            # 生成 PowerShell 加固命令
             hardening_commands, item_results = self.generate_hardening_commands(hardening_items)
 
             if not hardening_commands.strip():
-                return {
-                    "mac": self.get_mac_address(),
+                return [{
+                    "mac": mac_address,
+                    "taskId": task_id,
                     "name": "No valid hardening items found",
                     "result": "失败"
-                }
+                }]
 
-            # 生成完整的PowerShell脚本
+            # 生成完整 PowerShell 脚本
             full_script = self.powershell_template.format(hardening_commands=hardening_commands)
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            # 获取时间戳
             timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-            # 拼接文件路径，带时间戳
             script_filename = f'baseline_hardening_{timestamp}.ps1'
             script_path = os.path.join(current_dir, 'ps', script_filename)
+
             with open(script_path, 'w', encoding='utf-8') as f:
                 f.write(full_script)
-            # 检查操作系统
+
             if platform.system() == "Windows":
-                # 在Windows上执行PowerShell脚本
                 try:
-                    set_policy_cmd = [
+                    subprocess.run([
                         'powershell',
                         '-Command',
                         'Set-ExecutionPolicy Unrestricted -Force'
-                    ]
-                    subprocess.run(set_policy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-                    # 构建 PowerShell 执行命令
                     ps_command = f'powershell -ExecutionPolicy Bypass -File "{script_path}"'
                     result = subprocess.run(
                         ps_command,
@@ -204,49 +206,43 @@ class BaselineHardening:
                         shell=True
                     )
 
-                    # 输出日志
                     print("========== PowerShell 执行输出 ==========")
                     print(result.stdout.strip())
                     print("========== PowerShell 错误输出 ==========")
                     print(result.stderr.strip())
 
-                    # 判断是否成功
-                    if result.returncode == 0 and "error" not in result.stderr.lower():
-                        execution_result = "成功"
-                    else:
-                        execution_result = f"失败: {result.stderr.strip() or '未知错误'}"
-                        print(f"❌ PowerShell 执行失败，错误信息: {result.stderr.strip()}")
+                    # 是否整体执行成功
+                    overall_success = result.returncode == 0 and "error" not in result.stderr.lower()
+
                 except subprocess.TimeoutExpired:
-                    execution_result = "失败: 执行超时"
+                    overall_success = False
                 except Exception as e:
-                    execution_result = f"失败: {str(e)}"
+                    print(f"异常: {str(e)}")
+                    overall_success = False
             else:
-                # 非Windows系统，模拟执行
-                print("Non-Windows system detected. Simulating execution...")
-                print("Generated PowerShell script:")
+                print("非Windows系统，模拟执行...")
                 print(full_script)
-                execution_result = "成功 (模拟执行)"
+                overall_success = True  # 模拟为成功
 
-            # # 清理临时文件
-            # try:
-            #     os.remove(script_path)
-            # except:
-            #     pass
+            # 构造每一项的返回结果
+            final_results = []
+            for item in item_results:
+                final_results.append({
+                    "mac": mac_address,
+                    "taskId": task_id,
+                    "name": item["name"],
+                    "result": item["result"] if overall_success else "失败"
+                })
 
-            # 返回结果
-            return {
-                "mac": self.get_mac_address(),
-                "name": f"基线加固项: {', '.join(hardening_items)}",
-                "result": execution_result,
-                "details": item_results
-            }
+            return final_results
 
         except Exception as e:
-            return {
+            return [{
                 "mac": self.get_mac_address(),
+                "taskId": request_data.get("taskId", ""),
                 "name": f"Execution error: {str(e)}",
                 "result": "失败"
-            }
+            }]
 
     def get_mac_address(self):
         """

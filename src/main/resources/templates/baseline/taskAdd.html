@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加任务</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
+    <style>
+        .st {
+            width: 270px!important;
+        }
+        .layui-form-label {
+            width: 120px!important;
+        }
+        .xinghao {
+            color: red!important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 表单 -->
+<div class="layui-form" lay-filter="layuiadmin-form-useradmin" id="layuiadmin-form-useradmin" style="padding: 20px;">
+    <input type="hidden" name="id">
+
+    <!-- 任务名称 -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务名称<span class="xinghao">*</span></label>
+        <div class="layui-input-inline st">
+            <input type="text" name="taskName" lay-verify="required" placeholder="请输入任务名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务时间</label>
+        <div class="layui-input-inline st">
+            <input type="text" name="taskTime" id="taskTime" required lay-verify="required" placeholder="请选择任务时间" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+
+    <!-- 主机 MAC 地址 -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">主机MAC<span class="xinghao">*</span></label>
+        <div class="layui-input-inline st">
+            <input type="text" name="taskHosts" lay-verify="required|mac" placeholder="请输入主机MAC地址" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <!-- 状态：只读展示 + 隐藏提交 -->
+    <input type="hidden" name="taskStatus" value="2">
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="taskStatus_display" value="1" title="已完成" disabled>
+            <input type="radio" name="taskStatus_display" value="0" title="未完成" checked disabled>
+        </div>
+    </div>
+
+    <!-- 提交按钮 -->
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit" value="确认">
+    </div>
+</div>
+
+<script src="/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/layui/layuiAdmin/'
+    }).extend({
+        index: 'lib/index'
+    }).use(['index', 'form', 'laydate'], function(){
+        var $ = layui.$,
+            form = layui.form,
+            laydate = layui.laydate;
+
+        // 渲染任务时间的日期时间选择器，格式化为标准格式
+        laydate.render({
+            elem: '#taskTime',               // 对应 input 框的 id
+            type: 'datetime',                // 类型为日期+时间
+            format: 'yyyy-MM-dd HH:mm:ss'    // ✅ 确保符合后端格式
+        });
+
+        // 自定义验证规则
+        form.verify({
+            mac: function(value){
+                var reg = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+                if (!reg.test(value)) {
+                    return 'MAC地址格式错误，应为00:1A:2B:3C:4D:5E格式';
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

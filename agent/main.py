@@ -39,6 +39,7 @@ def join(l):
 
 def main():
     l = login()
+    print("login")
     startup()
     join(l)
 

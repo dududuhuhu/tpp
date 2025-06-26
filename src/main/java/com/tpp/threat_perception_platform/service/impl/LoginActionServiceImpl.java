@@ -55,7 +55,8 @@ public class LoginActionServiceImpl implements LoginActionService {
      */
     @Override
     public List<LogParam> getLoginLogsWithActions(LogParam params) {
-        List<LoginLog> loginLogs = loginLogMapper.findAll(params);
+        System.out.println("audit_params:"+params);
+        List<LoginLog> loginLogs = loginLogMapper.findAllForAudit(params);
         List<LogParam> result = new ArrayList<>();
 
         for (LoginLog log : loginLogs) {
@@ -63,6 +64,7 @@ public class LoginActionServiceImpl implements LoginActionService {
 
             // ✅ 只保留有 actions 的记录
             if (actions == null || actions.isEmpty()) {
+                System.out.println("actions is null or empty");
                 continue; // 跳过
             }
 
@@ -100,24 +102,31 @@ public class LoginActionServiceImpl implements LoginActionService {
      */
     @Override
     public void saveLoginActionReport(LogParam logParam) {
+        // ✅ 先查询是否已有分析报告
+        List<LoginActionReport> existingReports = loginActionReportMapper.findAllByMacAndUsernameAndLoginTime(
+                logParam.getMac(), logParam.getUsername(), logParam.getLoginTime()
+        );
+        if (existingReports != null && !existingReports.isEmpty()) {
+            // 已有结果，无需重复调用
+            System.out.println("已存在审计日志报告！");
+            return;
+        }
+
         try {
-            // 1. 生成提示词
+            // 🧠 生成提示词
             String prompt = generatePrompt(logParam);
 
-            // 2. 调用AI，得到生成结果对象
+            // 🧠 调用大模型生成分析结果
             GenerationResult genResult = AIUtils.callWithMessage(prompt);
 
-            // 3. 从结果中取文本内容
-            String aiResponse = genResult.getOutput()
-                    .getChoices()
-                    .get(0)
-                    .getMessage()
-                    .getContent();
+            // 🧠 提取 AI 返回内容
+            String aiResponse = genResult.getOutput().getChoices().get(0).getMessage().getContent();
+            System.out.println("AI返回原始内容:\n" + aiResponse);
 
-            // 4. 解析返回的JSON字符串（假设AI返回JSON格式）
-            JSONObject json = JSONObject.parseObject(aiResponse);
+            String cleanJson = extractJson(aiResponse);
+            JSONObject json = JSONObject.parseObject(cleanJson);
 
-            // 5. 构造并保存结果
+            // ✅ 构造分析报告实体
             LoginActionReport analysis = new LoginActionReport();
             analysis.setMac(logParam.getMac());
             analysis.setUsername(logParam.getUsername());
@@ -129,14 +138,44 @@ public class LoginActionServiceImpl implements LoginActionService {
             analysis.setAiPrompt(prompt);
             analysis.setAiRawOutput(aiResponse);
 
+            // ✅ 存入数据库
             loginActionReportMapper.insert(analysis);
-
         } catch (ApiException | NoApiKeyException | InputRequiredException e) {
-            // 异常处理：日志记录或重试
             e.printStackTrace();
-            // 根据业务需要处理异常，比如记录错误、报警等
+            // TODO：可写日志或告警
         }
     }
+
+    private String extractJson(String str) {
+        if (str == null) return null;
+        str = str.trim();
+
+        // 去除开头的 ```json 或 ```
+        if (str.startsWith("```json")) {
+            str = str.substring(6).trim();
+        } else if (str.startsWith("```")) {
+            str = str.substring(3).trim();
+        }
+
+        // 去除结尾的 ```
+        if (str.endsWith("```")) {
+            str = str.substring(0, str.length() - 3).trim();
+        }
+
+        // 再提取第一个 { 到最后一个 } 之间的内容，避免其他非 JSON 字符影响解析
+        int firstBrace = str.indexOf('{');
+        int lastBrace = str.lastIndexOf('}');
+        if (firstBrace >= 0 && lastBrace > firstBrace) {
+            str = str.substring(firstBrace, lastBrace + 1);
+        } else {
+            // 如果找不到有效的 JSON 对象，返回空字符串或null，避免异常
+            return null;
+        }
+
+        return str;
+    }
+
+
 
     /**
      * 查询 AI 用户行为分析结果列表

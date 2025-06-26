@@ -11,16 +11,18 @@ import com.tpp.threat_perception_platform.dao.ApplicationRiskRulesMapper;
 import com.tpp.threat_perception_platform.param.ApplicationRiskParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRisk;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskAiReport;
-import com.tpp.threat_perception_platform.pojo.User;
+import com.tpp.threat_perception_platform.pojo.SystemRisk;
 import com.tpp.threat_perception_platform.response.ResponseResult;
 import com.tpp.threat_perception_platform.service.ApplicationRiskService;
 import com.tpp.threat_perception_platform.utils.AIUtils;
 import com.tpp.threat_perception_platform.utils.HashUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+
 import java.sql.Timestamp;
 import java.util.*;
 

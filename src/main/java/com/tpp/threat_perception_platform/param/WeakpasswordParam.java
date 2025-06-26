@@ -1,5 +1,7 @@
 package com.tpp.threat_perception_platform.param;
 
+import java.util.List;
+
 public class WeakpasswordParam {
     private String hostName;
 
@@ -8,6 +10,16 @@ public class WeakpasswordParam {
     private String type;
 
     private String ipAddress;
+
+    public List<String> getWeakPasswords() {
+        return weakPasswords;
+    }
+
+    public void setWeakPasswords(List<String> weakPasswords) {
+        this.weakPasswords = weakPasswords;
+    }
+
+    private List<String> weakPasswords;
 
     /**
      * 页码

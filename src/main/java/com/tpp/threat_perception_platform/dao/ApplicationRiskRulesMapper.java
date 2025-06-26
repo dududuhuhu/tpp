@@ -1,6 +1,7 @@
 package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.param.MyParam;
+import com.tpp.threat_perception_platform.param.RuleParam;
 import com.tpp.threat_perception_platform.pojo.ApplicationRiskRules;
 import org.springframework.data.repository.query.Param;
 
@@ -41,4 +42,5 @@ public interface ApplicationRiskRulesMapper {
     String selectRiskNameById(@Param("id") Integer id);
 
 
+    List<RuleParam> getRulesByPlatform(String platform);
 }

@@ -3,6 +3,7 @@ import uuid
 import platform
 from mq.consumer import Consumer
 from mq.publisher import Publisher
+from utils.crypto.src import translate_str_to_bytes
 from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
 PLATFORM = platform.system()
@@ -14,20 +15,22 @@ if PLATFORM.startswith('Linux'):
     from linux.assetsDetect import AcountDetectorLinux as AcountDetector, AppDetectorLinux as AppDetector, \
         ProcessDetectorLinux as ProcessDetector, ServiceDetectorLinux as ServiceDetector
     from linux.logDetector import AuditLogDetector, AccountChangeLogDetector, LoginLogDetector
+    from linux.baselineDetect import BaselineCheckDetect, BaselineHardenDetect
 elif PLATFORM.startswith('Windows'):
     from work.HotfixDetect import HotfixDetector
     from work.PasswordDetect import SMBWeakPasswordScanner
     from work.SystemRiskDetect import SystemRiskDetect
     from work.AssetsDetect import *
     from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
+    from work.BaselineCheckDetect import BaselineCheckDetect
+    from work.BaselineHardenCheck import BaselineHardenDetect
 else:
     print("Unsupported platform. Please set PLATFORM to 'Linux' or 'Windows'.")
     exit(-1)
 from threading import Thread
-from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
-from work.BaselineCheckDetect import BaselineCheckDetect
-from utils.crypto.src import translate_bytes_to_str, translate_str_to_bytes
-from work.BaselineHardenDetect import BaselineHardenDetect
+
+
+
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
         publisher.publish_message(routing_key=routing_key, message=detector.detect())
@@ -37,7 +40,12 @@ def wrapper(routing_key, detector, publisher, need_publish):
 def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, basic_deliver, properties, body):
     try:
         print(body.decode('utf-8'))
-        data = json.loads(body.decode('utf-8'))
+        _body = json.loads(body.decode('utf-8'))
+        if (
+        not consumer._verify_key_pair.verify(_body['message'].encode('utf-8'), translate_str_to_bytes(_body['sig']))):
+            return
+
+        data = json.loads(_body['message'])
         print(f"Received message: {data}")
         detector = None
         routing_key = data['type']

@@ -1,236 +1,173 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>账号变更日志时间轴</title>
-    <link rel="stylesheet" href="/layui/css/layui.css">
-    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css">
+    <title>账号变更日志分析</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/layui/layuiAdmin/css/admin.css" media="all">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <style>
-        body {
-            background-color: #f7f7f7;
-            font-family: "Microsoft YaHei", sans-serif;
-        }
-        .layui-container { margin-top: 20px; padding-bottom: 50px; }
-        .sticky-header {
-            position: sticky; top: 0; z-index: 100; background-color: #fff;
-            padding: 16px 20px; font-size: 18px; font-weight: bold;
-            color: #333; border-bottom: 1px solid #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-        }
-        .layui-card { margin: 16px 0; border-radius: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
-        .layui-card-header {
-            background-color: #fafafa; font-size: 16px; font-weight: bold;
-            padding: 14px 20px; border-bottom: 1px solid #eee;
-            border-top-left-radius: 12px; border-top-right-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .layui-card-body {
-            background-color: white; padding: 20px;
-            border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
-        }
-        .no-data {
-            padding: 30px; text-align: center; color: #999;
-        }
-    </style>
 </head>
 <body>
 
-<!-- 标题 + 搜索栏 -->
-<div class="layui-card sticky-header">
-    <div class="layui-card-header">
-        👥 账号变更日志分析
-        <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal" style="margin-left: 12px;" id="sync-btn">
-            🔄 同步
-        </button>
-    </div>
-    <div class="layui-card-body">
-        <div class="layui-form">
-            <div class="layui-inline" style="margin-right: 10px;">
-                <input type="text" id="mac-search" placeholder="🔍 输入 MAC 地址筛选" autocomplete="off" class="layui-input">
+<div class="layui-fluid">
+    <div class="layui-card">
+        <!-- 搜索栏 -->
+        <div class="layui-card-header layuiadmin-card-header-auto" style="border-radius: 0; border-top: 4px solid #d2d2d2;">
+            <form class="layui-form" lay-filter="searchForm">
+                <div class="layui-form-item" style="margin-bottom:0;">
+                    <div class="layui-inline">
+                        <select name="searchType" lay-filter="searchType">
+                            <option value="mac">MAC地址</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-baseline-search">
+                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 按钮区和表格 -->
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-table="baseline" data-type="refresh">刷新</button>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-table="baseline" data-type="sync">同步</button>
+                <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin layui-btn-disabled" data-table="baseline" data-type="AI" disabled>AI辅助分析</button>
             </div>
-            <div class="layui-inline">
-                <button class="layui-btn layui-btn-normal" id="search-btn">
-                    <i class="layui-icon layui-icon-search"></i> 搜索
-                </button>
-                <button class="layui-btn layui-btn-primary" id="reset-btn">重置</button>
-            </div>
+            <table id="LAY-baseline-manage" lay-filter="LAY-baseline-manage"></table>
         </div>
     </div>
 </div>
 
-<!-- 时间轴展示 -->
-<div class="layui-container" id="timeline-container"></div>
-<div id="pagination" style="text-align: center; padding: 20px;"></div>
+<script src="/layui/layui.js"></script>
+<script src="/js/reportUtils.js"></script>  <!-- 确保路径正确 -->
 
-<script src="/layui/layui.js"></script>
-<script src="/layui/layui.js"></script>
 <script>
-    layui.config({ base: '/layui/layuiAdmin/' }).extend({ index: 'lib/index' }).use(['layer', 'form', 'laypage'], function () {
-        var $ = layui.$,
+    function padZero(n) {
+        return n < 10 ? '0' + n : n;
+    }
+    function formatDate(str) {
+        if (str != null) {
+            const d = new Date(str);
+            const year = d.getFullYear();
+            const month = padZero(d.getMonth() + 1);
+            const date = padZero(d.getDate());
+            const hour = padZero(d.getHours());
+            const minute = padZero(d.getMinutes());
+            const second = padZero(d.getSeconds());
+            return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
+        }
+        return '';
+    }
+</script>
+
+<script type="text/javascript" th:inline="none">
+    layui.use(['table', 'form', 'layer', 'jquery'], function () {
+        var table = layui.table,
             form = layui.form,
             layer = layui.layer,
-            laypage = layui.laypage;
+            $ = layui.$;
 
-        let page = 1;
-        let limit = 5;
-        let totalCount = 0;
-        let latestCreateTime = null;
+        // 全局变量，记录当前已搜索的MAC
+        var searchedMac = null;
 
-        function getRiskColor(event_id) {
-            if ([4720, 4726, 4738, 4728, 4732].includes(event_id)) return '#e74c3c';
-            return '#5FB878';
-        }
-
-        // ✅ 将扁平数据按 mac 分组
-        function groupByMac(data) {
-            const grouped = {};
-            data.forEach(item => {
-                const mac = item.mac;
-                console.log("item:",item)
-                if (!grouped[mac]) {
-                    grouped[mac] = [];
-                }
-                grouped[mac].push({
-                    event_id: item.eventId,
-                    timestamp: item.eventTime,
-                    action: item.action,
-                    target_user: item.targetUser || '-',
-                    operator_user: item.operatorUser || '-'
-                });
-            });
-            return Object.keys(grouped).map(mac => ({
-                mac: mac,
-                actions: grouped[mac]
-            }));
-        }
-
-        function renderTimeline(data) {
-            if (!data || data.length === 0) {
-                $('#timeline-container').html('<p class="no-data">暂无账号变更日志</p>');
-                return;
-            }
-
-            let html = '';
-            data.forEach(entry => {
-                console.log("entry:",entry)
-                let card = `<div class="layui-card">
-                    <div class="layui-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            💻 MAC: <strong>${entry.mac}</strong>
-                        </div>
-                        <button class="layui-btn layui-btn-xs layui-btn-danger ai-btn" data-mac="${entry.mac}" style="margin-left: 10px;">
-                            🧠 查看AI分析
-                        </button>
-                    </div>
-
-                    <div class="layui-card-body">
-                        <ul class="layui-timeline">`;
-                entry.actions.forEach(action => {
-                    console.log("action:",action)
-                    card += `<li class="layui-timeline-item">
-                        <i class="layui-icon layui-timeline-axis" style="color: ${getRiskColor(action.event_id)}"></i>
-                        <div class="layui-timeline-content layui-text">
-                            <h3 class="layui-timeline-title">${action.timestamp}</h3>
-                            <p>
-                                事件ID: ${action.event_id}<br>
-                                👤 被操作用户: ${action.target_user}<br>
-                                👮 操作用户: ${action.operator_user}<br>
-                                 <strong>${action.action}</strong><br>
-                            </p>
-                        </div>
-                    </li>`;
-                });
-                card += `</ul></div></div>`;
-                html += card;
-            });
-
-            $('#timeline-container').html(html);
-        }
-
-        function getMaxCreateTime(data) {
-            if (!Array.isArray(data)) return null;
-            const validDates = data
-                .map(item => new Date(item.eventTime))
-                .filter(d => !isNaN(d));
-            if (!validDates.length) return null;
-            return new Date(Math.max(...validDates)).toISOString();
-        }
-
-        function fetchData() {
-            const mac = $('#mac-search').val().trim();
-
-            $.ajax({
-                url: '/logs/accountChange',
-                type: 'POST',
-                contentType: 'application/json',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
-                },
-                data: JSON.stringify({ mac: mac || null, page: page, limit: limit }),
-                success: function (res) {
-                    console.log("接口响应：", res);
-                    if (res.code === 0) {
-                        totalCount = res.count || 0;
-                        const newMaxTime = getMaxCreateTime(res.data || []);
-                        if (newMaxTime !== latestCreateTime) {
-                            latestCreateTime = newMaxTime;
-                            const groupedData = groupByMac(res.data || []);
-                            renderTimeline(groupedData);
-                            renderPagination();
-                        }
-                    } else {
-                        $('#timeline-container').html('<p class="no-data">加载失败</p>');
+        // 渲染表格
+        table.render({
+            elem: '#LAY-baseline-manage',
+            method: 'post',
+            url: '/logs/accountChange',
+            contentType: 'application/json',
+            headers: {
+                'Authorization': localStorage.getItem('token'),
+                'userId': localStorage.getItem('id')
+            },
+            title: '账号变更日志探测结果',
+            cellMinWidth: 80,
+            where: {},
+            page: { curr: 1, limit: 5 },
+            limits: [5, 10, 15, 20],
+            request: {
+                pageName: 'page',
+                limitName: 'limit'
+            },
+            parseData: function (res) {
+                return {
+                    code: res.code,
+                    msg: res.msg,
+                    count: res.count,
+                    data: res.data
+                };
+            },
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'id', title: 'ID', width: 80, hide: true},
+                {field: 'mac', title: 'MAC地址', width: 150},
+                {field: 'eventTime', title: '事件时间', width: 160, templet: d => formatDate(d.eventTime)},
+                {
+                    field: 'eventId',
+                    title: '事件ID',
+                    width: 80,
+                    templet: function (d) {
+                        return `<button class="layui-btn layui-btn-xs layui-btn-warm">${d.eventId}</button>`;
                     }
                 },
-                error: function () {
-                    $('#timeline-container').html('<p class="no-data">接口异常</p>');
-                }
-            });
-        }
-
-        function renderPagination() {
-            laypage.render({
-                elem: 'pagination',
-                count: totalCount,
-                limit: limit,
-                curr: page,
-                layout: ['prev', 'page', 'next', 'count'],
-                jump: function (obj, first) {
-                    if (!first) {
-                        page = obj.curr;
-                        limit = obj.limit;
-                        fetchData();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                {
+                    field: 'targetUser',
+                    title: '被操作用户',
+                    width: 100,
+                    templet: function (d) {
+                        return `<span class="layui-badge layui-bg-green">${d.targetUser || '-'}</span>`;
                     }
-                }
-            });
-        }
-
-        $(document).on('click', '.ai-btn', function () {
-            const mac = $(this).data('mac');
-            layer.load(1, {shade: [0.1, '#fff']});
-
-            $.ajax({
-                url: '/api/report/acct-chg/analyze',
-                type: 'POST',
-                contentType: 'application/json',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
                 },
-                data: JSON.stringify({mac: mac}),
-                success: function (res) {
-                    layer.closeAll('loading');
-                    if (res && res.overall_risk_level) {
-                        const data = res;
+                {
+                    field: 'operatorUser',
+                    title: '操作用户',
+                    width: 100,
+                    templet: function (d) {
+                        return `<span class="layui-badge layui-bg-blue">${d.operatorUser || '-'}</span>`;
+                    }
+                },
+                {field: 'action', title: '操作描述', minWidth: 471}
+            ]]
+        });
 
-                        // 构造 HTML（整合图表容器和文字报告）
-                        let html = `
+        // 定义统一事件处理对象
+        var active = {
+            AI: function () {
+                if (!searchedMac) {
+                    return layer.msg('请先通过 MAC 地址进行搜索后再使用 AI 辅助分析');
+                }
+                var checkStatus = table.checkStatus('LAY-baseline-manage');
+                var data = checkStatus.data;
+                if (data.length === 0) {
+                    return layer.msg('请至少选择一条记录');
+                }
+                var mac = data[0].mac;
+
+                var $btn = $('#btn-ai-analyze');
+                $btn.attr('disabled', true).addClass('layui-btn-disabled');
+
+                $.ajax({
+                    url: '/api/report/acct-chg/analyze',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('token'),
+                        'userId': localStorage.getItem('id')
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({mac: mac}),
+                    success: function (res) {
+                        layer.closeAll('loading');
+                        if (res && res.overall_risk_level) {
+                            const data = res;
+
+                            // 构造 HTML（整合图表容器和文字报告）
+                            let html = `
                     <div style="padding: 20px; font-size: 14px;">
                         <h2 style="margin-bottom: 10px;">📊 风险分析报告</h2>
                        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
@@ -277,107 +214,132 @@
                     </div>
                 `;
 
-                        // 打开弹窗 + 图表渲染
-                        layer.open({
-                            type: 1,
-                            title: 'AI 风险分析报告',
-                            area: ['780px', '650px'],
-                            shadeClose: true,
-                            content: `<div style="max-height: 580px; overflow-y: auto;">${html}</div>`,
-                            success: function () {
-                                const riskChart = echarts.init(document.getElementById('risk-chart'));
-                                riskChart.setOption({
-                                    title: {text: '风险评分分布', left: 'center'},
-                                    tooltip: {},
-                                    xAxis: {
-                                        type: 'category',
-                                        data: data.risk_scores.map(r => r.event_id),
-                                        name: '事件ID'
-                                    },
-                                    yAxis: {
-                                        type: 'value',
-                                        name: '评分',
-                                        max: 10
-                                    },
-                                    series: [{
-                                        data: data.risk_scores.map(r => r.risk_score),
-                                        type: 'bar',
-                                        itemStyle: {color: '#e74c3c'}
-                                    }]
-                                });
+                            // 打开弹窗 + 图表渲染
+                            layer.open({
+                                type: 1,
+                                title: 'AI 风险分析报告',
+                                area: ['780px', '650px'],
+                                shadeClose: true,
+                                content: `<div style="max-height: 580px; overflow-y: auto;">${html}</div>`,
+                                success: function () {
+                                    const riskChart = echarts.init(document.getElementById('risk-chart'));
+                                    riskChart.setOption({
+                                        title: {text: '风险评分分布', left: 'center'},
+                                        tooltip: {},
+                                        xAxis: {
+                                            type: 'category',
+                                            data: data.risk_scores.map(r => r.event_id),
+                                            name: '事件ID'
+                                        },
+                                        yAxis: {
+                                            type: 'value',
+                                            name: '评分',
+                                            max: 10
+                                        },
+                                        series: [{
+                                            data: data.risk_scores.map(r => r.risk_score),
+                                            type: 'bar',
+                                            itemStyle: {color: '#e74c3c'}
+                                        }]
+                                    });
 
-                                const freqChart = echarts.init(document.getElementById('freq-chart'));
-                                freqChart.setOption({
-                                    title: {text: '用户操作频率', left: 'center'},
-                                    tooltip: {trigger: 'item'},
-                                    legend: {bottom: '0%'},
-                                    series: [{
-                                        type: 'pie',
-                                        radius: '55%',
-                                        data: data.operation_frequencies.map(f => ({
-                                            name: f.user,
-                                            value: f.frequency
-                                        })),
-                                        label: {
-                                            formatter: '{b}: {c}次 ({d}%)'
-                                        }
-                                    }]
-                                });
-                            }
-                        });
-                    } else {
-                        layer.msg('AI分析失败：数据异常', {icon: 2});
+                                    const freqChart = echarts.init(document.getElementById('freq-chart'));
+                                    freqChart.setOption({
+                                        title: {text: '用户操作频率', left: 'center'},
+                                        tooltip: {trigger: 'item'},
+                                        legend: {bottom: '0%'},
+                                        series: [{
+                                            type: 'pie',
+                                            radius: '55%',
+                                            data: data.operation_frequencies.map(f => ({
+                                                name: f.user,
+                                                value: f.frequency
+                                            })),
+                                            label: {
+                                                formatter: '{b}: {c}次 ({d}%)'
+                                            }
+                                        }]
+                                    });
+                                }
+                            });
+                        } else {
+                            layer.msg('AI分析失败：数据异常', {icon: 2});
+                        }
+                    },
+                    error: function () {
+                        layer.closeAll('loading');
+                        layer.msg('AI分析请求失败', {icon: 2});
+                    },
+                    complete: function () {
+                        $btn.attr('disabled', false).removeClass('layui-btn-disabled');
                     }
-                },
-                error: function () {
-                    layer.closeAll('loading');
-                    layer.msg('AI分析请求失败', {icon: 2});
-                }
-            });
-        });
-
-
-
-
-        $('#sync-btn').click(function () {
-            layer.load(1, { shade: [0.1, '#fff'] });
-            $.ajax({
-                url: '/logs/accountChange/sync',
-                type: 'POST',
-                headers: {
-                    'Authorization': localStorage.getItem('token'),
-                    'userId': localStorage.getItem('id')
-                },
-                success: function (res) {
-                    layer.closeAll('loading');
-                    if (res.code === 0) {
-                        layer.msg('同步请求已发送，稍后自动刷新数据');
-                    } else {
-                        layer.msg('同步失败：' + res.msg, { icon: 2 });
+                });
+            },
+            sync:function (){
+                layer.load(1, { shade: [0.1, '#fff'] });
+                $.ajax({
+                    url: '/logs/accountChange/sync',
+                    type: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('token'),
+                        'userId': localStorage.getItem('id')
+                    },
+                    success: function (res) {
+                        layer.closeAll('loading');
+                        if (res.code === 0) {
+                            layer.msg('同步请求已发送，稍后自动刷新数据');
+                        } else {
+                            layer.msg('同步失败：' + res.msg, { icon: 2 });
+                        }
+                    },
+                    error: function () {
+                        layer.closeAll('loading');
+                        layer.msg('同步请求失败', { icon: 2 });
                     }
-                },
-                error: function () {
-                    layer.closeAll('loading');
-                    layer.msg('同步请求失败', { icon: 2 });
-                }
+                });
+            },
+            refresh: function () {
+                $('input[name="keywords"]').val('');
+                searchedMac = null;
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+                table.reload('LAY-baseline-manage', {
+                    where: {},
+                    page: { curr: 1 }
+                });
+            }
+        };
+
+        // 搜索表单提交
+        form.on('submit(LAY-baseline-search)', function (data) {
+            var mac = data.field.keywords.trim();
+            console.log("searchedMac:", mac);
+            searchedMac = mac ? mac : null;
+
+            table.reload('LAY-baseline-manage', {
+                where: {mac: mac},
+                page: { curr: 1 }
             });
+
+            if (searchedMac) {
+                $('#btn-ai-analyze').removeClass('layui-btn-disabled').attr('disabled', false);
+            } else {
+                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+            }
+
+            return false;
         });
 
-        $('#search-btn').click(function () {
-            page = 1;
-            fetchData();
+        // 按钮点击统一处理
+        $('.layuiadmin-btn-useradmin').on('click', function () {
+            var type = $(this).data('type');
+            var tableName = $(this).data('table');
+            if (tableName === 'baseline' && active[type]) {
+                active[type]();
+            }
         });
 
-        $('#reset-btn').click(function () {
-            $('#mac-search').val('');
-            page = 1;
-            fetchData();
-        });
-
-        setInterval(() => { fetchData(); }, 10000);
-        fetchData();
+        // 可根据需要添加表格事件处理
     });
 </script>
-
 </body>
 </html>
