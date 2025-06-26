@@ -40,8 +40,6 @@ public interface RuleService {
     public ResponseResult systemRiskRulesList(MyParam param);
 
     void sendLogRules(String mac,String platform);
-<<<<<<< HEAD
-=======
 
     public ResponseResult vulRulesSave(VulnerabilityRules vulnerabilityRules);
 
@@ -52,5 +50,4 @@ public interface RuleService {
     public ResponseResult weakPasswordDelete(Integer[] ids);
 
     ResponseResult systemRulesDelete(Integer[] ids);
->>>>>>> demo
 }

@@ -231,15 +231,12 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-<<<<<<< HEAD
-=======
     public ResponseResult systemRulesDelete(Integer[] ids) {
         systemRiskRulesMapper.delete(ids);
         return new ResponseResult<>(0, "删除成功！");
     }
 
     @Override
->>>>>>> demo
     public void sendLogRules(String mac,String platform) {
         List<LogRules> rulesList = logRulesMapper.selectByPlatform(platform); // 多条规则
         if (rulesList == null || rulesList.isEmpty()) {
@@ -249,17 +246,7 @@ public class RuleServiceImpl implements RuleService {
         // 将规则列表转为 JSON 数组字符串
         String json = JSON.toJSONString(rulesList);
         String routingKey = mac.replace(":", "") + "Rule";
-<<<<<<< HEAD
-        rabbitService.sendMessage("agent_" + mac.replaceAll(":", "") + "_exchange", routingKey, json);
-        System.out.println("已发送规则到路由键: " + routingKey);
-    }
-
-=======
         rabbitService.sendMessage("agent_exchange", routingKey, json);
         System.out.println("已发送规则到路由键: " + routingKey);
     }
-
-
-
->>>>>>> demo
 }

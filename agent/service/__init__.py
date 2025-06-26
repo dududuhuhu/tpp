@@ -9,6 +9,12 @@ from user.userConfig import USER_PEM_PRI
 from linux.logDetect import LogDetect
 import platform
 PLATFORM = platform.platform()
+if PLATFORM.startswith("Linux"):
+    from linux.logDetect import LogDetect
+    log_path = '/var/log/auth.log'
+elif PLATFORM.startswith("Windows"):
+    from work.LogDetect import LogDetect
+    log_path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
 
 
 all = ['default_consumer', 'default_publisher', 'user_signer', 'server_verifier', 'logDetector']
@@ -20,4 +26,4 @@ url = get_amqp_url(HOST, PORT, USERNAME, PASSWORD, VHOST)
 default_consumer = Consumer(exchange=CONSUMER_EXCHANGE_NAME, amqp_url=url, verify_key_pair=server_verifier)
 default_publisher = Publisher(exchange=PUBLISHER_EXCHANGE_NAME, amqp_url=url, sign_key_pair=user_signer, mac=MAC)
 
-logDetector = LogDetect(log_path='/var/log/auth.log')
+logDetector = LogDetect(log_path=log_path)
