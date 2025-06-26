@@ -30,7 +30,7 @@ public interface LoginLogMapper {
 
     LoginLog selectByMacAndUsernameAndLoginTime(String mac, String username, Date loginTime);
 
-    List<LoginLog> findAllForAudit(@Param("params") LogParam params);
+    List<LoginLog> findAllForAudit(LogParam params);
 
     List<LoginLog> selectByCondition(LogParam param);
 
@@ -38,5 +38,5 @@ public interface LoginLogMapper {
 
     List<Map<String, Object>> getLoginAbnormalStats();
 
-    List<LoginLog> findAllForLogin(@Param("params") LogParam param);
+    List<LoginLog> findAllForLogin(LogParam param);
 }
