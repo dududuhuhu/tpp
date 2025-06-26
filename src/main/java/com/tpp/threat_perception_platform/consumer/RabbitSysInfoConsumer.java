@@ -814,13 +814,16 @@ public class RabbitSysInfoConsumer {
 
             // 查询检测结果表中该任务的检测记录
 
-            Integer id =baselineDetectList.get(0).getId();
+            Integer id =baselineDetectList.get(0).getTaskId();
+            System.out.println("第一条检测记录的taskId是："+id);
             List<BaselineDetect> db_resultList = baselineDetectMapper.findByTaskId(id);
             BaselineTask task =baselineTaskMapper.selectByPrimaryKey(Long.valueOf(id));
             if (db_resultList.size() > 0) {
+                System.out.println("基线任务"+id+"已完成！");
                 // 如果检测结果存在，说明任务执行成功
                 task.setTaskStatus(1);  // 已执行成功
             } else {
+                System.out.println("基线任务"+id+"未完成！");
                 // 如果没查到检测结果，任务状态维持未执行状态（0）
                 task.setTaskStatus(0);
             }

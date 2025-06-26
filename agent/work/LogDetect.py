@@ -66,7 +66,7 @@ class AuditLogDetector:
                     continue
                 action_name = EVENT_ACTION_MAP.get(act_log.get('event_id'), "未知操作")
                 actions.append({
-                    "event_id": act_log.get('event_id'),
+                    "eventId": act_log.get('event_id'),
                     "timestamp": to_beijing_time(act_log.get('timestamp')),
                     "action": action_name,
                     "details": f"{act_log.get('SubjectUserName')}对{act_log.get('TargetUserName')}进行{action_name}"
@@ -75,8 +75,8 @@ class AuditLogDetector:
             result = {
                 "mac": mac,
                 "username": username,
-                "login_time": user_login_time,
-                "logoff_time": user_logout_time,
+                "loginTime": user_login_time,
+                "logoffTime": user_logout_time,
                 "actions": actions
             }
             results.append(result)
@@ -145,9 +145,9 @@ class LoginLogDetector:
             result.append({
                 "mac": mac,
                 "username": username,
-                "login_time": login_time_str,
-                "is_risk_user": is_risk_user,
-                "is_risk_time": is_risk_time
+                "loginTime": login_time_str,
+                "isRiskUser": is_risk_user,
+                "isRiskTime": is_risk_time
             })
 
         print(f"[登录日志] 风险记录数: {len(result)}")
@@ -264,11 +264,11 @@ class AccountChangeLogDetector:
             print(f"[账号变更日志] {timestamp}: {action_desc}")
 
             result.append({
-                "event_id": event_id,
+                "eventId": event_id,
                 "timestamp": timestamp,
                 "action": action_desc,
-                "target_user": target_user,
-                "operator_user": operator_user
+                "targetUser": target_user,
+                "operatorUser": operator_user
             })
 
         print(f"[账号变更日志] 分析完成，共记录 {len(result)} 条")

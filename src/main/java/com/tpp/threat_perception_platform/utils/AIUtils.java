@@ -34,7 +34,7 @@ public class AIUtils {
 
         GenerationParam param = GenerationParam.builder()
                 .apiKey("sk-09107e052e9c4ad4ad7e3dd49c75145c")
-                .model("qwen-plus-latest")
+                .model("qwen-turbo")
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .build();

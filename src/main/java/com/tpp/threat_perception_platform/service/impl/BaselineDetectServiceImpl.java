@@ -88,7 +88,7 @@ public class BaselineDetectServiceImpl implements BaselineDetectService {
         // 查询主机状态，确认在线
         // 设成二十秒是因为，重新启动程序需要差不多20s，若要测试当然是已启动就执行任务
         if (dbHost == null || dbHost.getUpdateTime() == null ||
-                new Date().getTime() - dbHost.getUpdateTime().getTime() > 20000) {
+                new Date().getTime() - dbHost.getUpdateTime().getTime() > 40000) {
             System.out.println("基线任务目标不在线！");
             return new ResponseResult<>(1003, "主机不在线！");
         }
