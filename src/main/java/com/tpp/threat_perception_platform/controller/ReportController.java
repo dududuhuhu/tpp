@@ -38,6 +38,11 @@ public class ReportController {
     @Autowired
     private SystemRiskService systemRiskService;
 
+    @Autowired
+    private BaselineDetectService baselineDetectService;
+
+
+
     /**
      * 根据 MAC 地址生成账号变更风险分析报告
      *
@@ -114,4 +119,16 @@ public class ReportController {
         System.out.println("sysreportMac:"+mac);
         return systemRiskService.analyzeAndSaveSystemRiskReport(mac);
     }
+
+    /**
+     * 根据 MAC 地址分析基线探测记录并生成AI报告
+     * @param mac JSON请求体，包含 mac 字段
+     * @return 响应结果，包含分析报告内容
+     */
+    @PostMapping("/baselineDetect/analyze")
+    public ResponseResult analyzeBaselineDetectReport(@RequestParam("mac") String mac) {
+        System.out.println("BaselineDetectAnalyzeMac: " + mac);
+        return baselineDetectService.analyzeAndSaveBaselineDetectReport(mac);
+    }
+
 }

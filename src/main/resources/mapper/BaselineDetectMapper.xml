@@ -112,4 +112,21 @@
             updated_time =  #{updatedTime}
         where   id = #{id} 
     </update>
+
+    <select id="selectByMac" resultMap="BaseResultMap" parameterType="string">
+        SELECT
+            id,
+            mac,
+            name,
+            result,
+            current_value,
+            recommended_value,
+            description,
+            updated_time
+        FROM
+            baseline_detect
+        WHERE
+            mac = #{mac}
+    </select>
+
 </mapper>
