@@ -3,6 +3,7 @@ from utils.logParser import LogParser
 from service import MAC
 import json
 from db.tpp import get_log_rules
+import datetime
 
 class LogDetect(object):
     def __init__(self, log_path:str, logger_config:str='utils/config.yml'):
@@ -13,6 +14,17 @@ class LogDetect(object):
         """
         self._log_path = log_path
         self._parser = LogParser(logger_config)
+        self._time = datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
+    
+    def _is_valid_timestamp(self, timestamp: str) -> bool:
+        try:
+            # 解析时间戳为 offset-aware datetime
+            event_time = datetime.datetime.fromisoformat(timestamp)
+            # 比较时间戳是否在 self._time 之后
+            return event_time >= self._time
+        except ValueError:
+            # 如果时间戳格式不正确，返回 False
+            return False
     
     def _get_obj_events(self) -> dict:
         """
@@ -40,7 +52,7 @@ class LogDetect(object):
             for line in file:
                 try:
                     parsed = self._parser.parseLine(line)
-                    if parsed.get('appname') in keys:
+                    if parsed.get('appname') in keys and self._is_valid_timestamp(parsed.get('timestamp', datetime.datetime.min)):
                         results.append({
                             'mac':MAC,
                             'id':events[parsed.get('appname')][0],
@@ -64,9 +76,9 @@ class LogDetect(object):
             return []
         
         results = self._parse(events)
+        self._time = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
         if not results:
             print("No matching events found in the log file.")
             return None
         
         return json.dumps(results, ensure_ascii=False)
-        

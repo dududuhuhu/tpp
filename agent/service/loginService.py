@@ -5,9 +5,9 @@ from mq.service import Service
 from utils import logger
 from mq import extract_public_key
 from service import MAC, PLATFORM
-if PLATFORM == 'Linux':
+if PLATFORM.startswith('Linux'):
     from linux.systemInfo import SystemInfoLinux as SystemInfo
-elif PLATFORM == 'Windows':
+elif PLATFORM.startswith('Windows'):
     from system.SystemInfo import SystemInfo
 else:
     logger.error(f"Unsupported platform: {PLATFORM}")

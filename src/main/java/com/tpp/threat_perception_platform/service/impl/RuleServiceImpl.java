@@ -193,7 +193,7 @@ public class RuleServiceImpl implements RuleService {
         // 将规则列表转为 JSON 数组字符串
         String json = JSON.toJSONString(rulesList);
         String routingKey = mac.replace(":", "") + "Rule";
-        rabbitService.sendMessage("agent_exchange", routingKey, json);
+        rabbitService.sendMessage("agent_" + mac.replaceAll(":", "") + "_exchange", routingKey, json);
         System.out.println("已发送规则到路由键: " + routingKey);
     }
 

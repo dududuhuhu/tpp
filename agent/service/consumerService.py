@@ -7,14 +7,14 @@ from work.ApplicationRiskDetect import ApplicationRiskDetect
 from work.VulnerabilityDetect import VulnerabilityDetect
 PLATFORM = platform.system()
 # platform specific imports
-if PLATFORM == "Linux":
+if PLATFORM.startswith('Linux'):
     from linux.hotfixDetect import HotfixDetectLinux as HotfixDetector
     from linux.passwordDetect import WeakPasswordDetect as SMBWeakPasswordScanner
     from linux.systemRiskDetect import SystemRiskDetectLinux as SystemRiskDetect
     from linux.assetsDetect import AcountDetectorLinux as AcountDetector, AppDetectorLinux as AppDetector, \
         ProcessDetectorLinux as ProcessDetector, ServiceDetectorLinux as ServiceDetector
     from linux.logDetector import AuditLogDetector, AccountChangeLogDetector, LoginLogDetector
-elif PLATFORM == "Windows":
+elif PLATFORM.startswith('Windows'):
     from work.HotfixDetect import HotfixDetector
     from work.PasswordDetect import SMBWeakPasswordScanner
     from work.SystemRiskDetect import SystemRiskDetect

@@ -13,7 +13,7 @@ def update_log_rules(rules:list[tuple]):
             VALUES (?, ?, ?, ?, ?)
             """
         cursor.executemany(query, rules)
-        cursor.commit()
+        connection.commit()
         cursor.close()
         connection.close()
 

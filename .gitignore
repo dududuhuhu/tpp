@@ -6,3 +6,4 @@
 **/configure.py
 **/application.properties
 **/*.db
+**/build/*
