@@ -13,7 +13,7 @@ from work.AssetsDetect import *
 from threading import Thread
 from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
 from work.BaselineCheckDetect import BaselineCheckDetect
-
+from work.BaselineHardenDetect import BaselineHardenDetect
 
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
@@ -70,6 +70,8 @@ def agent_mac_queue_callback(consumer:Consumer, publisher:Publisher, channel, ba
             detector = AccountChangeLogDetector(data)
         elif data['type'] == 'baselineDetect':
             detector = BaselineCheckDetect(data)
+        elif data['type'] == 'baselineHardening':
+            detector = BaselineHardenDetect(data)
         else:
             print(f"Unknown message type: {data['type']}")
         if detector:
