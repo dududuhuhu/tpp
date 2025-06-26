@@ -39,9 +39,10 @@
         from baseline_detect
         order by
         case result
-        when '异常项' then 0
-        when '合格项' then 1
-        else 2
+        when '已加固' then 0
+        when '异常项' then 1
+        when '合格项' then 2
+        else 3
         end,
         id asc
     </select>
@@ -52,9 +53,10 @@
         where mac=#{mac}
         order by
         case result
-        when '异常项' then 0
-        when '合格项' then 1
-        else 2
+        when '已加固' then 0
+        when '异常项' then 1
+        when '合格项' then 2
+        else 3
         end,
         id asc
     </select>
@@ -65,9 +67,10 @@
         where task_id=#{taskId}
         order by
         case result
-        when '异常项' then 0
-        when '合格项' then 1
-        else 2
+        when '已加固' then 0
+        when '异常项' then 1
+        when '合格项' then 2
+        else 3
         end,
         id asc
     </select>

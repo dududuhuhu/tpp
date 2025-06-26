@@ -21,7 +21,9 @@ class BaselineHardenDetect:
         外部调用接口：执行漏洞探测，返回 JSON 字符串
         """
         self.__BaselineHarden_detect(self.data)
-        return json.dumps(self.results, ensure_ascii=False)
+        results=json.dumps(self.results, ensure_ascii=False)
+        print(results)
+        return results
 
     def __BaselineHarden_detect(self,data):
         """
@@ -30,8 +32,9 @@ class BaselineHardenDetect:
         print("开始基线加固..............!")
         # 创建扫描器实例并执行
         hardening = BaselineHardening()
+        print("data:", data)
+        print("name:", data["name"])
         self.results = hardening.execute_hardening(data)
-        self.results["task_id"]=data["task_id"]
         # print(json.dumps(result, indent=4, ensure_ascii=False))
 
         print("基线加固结束！")

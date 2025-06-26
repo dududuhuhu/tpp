@@ -20,7 +20,7 @@
                         </select>
                     </div>
                     <div class="layui-inline">
-                        <input type="text" name="keywords" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+                        <input type="text" name="keywords" placeholder="请输入任务ID搜索" autocomplete="off" class="layui-input">
                     </div>
                     <div class="layui-inline">
                         <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-baseline-search">
@@ -35,12 +35,15 @@
         <div class="layui-card-body">
             <div style="padding-bottom: 10px;">
                 <button class="layui-btn layuiadmin-btn-useradmin" data-table="baseline" data-type="refresh">刷新</button>
+                <button class="layui-btn layui-btn-warm layuiadmin-btn-useradmin" data-table="baseline" data-type="batchFix" disabled>加固</button>
                 <button id="btn-ai-analyze" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" data-table="baseline" data-type="AI" disabled>AI辅助分析</button>
             </div>
             <table id="LAY-baseline-manage" lay-filter="LAY-baseline-manage"></table>
         </div>
+
+        <!-- 操作栏模板：加固按钮禁用逻辑 -->
         <script type="text/html" id="table-baseline-operation">
-            {{# if(d.result === '合格项'){ }}
+            {{# if(d.result === '合格项' || d.result === '已加固'){ }}
             <a class="layui-btn layui-btn-disabled layui-btn-xs" disabled>加固</a>
             {{# } else { }}
             <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="fix"><i class="layui-icon layui-icon-auz"></i>加固</a>
@@ -50,8 +53,9 @@
 </div>
 
 <script src="/layui/layui.js"></script>
-<script src="/js/reportUtils.js"></script>  <!-- 确保路径正确 -->
+<script src="/js/reportUtils.js"></script>
 <script>
+    // 格式化日期函数
     function padZero(n) {
         return n < 10 ? '0' + n : n;
     }
@@ -69,6 +73,7 @@
         return '';
     }
 </script>
+
 <script type="text/javascript" th:inline="none">
     layui.use(['table', 'form', 'layer', 'jquery'], function () {
         var table = layui.table,
@@ -76,8 +81,7 @@
             layer = layui.layer,
             $ = layui.$;
 
-        // 页面初始化时禁用按钮并移除搜索标记
-        $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+        // 当前搜索的任务ID，初始化为空
         var searchedTaskId = null;
 
         // 渲染表格
@@ -114,25 +118,24 @@
                 {field: 'result', title: '检测结果', width: 100, align: 'center', templet: function (d) {
                         var colorMap = {
                             '合格项': '#5FB878',
-                            '异常项': '#FF5722'
+                            '异常项': '#FF5722',
+                            '已加固':'#f0d03b'
                         };
                         var color = colorMap[d.result] || '#999';
                         return `<span class="layui-btn layui-btn-xs" style="background-color:${color};">${d.result}</span>`;
                     }},
-                // {field: 'currentValue', title: '当前值', minWidth: 200},
-                // {field: 'recommendedValue', title: '推荐值', minWidth: 200},
                 {field: 'description', title: '说明', minWidth: 300},
                 {field: 'updatedTime', title: '更新时间', width: 160, templet: d => formatDate(d.updatedTime)},
                 {fixed: 'right', title: '操作', toolbar: '#table-baseline-operation', width: 80}
-
             ]]
         });
 
-        // 统一事件处理对象
+        // 操作事件集合
         var active = {
+            // AI辅助分析按钮事件
             AI: function () {
-                if (!searchedMac) {
-                    return layer.msg('请先通过 MAC 地址进行搜索后再使用 AI 辅助分析');
+                if (!searchedTaskId) {
+                    return layer.msg('请先通过任务ID进行搜索后再使用 AI 辅助分析');
                 }
                 var checkStatus = table.checkStatus('LAY-baseline-manage');
                 var data = checkStatus.data;
@@ -155,11 +158,9 @@
                     data: JSON.stringify({ macAddress: mac }),
                     success: function (res) {
                         if (res.code === 0) {
-                            if (res.code === 0) {
-                                reportUtils.showReportDialog('漏洞检测分析报告', res.data);
-                            } else {
-                                layer.msg(res.msg || '分析失败', {icon: 5});
-                            }
+                            reportUtils.showReportDialog('漏洞检测分析报告', res.data);
+                        } else {
+                            layer.msg(res.msg || '分析失败', {icon: 5});
                         }
                     },
                     error: function () {
@@ -170,22 +171,89 @@
                     }
                 });
             },
+
+            // 刷新按钮事件
             refresh: function () {
                 $('input[name="keywords"]').val('');
                 searchedTaskId = null;
-                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+                disableActionButtons();
                 table.reload('LAY-baseline-manage', {
                     where: {},
                     page: { curr: 1 }
                 });
+            },
+
+            // 批量加固按钮事件
+            batchFix: function () {
+                var checkStatus = table.checkStatus('LAY-baseline-manage');
+                var data = checkStatus.data;
+
+                if (data.length === 0) {
+                    return layer.msg('请至少选择一条记录进行加固');
+                }
+
+                // 判断是否含合格项或已加固项
+                var hasInvalid = data.some(item => item.result === '合格项' || item.result === '已加固');
+                if (hasInvalid) {
+                    return layer.msg('存在合格项或已加固项不需要加固，请重新选择');
+                }
+
+                var nameList = data.map(item => item.name);
+                var mac = data[0].mac;
+                var taskId = searchedTaskId || '';
+
+                layer.confirm('确定加固以下基线项？<br><span style="color:red;">' + nameList.join('，') + '</span>', function(index) {
+                    sendFixRequest(nameList, mac, taskId);
+                    layer.close(index);
+                });
             }
         };
 
-        // 搜索表单提交
+        // 发送批量加固请求
+        function sendFixRequest(nameList, mac, taskId) {
+            $.ajax({
+                url: '/baseline/fix/batch',
+                type: 'POST',
+                headers: {
+                    'Authorization': localStorage.getItem('token'),
+                    'userId': localStorage.getItem('id')
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: nameList,
+                    mac: mac,
+                    taskId: taskId
+                }),
+                success: function (res) {
+                    if (res.code === 0) {
+                        layer.msg('加固成功');
+                        table.reload('LAY-baseline-manage');
+                    } else {
+                        layer.msg(res.msg || '加固失败', { icon: 5 });
+                    }
+                },
+                error: function () {
+                    layer.msg('请求失败，请检查接口或网络连接', { icon: 2 });
+                }
+            });
+        }
+
+        // 禁用顶部加固和AI按钮
+        function disableActionButtons() {
+            $('button[data-type=batchFix]').attr('disabled', true).addClass('layui-btn-disabled');
+            $('#btn-ai-analyze').attr('disabled', true).addClass('layui-btn-disabled');
+        }
+
+        // 启用顶部加固和AI按钮
+        function enableActionButtons() {
+            $('button[data-type=batchFix]').attr('disabled', false).removeClass('layui-btn-disabled');
+            $('#btn-ai-analyze').attr('disabled', false).removeClass('layui-btn-disabled');
+        }
+
+        // 搜索表单提交事件
         form.on('submit(LAY-baseline-search)', function (data) {
             var taskId = data.field.keywords.trim();
-            console.log("resultid:",taskId);
-            searchedTaskId = taskId ? true : false;
+            searchedTaskId = taskId ? taskId : null;
 
             table.reload('LAY-baseline-manage', {
                 where: { taskId: taskId },
@@ -193,15 +261,14 @@
             });
 
             if (searchedTaskId) {
-                $('#btn-ai-analyze').removeClass('layui-btn-disabled').attr('disabled', false);
+                enableActionButtons();
             } else {
-                $('#btn-ai-analyze').addClass('layui-btn-disabled').attr('disabled', true);
+                disableActionButtons();
             }
-
             return false;
         });
 
-        // 按钮点击统一处理
+        // 顶部按钮点击事件
         $('.layuiadmin-btn-useradmin').on('click', function () {
             var type = $(this).data('type');
             var tableName = $(this).data('table');
@@ -210,38 +277,30 @@
             }
         });
 
+        // 操作栏加固按钮监听
         table.on('tool(LAY-baseline-manage)', function (obj) {
             var data = obj.data;
             if (obj.event === 'fix') {
-                layer.confirm('确定对该基线项执行加固操作吗？', function(index){
-                    $.ajax({
-                        url: '/baseline/fix',
-                        type: 'POST',
-                        headers: {
-                            'Authorization': localStorage.getItem('token'),
-                            'userId': localStorage.getItem('id')
-                        },
-                        contentType: 'application/json',
-                        data: JSON.stringify({ id: data.id, mac: data.mac }),  // 根据你后端字段调整
-                        success: function (res) {
-                            if (res.code === 0) {
-                                layer.msg('加固成功');
-                                table.reload('LAY-baseline-manage');
-                            } else {
-                                layer.msg(res.msg || '加固失败', {icon: 5});
-                            }
-                        },
-                        error: function () {
-                            layer.msg('请求失败，请检查接口或网络连接', {icon: 2});
-                        }
-                    });
+                if (data.result === '合格项' || data.result === '已加固') {
+                    return layer.msg('该项无需加固');
+                }
+
+                var nameList = [data.name];
+                var mac = data.mac;
+                var taskId = data.taskId;
+
+                layer.confirm('确定加固该基线项？<br><span style="color:red;">' + data.name + '</span>', function(index) {
+                    sendFixRequest(nameList, mac, taskId);
                     layer.close(index);
                 });
             }
         });
 
+        // 页面初始化禁用按钮
+        disableActionButtons();
 
     });
 </script>
+
 </body>
 </html>

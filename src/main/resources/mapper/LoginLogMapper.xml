@@ -96,17 +96,14 @@
         SELECT '风险用户登录' AS name, COUNT(*) AS value
         FROM login_log
         WHERE is_risk_user = 1
-
         UNION ALL
-
         SELECT '非正常时间登录' AS name, COUNT(*) AS value
         FROM login_log
         WHERE is_risk_time = 1
-
         UNION ALL
-
         SELECT '正常登录' AS name, 0 AS value
     </select>
+
     <select id="findAllForAudit" resultType="com.tpp.threat_perception_platform.pojo.LoginLog">
         SELECT t.*
         FROM login_log t

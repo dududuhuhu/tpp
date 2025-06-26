@@ -27,4 +27,6 @@ public interface BaselineHardeningMapper {
     BaselineHardening selectByMacAndName(String mac, String name);
 
     List<BaselineHardening> findAll();
+
+    BaselineHardening selectByTaskIDAndName(Integer taskId, String name);
 }

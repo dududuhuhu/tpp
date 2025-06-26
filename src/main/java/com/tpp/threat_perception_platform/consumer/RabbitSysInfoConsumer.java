@@ -856,14 +856,18 @@ public class RabbitSysInfoConsumer {
             // 反序列化 JSON → 对象
             // List<VulnerabilityRisk> baselineDetectList = JSON.parseArray(message, VulnerabilityRisk.class);
             List<BaselineHardening> baselineHardeningList = validateAndParseList(message, BaselineHardening.class);
+            System.out.println("Received BaselineHardening data: " + baselineHardeningList);
             if (baselineHardeningList == null) {
                 Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
                 channel.basicAck(deliveryTag, false);
+                System.out.println("没接收到数据！");
+
                 return;
             }
 
             // 循环保存每一个
             for (BaselineHardening baselineHardening: baselineHardeningList) {
+                System.out.println("Received BaselineHardening data: " + baselineHardeningList);
                 ResponseResult result = baselineHardeningService.saveBaselineHardening(baselineHardening);
                 System.out.println("Save result: " + result.getMsg());
             }

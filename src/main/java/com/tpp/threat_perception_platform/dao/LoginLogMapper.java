@@ -2,7 +2,7 @@ package com.tpp.threat_perception_platform.dao;
 
 import com.tpp.threat_perception_platform.param.LogParam;
 import com.tpp.threat_perception_platform.pojo.LoginLog;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;

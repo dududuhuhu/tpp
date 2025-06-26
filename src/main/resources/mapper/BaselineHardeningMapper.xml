@@ -6,6 +6,7 @@
 
     <resultMap id="BaseResultMap" type="com.tpp.threat_perception_platform.pojo.BaselineHardening">
             <id property="id" column="id" />
+            <result property="taskId" column="task_id" />
             <result property="mac" column="mac" />
             <result property="name" column="name" />
             <result property="result" column="result" />
@@ -13,7 +14,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,mac,name,result,updated_time
+        id,task_id,mac,name,result,updated_time
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -34,6 +35,12 @@
         from baseline_hardening
         where updated_time = (SELECT MAX(updated_time) FROM baseline_hardening)
     </select>
+    <select id="selectByTaskIDAndName" resultType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
+        select
+        <include refid="Base_Column_List" />
+        from baseline_hardening
+        where task_id = #{taskId} and name = #{name}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from baseline_hardening
@@ -41,8 +48,8 @@
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening" useGeneratedKeys="true">
         insert into baseline_hardening
-        ( id,mac,name,result,updated_time)
-        values (#{id},#{mac},#{name},#{result},#{updatedTime})
+        ( task_id,mac,name,result,updated_time)
+        values (#{taskId},#{mac},#{name},#{result},#{updatedTime})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening" useGeneratedKeys="true">
         insert into baseline_hardening
@@ -81,7 +88,8 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.tpp.threat_perception_platform.pojo.BaselineHardening">
         update baseline_hardening
-        set 
+        set
+            task_id=#{taskId},
             mac =  #{mac},
             name =  #{name},
             result =  #{result},

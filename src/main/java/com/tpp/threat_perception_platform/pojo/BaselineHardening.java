@@ -12,6 +12,16 @@ public class BaselineHardening {
      */
     private Long id;
 
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    private Integer taskId;
+
     /**
      * 客户端MAC地址
      */

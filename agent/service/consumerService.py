@@ -13,7 +13,9 @@ from work.AssetsDetect import *
 from threading import Thread
 from work.LogDetect import AuditLogDetector,AccountChangeLogDetector,LoginLogDetector
 from work.BaselineCheckDetect import BaselineCheckDetect
-from work.BaselineHardenDetect import BaselineHardenDetect
+from work.BaselineHardenCheck import BaselineHardenDetect
+
+
 
 def wrapper(routing_key, detector, publisher, need_publish):
     if need_publish:
