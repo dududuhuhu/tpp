@@ -5,10 +5,15 @@ from Logs.logs import get_log_info, EVENT_ACTION_MAP
 import sqlite3
 import os
 import json
-from utils.logParser import LogParser
+from tpp.agent.utils.logParser import LogParser
 from service import MAC
 from db.tpp import get_log_rules
-
+from xml.dom import minidom
+import html
+from evtx import PyEvtxParser
+import uuid
+import re
+from datetime import datetime
 
 def to_beijing_time(utc_str):
     try:
@@ -299,7 +304,14 @@ class LogDetect(object):
         """
         try:
             events = {}
+    #         rules=[
+    # (1, 'Windows', '4625', 3, '尝试登陆失败'),
+    # (2, 'Windows', '4740', 2, '用户账号被锁定'),
+    # (3, 'Windows', '4719', 3, '审计策略被修改')
+    #     ]
+
             for rule in get_log_rules():
+            # for rule in rules:
                 # rule[2] 代表事件ID或关键字段，如 SourceName、EventID、类别等
                 if rule[2]:
                     events[rule[2]] = [rule[0], rule[3]]
@@ -310,41 +322,72 @@ class LogDetect(object):
 
     def _parse(self, events: dict) -> list[dict] | None:
         """
-        解析 Windows 日志文件
-        :param events: 规则事件映射
+        解析 Windows EVTX 日志文件（改进版，参考 get_log_info 提取方式）
+        :param events: 规则事件映射，格式如 {'4625': [1, 3]}
         :return: 匹配的日志项列表
         """
         results = []
+        MAC = ':'.join(("%012X" % uuid.getnode())[i:i + 2] for i in range(0, 12, 2))
 
-        # Windows 日志可能为 UTF-16 或 GBK 编码
-        try_encodings = ['utf-8', 'utf-16', 'gbk']
-        for encoding in try_encodings:
-            try:
-                with open(self._log_path, 'r', encoding=encoding) as file:
-                    keys = events.keys()
-                    for line in file:
-                        try:
-                            parsed = self._parser.parseLine(line)
-                            if parsed.get('appname') in keys:
-                                results.append({
-                                    'mac': MAC,
-                                    'id': events[parsed.get('appname')][0],
-                                    'event_id': parsed.get('appname'),
-                                    'event': line.strip(),
-                                    'risk_level': events[parsed.get('appname')][1],
-                                })
-                        except Exception as e:
-                            print(f"[日志解析错误] {e}")
-                            continue
-                break  # 成功解析后跳出编码尝试
-            except UnicodeDecodeError:
-                continue  # 尝试下一种编码
-            except FileNotFoundError:
-                print(f"[错误] 未找到日志文件：{self._log_path}")
-                return None
+        try:
+            parser = PyEvtxParser(self._log_path)
+            pattern = re.compile(r"<EventID>(\d+)</EventID>")
+            keys = set(events.keys())
+
+            for record in parser.records():
+                try:
+                    xml_data = record['data']
+                    timestamp = record['timestamp']
+                    res = pattern.findall(xml_data)
+                    if not res:
+                        continue
+
+                    event_id = res[0]
+                    if event_id not in keys:
+                        continue
+
+                    # 解析 <Data Name="..."> 的所有键值对
+                    data = {}
+                    try:
+                        xml_doc = minidom.parseString(xml_data)
+                        data_nodes = xml_doc.getElementsByTagName('Data')
+                        for d in data_nodes:
+                            name = d.getAttribute('Name')
+                            value = html.unescape(d.firstChild.data) if d.firstChild else ""
+                            data[name] = value
+                    except Exception as e:
+                        print(f"[XML解析失败] {e}")
+
+                    subject = data.get("SubjectUserName", "未知主体")
+                    target = data.get("TargetUserName", "未知目标")
+                    ts = timestamp
+                    if isinstance(ts, datetime):
+                        ts_str = ts.strftime("%Y-%m-%d %H:%M:%S.%f") + " UTC"
+                    else:
+                        ts_str = str(ts)
+
+                    action = EVENT_ACTION_MAP.get(int(event_id), "未知操作")
+                    rule_info = events[event_id]  # [rule_id, risk_level]
+
+                    results.append({
+                        "event_id": int(event_id),
+                        "timestamp": ts_str,
+                        "event": f"{subject}对{target}{action}",
+                        "risk_level": rule_info[1],
+                        "mac": MAC,
+                    })
+                except Exception as e:
+                    print(f"[日志解析错误] {e}")
+                    continue
+
+        except FileNotFoundError:
+            print(f"[错误] 未找到日志文件：{self._log_path}")
+            return None
+        except Exception as e:
+            print(f"[解析失败] {e}")
+            return None
 
         return results
-
     def detect(self):
         """
         执行日志检测（Windows 版）
@@ -362,3 +405,8 @@ class LogDetect(object):
             return None
 
         return json.dumps(results, ensure_ascii=False, indent=2)
+if __name__ == '__main__':
+    log_path = r"C:\Windows\System32\winevt\Logs\Security.evtx"
+    logDetector = LogDetect(log_path=log_path)
+    result = logDetector.detect()
+    print(result)
