@@ -1,0 +1,779 @@
+﻿————————————————————————
+当前系统时间
+键: Date
+值: 06/25/2025 01:45:59
+---
+————————————————————————
+系统NTP时钟设置
+键: NTP
+值: 发生下列错误: 服务尚未启动。 (0x80070426)
+
+---
+————————————————————————
+IP地址查询
+
+Windows IP 配置
+
+
+无线局域网适配器 本地连接* 1:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+无线局域网适配器 本地连接* 2:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+以太网适配器 VMware Network Adapter VMnet1:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::dee:8052:7b6a:ef25%18
+   IPv4 地址 . . . . . . . . . . . . : 192.168.81.1
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 
+
+以太网适配器 VMware Network Adapter VMnet8:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::d86e:7570:bace:32f2%19
+   IPv4 地址 . . . . . . . . . . . . : 192.168.67.1
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 192.168.67.0
+
+无线局域网适配器 WLAN:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::3dc8:6e00:4f19:658e%12
+   IPv4 地址 . . . . . . . . . . . . : 192.168.43.148
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 192.168.43.1
+
+以太网适配器 蓝牙网络连接:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+————————————————————————
+当前自动运行程序进程数量信息一览
+{"autoRunRes":"181"}
+
+————————————————————————
+远程端口获取测试
+{"rdpPort":"3389"}
+
+————————————————————————
+IP地址查询
+
+Windows IP 配置
+
+
+无线局域网适配器 本地连接* 1:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+无线局域网适配器 本地连接* 2:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+以太网适配器 VMware Network Adapter VMnet1:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::dee:8052:7b6a:ef25%18
+   IPv4 地址 . . . . . . . . . . . . : 192.168.81.1
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 
+
+以太网适配器 VMware Network Adapter VMnet8:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::d86e:7570:bace:32f2%19
+   IPv4 地址 . . . . . . . . . . . . : 192.168.67.1
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 192.168.67.0
+
+无线局域网适配器 WLAN:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   本地链接 IPv6 地址. . . . . . . . : fe80::3dc8:6e00:4f19:658e%12
+   IPv4 地址 . . . . . . . . . . . . : 192.168.43.148
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 192.168.43.1
+
+以太网适配器 蓝牙网络连接:
+
+   媒体状态  . . . . . . . . . . . . : 媒体已断开连接
+   连接特定的 DNS 后缀 . . . . . . . : 
+
+————————————————————————
+系统安装的修补程序一览
+[
+    "KB5054979",
+    "KB5060842",
+    "KB5059502"
+]
+
+————————————————————————
+当前运行端口信息一览
+
+活动连接
+
+  协议  本地地址          外部地址        状态           PID
+  TCP    0.0.0.0:22             0.0.0.0:0              LISTENING       7644
+  TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       1928
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:902            0.0.0.0:0              LISTENING       7692
+  TCP    0.0.0.0:912            0.0.0.0:0              LISTENING       7692
+  TCP    0.0.0.0:1536           0.0.0.0:0              LISTENING       1696
+  TCP    0.0.0.0:1537           0.0.0.0:0              LISTENING       1592
+  TCP    0.0.0.0:1538           0.0.0.0:0              LISTENING       2788
+  TCP    0.0.0.0:1540           0.0.0.0:0              LISTENING       4992
+  TCP    0.0.0.0:1548           0.0.0.0:0              LISTENING       6484
+  TCP    0.0.0.0:1563           0.0.0.0:0              LISTENING       1668
+  TCP    0.0.0.0:3306           0.0.0.0:0              LISTENING       9608
+  TCP    0.0.0.0:5040           0.0.0.0:0              LISTENING       13604
+  TCP    0.0.0.0:7680           0.0.0.0:0              LISTENING       10536
+  TCP    0.0.0.0:7890           0.0.0.0:0              LISTENING       26548
+  TCP    0.0.0.0:10547          0.0.0.0:0              LISTENING       4080
+  TCP    0.0.0.0:16914          0.0.0.0:0              LISTENING       25452
+  TCP    0.0.0.0:33060          0.0.0.0:0              LISTENING       9608
+  TCP    127.0.0.1:1554         127.0.0.1:1555         ESTABLISHED     9608
+  TCP    127.0.0.1:1555         127.0.0.1:1554         ESTABLISHED     9608
+  TCP    127.0.0.1:1556         127.0.0.1:1557         ESTABLISHED     9608
+  TCP    127.0.0.1:1557         127.0.0.1:1556         ESTABLISHED     9608
+  TCP    127.0.0.1:1710         127.0.0.1:65001        ESTABLISHED     7652
+  TCP    127.0.0.1:1711         0.0.0.0:0              LISTENING       14572
+  TCP    127.0.0.1:2017         0.0.0.0:0              LISTENING       25452
+  TCP    127.0.0.1:4001         0.0.0.0:0              LISTENING       17012
+  TCP    127.0.0.1:4301         0.0.0.0:0              LISTENING       17012
+  TCP    127.0.0.1:4310         0.0.0.0:0              LISTENING       17012
+  TCP    127.0.0.1:4709         0.0.0.0:0              LISTENING       4080
+  TCP    127.0.0.1:5283         0.0.0.0:0              LISTENING       18744
+  TCP    127.0.0.1:5284         0.0.0.0:0              LISTENING       17012
+  TCP    127.0.0.1:5354         0.0.0.0:0              LISTENING       7472
+  TCP    127.0.0.1:7096         127.0.0.1:60495        ESTABLISHED     20940
+  TCP    127.0.0.1:7890         127.0.0.1:14290        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34399        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34405        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34421        TIME_WAIT       0
+  TCP    127.0.0.1:7890         127.0.0.1:34469        TIME_WAIT       0
+  TCP    127.0.0.1:7890         127.0.0.1:34484        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34486        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34488        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34501        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34506        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34509        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34510        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34513        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34516        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34520        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:34547        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:40827        ESTABLISHED     26548
+  TCP    127.0.0.1:7890         127.0.0.1:46009        FIN_WAIT_2      26548
+  TCP    127.0.0.1:9210         0.0.0.0:0              LISTENING       17012
+  TCP    127.0.0.1:10195        127.0.0.1:60495        ESTABLISHED     20940
+  TCP    127.0.0.1:14290        127.0.0.1:7890         ESTABLISHED     23832
+  TCP    127.0.0.1:21003        0.0.0.0:0              LISTENING       15476
+  TCP    127.0.0.1:34399        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34405        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34484        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34486        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34488        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34501        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34506        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34509        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34510        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34513        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34516        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34520        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34528        127.0.0.1:9210         TIME_WAIT       0
+  TCP    127.0.0.1:34547        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:34549        127.0.0.1:7890         SYN_SENT        21296
+  TCP    127.0.0.1:34550        127.0.0.1:7890         SYN_SENT        21296
+  TCP    127.0.0.1:40148        127.0.0.1:60495        ESTABLISHED     20940
+  TCP    127.0.0.1:40827        127.0.0.1:7890         ESTABLISHED     21640
+  TCP    127.0.0.1:40976        127.0.0.1:40977        ESTABLISHED     25452
+  TCP    127.0.0.1:40977        127.0.0.1:40976        ESTABLISHED     25452
+  TCP    127.0.0.1:40978        127.0.0.1:40979        ESTABLISHED     25452
+  TCP    127.0.0.1:40979        127.0.0.1:40978        ESTABLISHED     25452
+  TCP    127.0.0.1:46009        127.0.0.1:7890         CLOSE_WAIT      23832
+  TCP    127.0.0.1:46610        0.0.0.0:0              LISTENING       27992
+  TCP    127.0.0.1:48902        0.0.0.0:0              LISTENING       16016
+  TCP    127.0.0.1:60495        0.0.0.0:0              LISTENING       26548
+  TCP    127.0.0.1:60495        127.0.0.1:7096         ESTABLISHED     26548
+  TCP    127.0.0.1:60495        127.0.0.1:10195        ESTABLISHED     26548
+  TCP    127.0.0.1:60495        127.0.0.1:40148        ESTABLISHED     26548
+  TCP    127.0.0.1:60495        127.0.0.1:60527        ESTABLISHED     26548
+  TCP    127.0.0.1:60495        127.0.0.1:63667        ESTABLISHED     26548
+  TCP    127.0.0.1:60527        127.0.0.1:60495        ESTABLISHED     20940
+  TCP    127.0.0.1:63342        0.0.0.0:0              LISTENING       15140
+  TCP    127.0.0.1:63667        127.0.0.1:60495        ESTABLISHED     15476
+  TCP    127.0.0.1:65001        0.0.0.0:0              LISTENING       7652
+  TCP    127.0.0.1:65001        127.0.0.1:1710         ESTABLISHED     7652
+  TCP    192.168.43.148:139     0.0.0.0:0              LISTENING       4
+  TCP    192.168.43.148:1280    20.198.162.76:443      ESTABLISHED     7616
+  TCP    192.168.43.148:1281    20.198.162.76:443      ESTABLISHED     7616
+  TCP    192.168.43.148:1701    117.185.117.25:443     ESTABLISHED     5404
+  TCP    192.168.43.148:1723    40.100.55.2:443        ESTABLISHED     7304
+  TCP    192.168.43.148:1775    59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:1783    59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:1789    59.111.192.150:443     ESTABLISHED     5340
+  TCP    192.168.43.148:1795    103.212.12.56:3000     ESTABLISHED     15924
+  TCP    192.168.43.148:14291   20.243.74.193:443      ESTABLISHED     26548
+  TCP    192.168.43.148:16906   111.124.204.217:443    CLOSE_WAIT      25452
+  TCP    192.168.43.148:16911   111.124.204.218:443    CLOSE_WAIT      25452
+  TCP    192.168.43.148:16915   1.95.21.135:80         ESTABLISHED     25452
+  TCP    192.168.43.148:31100   60.255.151.162:443     CLOSE_WAIT      30092
+  TCP    192.168.43.148:31101   60.255.151.162:443     CLOSE_WAIT      30092
+  TCP    192.168.43.148:31102   60.255.151.162:443     CLOSE_WAIT      30092
+  TCP    192.168.43.148:31237   60.255.155.97:443      CLOSE_WAIT      16192
+  TCP    192.168.43.148:33490   111.124.200.67:443     ESTABLISHED     25452
+  TCP    192.168.43.148:34358   59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:34360   59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:34361   59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:34400   36.150.245.179:443     ESTABLISHED     26548
+  TCP    192.168.43.148:34406   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34485   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34487   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34489   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34502   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34507   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34511   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34512   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34514   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34517   203.208.41.2:443       ESTABLISHED     26548
+  TCP    192.168.43.148:34521   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:34527   111.30.170.28:8081     TIME_WAIT       0
+  TCP    192.168.43.148:34539   110.242.70.57:80       FIN_WAIT_1      4080
+  TCP    192.168.43.148:34541   117.144.240.34:443     TIME_WAIT       0
+  TCP    192.168.43.148:34542   111.30.170.28:8081     TIME_WAIT       0
+  TCP    192.168.43.148:34543   116.177.253.44:443     ESTABLISHED     15140
+  TCP    192.168.43.148:34544   116.177.253.44:443     ESTABLISHED     15140
+  TCP    192.168.43.148:34545   120.233.20.242:36688   TIME_WAIT       0
+  TCP    192.168.43.148:34546   110.242.70.57:80       FIN_WAIT_1      4080
+  TCP    192.168.43.148:34548   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:40828   52.187.43.190:443      ESTABLISHED     26548
+  TCP    192.168.43.148:41163   60.255.155.97:443      CLOSE_WAIT      28328
+  TCP    192.168.43.148:45838   116.177.253.44:443     LAST_ACK        15140
+  TCP    192.168.43.148:45899   39.107.192.243:443     CLOSE_WAIT      28328
+  TCP    192.168.43.148:45900   101.126.24.87:443      CLOSE_WAIT      28604
+  TCP    192.168.43.148:45983   116.177.253.44:443     CLOSE_WAIT      15140
+  TCP    192.168.43.148:46817   101.126.24.53:443      CLOSE_WAIT      4080
+  TCP    192.168.43.148:46845   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46851   1.92.83.204:443        CLOSE_WAIT      28328
+  TCP    192.168.43.148:46852   116.171.192.84:443     CLOSE_WAIT      28328
+  TCP    192.168.43.148:46853   120.131.13.231:443     CLOSE_WAIT      4080
+  TCP    192.168.43.148:46866   120.131.13.231:443     CLOSE_WAIT      4080
+  TCP    192.168.43.148:46869   124.70.69.142:443      CLOSE_WAIT      4080
+  TCP    192.168.43.148:46874   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46875   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46876   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46877   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46878   8.140.31.243:443       CLOSE_WAIT      28328
+  TCP    192.168.43.148:46879   120.92.210.95:443      CLOSE_WAIT      28328
+  TCP    192.168.43.148:46880   120.92.210.95:443      CLOSE_WAIT      28328
+  TCP    192.168.43.148:46884   101.207.251.41:443     CLOSE_WAIT      28328
+  TCP    192.168.43.148:46889   101.126.24.53:443      CLOSE_WAIT      28328
+  TCP    192.168.43.148:46892   110.43.121.118:443     CLOSE_WAIT      28328
+  TCP    192.168.43.148:46922   1.92.83.204:443        CLOSE_WAIT      16192
+  TCP    192.168.43.148:46923   101.126.4.125:443      CLOSE_WAIT      28328
+  TCP    192.168.43.148:46933   1.92.83.204:443        CLOSE_WAIT      4080
+  TCP    192.168.43.148:46940   60.255.151.162:443     CLOSE_WAIT      28604
+  TCP    192.168.43.148:46942   180.184.51.196:443     CLOSE_WAIT      16192
+  TCP    192.168.43.148:46969   120.92.123.74:443      CLOSE_WAIT      4080
+  TCP    192.168.43.148:46970   120.92.123.74:443      CLOSE_WAIT      4080
+  TCP    192.168.43.148:47470   60.255.151.161:443     CLOSE_WAIT      4080
+  TCP    192.168.43.148:47471   60.255.151.161:443     CLOSE_WAIT      4080
+  TCP    192.168.43.148:47499   113.44.247.170:21116   ESTABLISHED     4080
+  TCP    192.168.43.148:48040   59.111.192.150:443     CLOSE_WAIT      5340
+  TCP    192.168.43.148:56848   120.232.31.239:8080    ESTABLISHED     17012
+  TCP    192.168.43.148:56945   111.9.92.99:49156      CLOSE_WAIT      17012
+  TCP    192.168.43.148:59467   39.105.32.31:443       CLOSE_WAIT      16192
+  TCP    192.168.67.1:139       0.0.0.0:0              LISTENING       4
+  TCP    192.168.81.1:139       0.0.0.0:0              LISTENING       4
+  TCP    [::]:80                [::]:0                 LISTENING       4
+  TCP    [::]:135               [::]:0                 LISTENING       1928
+  TCP    [::]:445               [::]:0                 LISTENING       4
+  TCP    [::]:1536              [::]:0                 LISTENING       1696
+  TCP    [::]:1537              [::]:0                 LISTENING       1592
+  TCP    [::]:1538              [::]:0                 LISTENING       2788
+  TCP    [::]:1540              [::]:0                 LISTENING       4992
+  TCP    [::]:1548              [::]:0                 LISTENING       6484
+  TCP    [::]:1563              [::]:0                 LISTENING       1668
+  TCP    [::]:3306              [::]:0                 LISTENING       9608
+  TCP    [::]:7680              [::]:0                 LISTENING       10536
+  TCP    [::]:7890              [::]:0                 LISTENING       26548
+  TCP    [::]:10547             [::]:0                 LISTENING       4080
+  TCP    [::]:33060             [::]:0                 LISTENING       9608
+  TCP    [::1]:46610            [::]:0                 LISTENING       27992
+  UDP    0.0.0.0:5050           *:*                                    13604
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    11772
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5353           *:*                                    3160
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5353           *:*                                    18612
+  UDP    0.0.0.0:5355           *:*                                    3160
+  UDP    0.0.0.0:7890           *:*                                    26548
+  UDP    0.0.0.0:49177          *:*                                    16016
+  UDP    0.0.0.0:50277          *:*                                    25452
+  UDP    0.0.0.0:53795          *:*                                    5404
+  UDP    0.0.0.0:60000          *:*                                    7472
+  UDP    0.0.0.0:61376          *:*                                    3160
+  UDP    0.0.0.0:62603          *:*                                    4184
+  UDP    0.0.0.0:64635          *:*                                    7652
+  UDP    127.0.0.1:1900         *:*                                    15420
+  UDP    127.0.0.1:10010        *:*                                    14572
+  UDP    127.0.0.1:52067        *:*                                    15420
+  UDP    127.0.0.1:52139        *:*                                    17012
+  UDP    127.0.0.1:52140        *:*                                    17012
+  UDP    127.0.0.1:60002        127.0.0.1:60002                        7596
+  UDP    127.0.0.1:60102        *:*                                    14848
+  UDP    192.168.43.148:137     *:*                                    4
+  UDP    192.168.43.148:138     *:*                                    4
+  UDP    192.168.43.148:1900    *:*                                    15420
+  UDP    192.168.43.148:5353    *:*                                    7652
+  UDP    192.168.43.148:5353    *:*                                    7472
+  UDP    192.168.43.148:52066   *:*                                    15420
+  UDP    192.168.67.1:137       *:*                                    4
+  UDP    192.168.67.1:138       *:*                                    4
+  UDP    192.168.67.1:1900      *:*                                    15420
+  UDP    192.168.67.1:5353      *:*                                    7652
+  UDP    192.168.67.1:5353      *:*                                    7472
+  UDP    192.168.67.1:52065     *:*                                    15420
+  UDP    192.168.81.1:137       *:*                                    4
+  UDP    192.168.81.1:138       *:*                                    4
+  UDP    192.168.81.1:1900      *:*                                    15420
+  UDP    192.168.81.1:5353      *:*                                    7472
+  UDP    192.168.81.1:5353      *:*                                    7652
+  UDP    192.168.81.1:52064     *:*                                    15420
+  UDP    [::]:5353              *:*                                    18612
+  UDP    [::]:5353              *:*                                    3160
+  UDP    [::]:5353              *:*                                    11772
+  UDP    [::]:5353              *:*                                    11772
+  UDP    [::]:5353              *:*                                    11772
+  UDP    [::]:5353              *:*                                    18612
+  UDP    [::]:5353              *:*                                    18612
+  UDP    [::]:5355              *:*                                    3160
+  UDP    [::]:7890              *:*                                    26548
+  UDP    [::]:60001             *:*                                    7472
+  UDP    [::]:61376             *:*                                    3160
+  UDP    [::]:64636             *:*                                    7652
+  UDP    [::1]:1900             *:*                                    15420
+  UDP    [::1]:5353             *:*                                    7472
+  UDP    [::1]:5353             *:*                                    7652
+  UDP    [::1]:52063            *:*                                    15420
+  UDP    [fe80::dee:8052:7b6a:ef25%18]:1900  *:*                                    15420
+  UDP    [fe80::dee:8052:7b6a:ef25%18]:52060  *:*                                    15420
+  UDP    [fe80::3dc8:6e00:4f19:658e%12]:1900  *:*                                    15420
+  UDP    [fe80::3dc8:6e00:4f19:658e%12]:52062  *:*                                    15420
+  UDP    [fe80::d86e:7570:bace:32f2%19]:1900  *:*                                    15420
+  UDP    [fe80::d86e:7570:bace:32f2%19]:52061  *:*                                    15420
+
+————————————————————————
+系统服务运行一览
+键: Service
+值: 23148 28427 AarSvc_122775 ALG AMD Crash Defender Service AMD External Events Utility AppHostSvc AppIDSvc Appinfo AppReadiness AppXSvc ApxSvc aspnet_state AudioEndpointBuilder Audiosrv autotimesvc AxInstSV BaiduNetdiskUtility BcastDVRUserService_122775 BDESVC BFE BITS BluetoothUserService_122775 Bonjour Service BrokerInfrastructure Browser BTAGService BthAvctpSvc bthserv camsvc CaptureService_122775 cbdhsvc_122775 CDPSvc CDPUserSvc_122775 CertPropSvc ClickToRunSvc ClipSVC CloudBackupRestoreSvc_122775 com.docker.service COMSysApp ConsentUxUserSvc_122775 CoreMessagingRegistrar CredentialEnrollmentManagerUserSvc_122775 CryptSvc DcomLaunch dcsvc defragsvc DeviceAssociationBrokerSvc_122775 DeviceAssociationService DeviceInstall DevicePickerUserSvc_122775 DevicesFlowUserSvc_122775 DevQueryBroker Dhcp diagsvc DiagTrack DispBrokerDesktopSvc DisplayEnhancementService DmEnrollmentSvc dmwappushservice Dnscache DolbyDAXAPI DoSvc dot3svc DPS DsmSvc DsSvc DusmSvc EapHost edgeupdate edgeupdatem EFS embeddedmode EntAppSvc EventLog EventSystem Fax fdPHost FDResPub fhsvc FileSyncHelper FlexNet Licensing Service FMAPOService FontCache FontCache3.0.0.0 FrameServer FrameServerMonitor ftpsvc FvSvc GameInputSvc GamingServices GamingServicesNet GoogleChromeElevationService GoogleUpdaterInternalService138.0.7194.0 GoogleUpdaterService138.0.7194.0 gpsvc GraphicsPerfSvc gupdate gupdatem hidserv HNS hpatchmon HRWSCCtrl HvHost icssvc IISADMIN IKEEXT ImControllerService InstallService InventorySvc iphlpsvc IpxlatCfgSvc KeyIso KtmRm LanmanServer LanmanWorkstation LAVService LenovoFnAndFunctionKeys LenovoHotkeyService LenovoPcManagerService LenovoServiceAS LenovoSLBrowserElevationService lfsvc LicenseManager LISFService LITSSVC lltdsvc lmhosts LnvSvcFdn LocalKdc LSM LxpSvc MapsBroker McpManagementService MDCoreSvc MessagingService_122775 MicrosoftEdgeElevationService MozillaMaintenance mpssvc MSDTC MSiSCSI msiserver MySQL80x NaturalAuthentication NcaSvc NcbService NcdAutoSetup NdlSvc Netlogon Netman netprofm NetSetupSvc NetTcpPortSharing NgcCtnrSvc NgcSvc NlaSvc NPSMSvc_122775 nsi nvagent NvContainerLocalSystem NVDisplay.ContainerLocalSystem OfficePLUS Service OneDrive Updater Service OneSyncSvc_122775 ose64 P9RdrService_122775 PcaSvc PCManager Service Store PenService_122775 perceptionsimulation PerfHost PhoneSvc PimIndexMaintenanceSvc_122775 pla PlugPlay PolicyAgent Power PrintDeviceConfigurationService PrintNotify PrintScanBrokerService PrintWorkflowUserSvc_122775 ProfSvc PushToInstall qmbsrv QQPCRTP QWAVE RasAuto RasMan refsdedupsvc RemoteAccess RemoteRegistry RetailDemo RmSvc RpcEptMapper RpcLocator RpcSs RtkAudioUniversalService SamSs SCardSvr ScDeviceEnum Schedule SCPolicySvc SDRSVC seclogon SecurityHealthService SEMgrSvc SENS SensorDataService SensorService SensrSvc SessionEnv SharedAccess ShellHWDetection shpamsvc SLBService SmartSense smphost SmsRouter SNMPTrap SogouSvc Spooler sppsvc SQLWriter SSDPSRV ssh-agent SstpSvc StateRepository StiSvc StorSvc svsvc swprv SysMain SystemEventsBroker TapiSrv TermService TextInputManagementService Themes TieringEngineService TimeBrokerSvc TokenBroker TrkWks TroubleshootingSvc TrustedInstaller tzautoupdate UDCService UdkUserSvc_122775 UmRdpService UnistoreSvc_122775 upnphost UserDataSvc_122775 UserManager UsoSvc VaultSvc vds VMAuthdService vmcompute vmicguestinterface vmicheartbeat vmickvpexchange vmicrdv vmicshutdown vmictimesync vmicvmsession vmicvss VMnetDHCP VMUSBArbService VMware NAT Service VmwareAutostartService VSInstallerElevationService VSS W32Time w3logsvc W3SVC WaaSMedicSvc WalletService WarpJITSvc WAS wbengine WbioSrvc Wcmsvc wcncsvc WdiServiceHost WdiSystemHost WdNisSvc WebClient webthreatdefsvc webthreatdefusersvc_122775 Wecsvc WemeetUpdateSvc WEPHOSTSVC wercplsupport WerSvc WFDSConMgrSvc WiaRpc WinDefend WinHttpAutoProxySvc Winmgmt WinRM wisvc WlanSvc wlidsvc wlpasvc WManSvc wmiApSrv WMPNetworkSvc WMSVC workfolderssvc WpcMonSvc WPDBusEnum WpnService WpnUserService_122775 wpscloudsvr WSAIFabricSvc wscsvc WSearch WslInstaller WSLService wuauserv WwanSvc XblAuthManager XblGameSave XboxGipSvc XboxNetApiSvc ZTHELPER
+---
+————————————————————————
+当前系统账户信息一览
+键: SysAccount
+值: [异常项]-系统中存在其他账号请检查: Administrator DefaultAccount Guest prejudice test test1 WDAGUtilityAccount
+---
+————————————————————————
+系统中所有的用户信息一览
+键: UserOther
+值: @{PSComputerName=LAPTOP-9PM0A5ML; Status=OK; Caption=LAPTOP-9PM0A5ML\prejudice; PasswordExpires=False; __GENUS=2; __CLASS=Win32_UserAccount; __SUPERCLASS=Win32_Account; __DYNASTY=CIM_ManagedSystemElement; __RELPATH=Win32_UserAccount.Domain="LAPTOP-9PM0A5ML",Name="prejudice"; __PROPERTY_COUNT=16; __DERIVATION=System.String[]; __SERVER=LAPTOP-9PM0A5ML; __NAMESPACE=root\cimv2; __PATH=\\LAPTOP-9PM0A5ML\root\cimv2:Win32_UserAccount.Domain="LAPTOP-9PM0A5ML",Name="prejudice"; AccountType=512; Description=; Disabled=False; Domain=LAPTOP-9PM0A5ML; FullName=; InstallDate=; LocalAccount=True; Lockout=False; Name=prejudice; PasswordChangeable=True; PasswordRequired=False; SID=S-1-5-21-897860091-700114118-385596113-1001; SIDType=1; Scope=System.Management.ManagementScope; Path=\\LAPTOP-9PM0A5ML\root\cimv2:Win32_UserAccount.Domain="LAPTOP-9PM0A5ML",Name="prejudice"; Options=System.Management.ObjectGetOptions; ClassPath=\\LAPTOP-9PM0A5ML\root\cimv2:Win32_UserAccount; Properties=System.Management.PropertyDataCollection; SystemProperties=System.Management.PropertyDataCollection; Qualifiers=System.Management.QualifierDataCollection; Site=; Container=}
+---
+————————————————————————
+当前系统安全策略信息一览
+SysAccountPolicy 检查结果：
+
+
+Name  : SysAccountPolicy::MinimumPasswordAge
+Key   : SysAccountPolicy::MinimumPasswordAge
+Value : [合格项]|0|30|系统账号策略配置-密码最短留存期-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::MaximumPasswordAge
+Key   : SysAccountPolicy::MaximumPasswordAge
+Value : [合格项]|42|90|系统账号策略配置-密码最长留存期-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::MinimumPasswordLength
+Key   : SysAccountPolicy::MinimumPasswordLength
+Value : [异常项]|0|14|系统账号策略配置-密码长度最小值-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::PasswordComplexity
+Key   : SysAccountPolicy::PasswordComplexity
+Value : [异常项]|0|1|系统账号策略配置-密码必须符合复杂性要求策略-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::PasswordHistorySize
+Key   : SysAccountPolicy::PasswordHistorySize
+Value : [异常项]|0|3|系统账号策略配置-强制密码历史个记住的密码-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::LockoutBadCount
+Key   : SysAccountPolicy::LockoutBadCount
+Value : [合格项]|0|6|系统账号策略配置-账户登录失败锁定阈值次数-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::RequireLogonToChangePassword
+Key   : SysAccountPolicy::RequireLogonToChangePassword
+Value : [合格项]|0|0|系统账号策略配置-下次登录必须更改密码-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::ForceLogoffWhenHourExpire
+Key   : SysAccountPolicy::ForceLogoffWhenHourExpire
+Value : [合格项]|0|0|系统账号策略配置-强制过期-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::NewAdministratorName
+Key   : SysAccountPolicy::NewAdministratorName
+Value : [异常项]|"Administrator"|"Administrator"|系统账号策略配置-当前系统默认管理账号登陆名称策略-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::NewGuestName
+Key   : SysAccountPolicy::NewGuestName
+Value : [异常项]|"Guest"|"Guest"|系统账号策略配置-当前系统默认来宾用户登陆名称策略-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::ClearTextPassword
+Key   : SysAccountPolicy::ClearTextPassword
+Value : [合格项]|0|0|系统账号策略配置-指示是否使用可逆加密来存储密码 (除非应用程序要求超过保护密码信息的需要)-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::LSAAnonymousNameLookup
+Key   : SysAccountPolicy::LSAAnonymousNameLookup
+Value : [合格项]|0|0|系统账号策略配置-启用时此设置允许匿名用户查询本地LSA策略 (0关闭)-【符合】等级保护标准.
+
+Name  : SysAccountPolicy::EnableAdminAccount
+Key   : SysAccountPolicy::EnableAdminAccount
+Value : [异常项]|0|1|系统账号策略配置-管理员账户停用与启用策略-【不符合】等级保护标准.
+
+Name  : SysAccountPolicy::EnableGuestAccount
+Key   : SysAccountPolicy::EnableGuestAccount
+Value : [合格项]|0|0|系统账号策略配置-来宾账户停用与启用策略-【符合】等级保护标准.
+
+
+
+
+SysEventAuditPolicy 检查结果：
+
+
+Name  : SysEventAuditPolicy::AuditSystemEvents
+Key   : SysEventAuditPolicy::AuditSystemEvents
+Value : [异常项]|0|3|系统账号策略配置-审核系统事件-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditLogonEvents
+Key   : SysEventAuditPolicy::AuditLogonEvents
+Value : [异常项]|0|3|系统账号策略配置-审核登录事件-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditObjectAccess
+Key   : SysEventAuditPolicy::AuditObjectAccess
+Value : [异常项]|0|3|系统账号策略配置-审核对象访问-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditPrivilegeUse
+Key   : SysEventAuditPolicy::AuditPrivilegeUse
+Value : [异常项]|0|3|系统账号策略配置-审核特权使用-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditPolicyChange
+Key   : SysEventAuditPolicy::AuditPolicyChange
+Value : [异常项]|0|3|系统账号策略配置-审核策略更改-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditAccountManage
+Key   : SysEventAuditPolicy::AuditAccountManage
+Value : [异常项]|0|3|系统账号策略配置-审核账户管理-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditProcessTracking
+Key   : SysEventAuditPolicy::AuditProcessTracking
+Value : [异常项]|0|3|系统账号策略配置-审核过程追踪-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditDSAccess
+Key   : SysEventAuditPolicy::AuditDSAccess
+Value : [异常项]|0|3|系统账号策略配置-审核目录服务访问-【不符合】等级保护标准.
+
+Name  : SysEventAuditPolicy::AuditAccountLogon
+Key   : SysEventAuditPolicy::AuditAccountLogon
+Value : [异常项]|0|3|系统账号策略配置-审核账户登录事件-【不符合】等级保护标准.
+
+
+
+
+SysUserPrivilegePolicy 检查结果：
+
+
+Name  : SysUserPrivilegePolicy::SeProfileSingleProcessPrivilege
+Key   : SysUserPrivilegePolicy::SeProfileSingleProcessPrivilege
+Value : [合格项]|*S-1-5-32-544|*S-1-5-32-544|策略组用户权限配置-取得文件或其他对象的所有权限策略-【符合】等级保护标准.
+
+Name  : SysUserPrivilegePolicy::SeNetworkLogonRight
+Key   : SysUserPrivilegePolicy::SeNetworkLogonRight
+Value : [异常项]|*S-1-1-0,*S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551|*S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551|策略组用户权限配置-从网络访问此计算机策略-【不符合】等级保护标准.
+
+Name  : SysUserPrivilegePolicy::SeRemoteShutdownPrivilege
+Key   : SysUserPrivilegePolicy::SeRemoteShutdownPrivilege
+Value : [合格项]|*S-1-5-32-544|*S-1-5-32-544|策略组用户权限配置-操作系统远程关机策略-【符合】等级保护标准.
+
+Name  : SysUserPrivilegePolicy::SeShutdownPrivilege
+Key   : SysUserPrivilegePolicy::SeShutdownPrivilege
+Value : [异常项]|*S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551|*S-1-5-32-544|策略组用户权限配置-操作系统本地关机策略-【不符合】等级保护标准.
+
+
+
+
+SysSecurityOptionPolicy 检查结果：
+
+
+Name  : SysSecurityOptionPolicy::MaxDevicePasswordFailedAttempts
+Key   : SysSecurityOptionPolicy::MaxDevicePasswordFailedAttempts
+Value : [异常项]|未配置|10|策略组安全选项配置-交互式登录: 此策略设置确定可导致计算机重启的失败登录尝试次数-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::NoLMHash
+Key   : SysSecurityOptionPolicy::NoLMHash
+Value : [合格项]|1|1|策略组安全选项配置-网络安全-在下一次改变密码时不存储LAN管理器哈希值(启用)-【符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::InactivityTimeoutSecs
+Key   : SysSecurityOptionPolicy::InactivityTimeoutSecs
+Value : [异常项]|未配置|600|策略组安全选项配置-交互式登录-计算机不活动限制值为600秒或更少-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::LimitBlankPasswordUse
+Key   : SysSecurityOptionPolicy::LimitBlankPasswordUse
+Value : [合格项]|1|1|策略组安全选项配置-帐户-使用空密码的本地帐户只允许进行控制台登录(启用)-【符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::LegalNoticeText
+Key   : SysSecurityOptionPolicy::LegalNoticeText
+Value : [异常项]||请谨慎的操作服务器中数据|策略组安全选项配置-交互式登录: 试图登录的用户的消息文本-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::DontDisplayUserName
+Key   : SysSecurityOptionPolicy::DontDisplayUserName
+Value : [异常项]|未配置|1|策略组安全选项配置-交互式登录: 登录时不显示用户名-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::RestrictAnonymous
+Key   : SysSecurityOptionPolicy::RestrictAnonymous
+Value : [异常项]|0|1|策略组安全选项配置-网络访问-不允许SAM账户和共享的匿名枚举值为(启用)-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::LegalNoticeCaption
+Key   : SysSecurityOptionPolicy::LegalNoticeCaption
+Value : [异常项]|""|"安全登陆"|策略组安全选项配置-交互式登录: 试图登录的用户的消息标题-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::DontDisplayLastUserName
+Key   : SysSecurityOptionPolicy::DontDisplayLastUserName
+Value : [异常项]|0|1|策略组安全选项配置-交互式登录-不显示上次登录用户名值(启用)-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::DisableCAD
+Key   : SysSecurityOptionPolicy::DisableCAD
+Value : [异常项]|未配置|0|策略组安全选项配置-交互式登录-无需按CTRL+ALT+DEL值(禁用)-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::RestrictAnonymousSAM
+Key   : SysSecurityOptionPolicy::RestrictAnonymousSAM
+Value : [合格项]|1|1|策略组安全选项配置-网络访问-不允许SAM账户的匿名枚举值为(启用)-【符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::AutoDisconnect
+Key   : SysSecurityOptionPolicy::AutoDisconnect
+Value : [异常项]|未配置|15|策略组安全选项配置-Microsoft网络服务器-暂停会话前所需的空闲时间数量值为15分钟-【不符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::EnablePlainTextPassword
+Key   : SysSecurityOptionPolicy::EnablePlainTextPassword
+Value : [合格项]|0|0|策略组安全选项配置-Microsoft网络客户端-将未加密的密码发送到第三方 SMB 服务器(禁用)-【符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::ClearPageFileAtShutdown
+Key   : SysSecurityOptionPolicy::ClearPageFileAtShutdown
+Value : [合格项]|0|0|策略组安全选项配置-关机-设置确定是否可以在无需登录 Windows 的情况下关闭计算机(禁用)-【符合】等级保护标准.
+
+Name  : SysSecurityOptionPolicy::DontDisplayLockedUserId
+Key   : SysSecurityOptionPolicy::DontDisplayLockedUserId
+Value : [异常项]|未配置|3|策略组安全选项配置-交互式登录: 锁定会话时显示用户信息(不显示任何信息)-【不符合】等级保护标准.
+
+
+
+
+SysRegistryPolicy 检查结果：
+
+
+Name  : Registry::restrictanonymous
+Key   : Registry::restrictanonymous
+Value : [异常项]|0|1|系统网络基配核查-关闭默认共享盘策略-【不符合】等级保护标准.
+
+Name  : Registry::EnableFirewall
+Key   : Registry::EnableFirewall
+Value : [合格项]|1|1|开启公用网络防火墙-【符合】等级保护标准.
+
+Name  : Registry::DisableAutoplay
+Key   : Registry::DisableAutoplay
+Value : [异常项]|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer中DisableAutoplay不存在该项|1|禁止全部驱动器自动播放
+
+Name  : Registry::MaxSize
+Key   : Registry::MaxSize
+Value : [异常项]|20971520|41943040|系统日志基配核查-应用日志查看器大小设置策略-【不符合】等级保护标准.
+
+Name  : Registry::AutoShareWks
+Key   : Registry::AutoShareWks
+Value : [异常项]|HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lanmanserver\parameters中AutoShareWks不存在该项|0|关闭禁用默认共享策略-Server2012
+
+Name  : Registry::ScreenSaverIsSecure
+Key   : Registry::ScreenSaverIsSecure
+Value : [合格项]|1|1|系统基配核查-屏幕恢复时使用密码保护策略-【符合】等级保护标准.
+
+Name  : Registry::EnableFirewall
+Key   : Registry::EnableFirewall
+Value : [合格项]|1|1|开启专用网络防火墙-【符合】等级保护标准.
+
+Name  : Registry::EnableFirewall
+Key   : Registry::EnableFirewall
+Value : [合格项]|1|1|开启域网络防火墙-【符合】等级保护标准.
+
+Name  : Registry::AutoShareServer
+Key   : Registry::AutoShareServer
+Value : [异常项]|HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lanmanserver\parameters中AutoShareServer不存在该项|0|关闭禁用默认共享策略-Server2012
+
+Name  : Registry::ScreenSaveTimeOut
+Key   : Registry::ScreenSaveTimeOut
+Value : [合格项]|300|600|系统基配核查-屏幕保护程序启动时间策略-【符合】等级保护标准.
+
+Name  : Registry::MaxSize
+Key   : Registry::MaxSize
+Value : [异常项]|20971520|41943040|系统日志基配核查-安全日志查看器大小设置策略-【不符合】等级保护标准.
+
+Name  : Registry::restrictanonymoussam
+Key   : Registry::restrictanonymoussam
+Value : [合格项]|1|1|不允许SAM账户的匿名枚举值为(启用)-【符合】等级保护标准.
+
+Name  : Registry::NoDriveTypeAutoRun
+Key   : Registry::NoDriveTypeAutoRun
+Value : [异常项]|181|255|禁止全部驱动器自动播放-【不符合】等级保护标准.
+
+Name  : Registry::MaxSize
+Key   : Registry::MaxSize
+Value : [异常项]|15728640|31457280|系统日志基配核查-PS日志查看器大小设置策略-【不符合】等级保护标准.
+
+Name  : Registry::ScreenSaveActive
+Key   : Registry::ScreenSaveActive
+Value : [合格项]|1|1|系统基配核查-屏幕自动保护程序策略-【符合】等级保护标准.
+
+Name  : Registry::MaxSize
+Key   : Registry::MaxSize
+Value : [异常项]|20971520|41943040|系统日志基配核查-系统日志查看器大小设置策略-【不符合】等级保护标准.
+
+
+
+
+SysProcessServicePolicy 检查结果：
+
+————————————————————————
+当前系统杂类信息一览
+键: Recent
+值: AutomaticDestinations CustomDestinations .condarc.lnk 1 (2).lnk 1.jpg.lnk 1.txt.lnk 1730997384623.jpeg.lnk 1747744355996546.docx.lnk 2024年度_向诗雨小组_基于事实推理的多模态假新闻短视频检测技术研究.zip.lnk 2025-02 (2).lnk 2025-02.lnk 2025-04.lnk 2025-06.lnk 20250617_01_windows日志审计的方式.mp4.lnk 20250617_02_python获取系统日志的方法.mp4.lnk 20250617_03_日志同步的一些方式.mp4.lnk 20250620_01_基线核查的介绍.mp4.lnk 20250620_02_SpringBoot开启定时任务.mp4.lnk 2025MPC.lnk 2025R11L1042295李媛媛合作1件加急(1).pdf.lnk 2025大创 (2).lnk 2025大创.lnk 2502.19041v2.pdf.lnk 5906-Article Text-9131-1-10-20200513.pdf.lnk 6.17-任务详情.docx.lnk 6.pptx.lnk 978-3-030-67658-2_11.pdf.lnk baseline.lnk Beyond Surface-Level.lnk build-info.txt.lnk case.docx.lnk case.png.lnk case_figure_final.pptx.lnk code.lnk cs.lnk Data (D).lnk defence_prompt1.txt.lnk Ditto Quantization-aware Secure Inference of Transformers upon MPC.pdf (2).lnk docker.lnk evaluation.lnk evaluation_results.lnk Firmadome-基于Hook技术的安卓通用高性能沙盒（2021年全国一等奖）（内部学习资料，勿上网外传）.pdf.lnk GAIGuardian：生成式AI自适应可信监管系统-Wang.docx.lnk GPTfuzzer.lnk http--www.msftconnecttest.com-redirect (2).lnk http--www.msftconnecttest.com-redirect.lnk IMG_20250616_114446_37cae44e41.png.lnk IMG_20250616_115807_640bdb2e60.png.lnk Internet 选项.lnk jailbreakTemplate+benign_guard3(1).lnk L001-保研ppt模板-无校徽-笔记同款.pptx.lnk L002-大气红-无校徽-保研ppt模板.pptx.lnk L003-绿色-英文-保研ppt模板.pptx.lnk L004-保研ppt模板.pptx.lnk L005-简约学术风-保研ppt模板.pptx.lnk L006-红色主题-保研ppt模板.pptx.lnk L007-红色-保研PPT模板.pptx.lnk L007-绿色-保研PPT模板.pptx.lnk LLM_fairness_preference_enhanced.json.lnk mcp.log.lnk ML相关分享.pptx.lnk MPC.lnk MPC.zip.lnk MPCFORMER FAST, PERFORMANT AND PRIVATE TRANSFORMER INFERENCE WITH MPC.pdf (2).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (10).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (11).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (12).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (13).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (14).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (15).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (16).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (17).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (18).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (19).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (2).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (20).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (21).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (22).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (23).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (24).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (25).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (26).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (27).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (28).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (29).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (3).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (30).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (31).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (32).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (33).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (34).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (35).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (36).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (37).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (38).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (39).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (4).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (40).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (41).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (42).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (43).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (44).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (45).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (46).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (47).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (48).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (49).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (5).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (50).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (6).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (7).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (8).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0 (9).lnk ms-actioncentercontrolcenter-&suppressAnimations=false&showFooter=true&allowPageNavigation=true&edgeGestureOffset=0&inputAnimationSourceId=0&inputAnimationProviderId=0.lnk ms-actioncentercontrolcenter-cast.lnk ms-gamingoverlay--- (2).lnk ms-gamingoverlay---.lnk ms-gamingoverlay--kglcheck- (2).lnk ms-gamingoverlay--kglcheck-.lnk ms-settingsprivacy-location.lnk ms-settingsprivacy-microphone.lnk msxbox--autostart- (10).lnk msxbox--autostart- (11).lnk msxbox--autostart- (12).lnk msxbox--autostart- (13).lnk msxbox--autostart- (14).lnk msxbox--autostart- (15).lnk msxbox--autostart- (16).lnk msxbox--autostart- (17).lnk msxbox--autostart- (18).lnk msxbox--autostart- (19).lnk msxbox--autostart- (2).lnk msxbox--autostart- (20).lnk msxbox--autostart- (21).lnk msxbox--autostart- (22).lnk msxbox--autostart- (23).lnk msxbox--autostart- (24).lnk msxbox--autostart- (25).lnk msxbox--autostart- (26).lnk msxbox--autostart- (27).lnk msxbox--autostart- (28).lnk msxbox--autostart- (29).lnk msxbox--autostart- (3).lnk msxbox--autostart- (30).lnk msxbox--autostart- (31).lnk msxbox--autostart- (32).lnk msxbox--autostart- (33).lnk msxbox--autostart- (34).lnk msxbox--autostart- (35).lnk msxbox--autostart- (36).lnk msxbox--autostart- (4).lnk msxbox--autostart- (5).lnk msxbox--autostart- (6).lnk msxbox--autostart- (7).lnk msxbox--autostart- (8).lnk msxbox--autostart- (9).lnk msxbox--autostart-.lnk NovBot-基于深度学习的新浪微博社交机器人检测及挖掘系统（2020年全国三等奖）（内部学习资料，勿上网外传）.pdf.lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=1025309470;peerUin=1025309470;peerName=信安赛;chatType=2;fuin=2284008329;windowName=MainWindow;scene=aio; (2).lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=1025309470;peerUin=1025309470;peerName=信安赛;chatType=2;fuin=2284008329;windowName=MainWindow;scene=aio; (3).lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=1025309470;peerUin=1025309470;peerName=信安赛;chatType=2;fuin=2284008329;windowName=MainWindow;scene=aio;.lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=1037612203;peerUin=1037612203;peerName=2025信安赛作品赛院内选拔;chatType=2;fuin=2284008329;windowName=MainWindow;scene=aio;.lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=214068187;peerUin=214068187;peerName=网安103班;chatType=2;fuin=2284008329;windowName=MainWindow;scene=aio;.lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=u_FYqCrwb9tbZJd2Pa3HYxsw;peerUin=1394653688;peerName=○_○;chatType=1;fuin=2284008329;windowName=ChatWindow;.lnk ntqq-notification--externalCommand-subcmd=openExternalWindow;peerUid=u_iljO7Q5XeGSBcR1sDFXjlg;peerUin=1352039586;peerName=Lara;chatType=1;fuin=2284008329;windowName=MainWindow;scene=aio;.lnk portfolio.pptx.lnk PPT讲解文案参考1.docx.lnk PPT讲解文案参考2.docx.lnk pre.pptx (2).lnk PrivacyGuardian网站隐私泄露智能检测系统（2020年全国一等奖）（内部学习资料，勿上网外传）.pdf.lnk ps.lnk RejectUnarchiver2025-03-14-22-23-051838a6cf.txt.lnk RiskDiscovery.lnk SecFormer Fast and Accurate Privacy-Preserving Inference for Transformer Models via SMPC.pdf.lnk software.lnk system_risk_rules.sql.lnk TempState.lnk test_benign_essence_vlmax_1.json.lnk trustgen.lnk Ubuntu 64 位 (2).vmx.lnk Ubuntu.lnk Ubuntu1.vmx.lnk Ubuntu2-crypto.vmx.lnk users.sql.lnk vulnerability_risk.sql.lnk vulnerability_rules.sql.lnk weak_passwords.sql.lnk WhiteSpy基于智能对话机的主动式黑产情报挖掘系统（2021年全国一等奖）（内部学习资料，勿上网外传）.pdf.lnk win10-vmware.lnk win10_vmware.lnk Win7 Base.lnk Win7.vmx.lnk Windows 10 x64.vmx.lnk Windows10.lnk WindowsSecurityBaseLine.ps1.lnk xinansai (2).lnk zhangpenghao_cv.pdf.lnk ZY202588373+向诗雨.zip.lnk _uninstall.pyc.lnk 【赠】大学校徽png免抠图.pptx.lnk 下载 (2).lnk 下载.lnk 个人陈述.lnk 主文件夹.lnk 五星+文字好评赠送资料.lnk 企业实训.lnk 优秀获奖作品 (2).lnk 优秀获奖作品.lnk 作品申报书.docx (2).lnk 作品申报书.docx.lnk 作品申报书2(1).docx.lnk 作品申报书2.docx (2).lnk 作品申报书2.docx.lnk 保研.lnk 保研面试PPT-模板1.pptx.lnk 保研面试PPT.ppt.lnk 保研面试PPT模板.lnk 信安讨论2.m4a.lnk 信安赛.lnk 信安赛图.pptx.lnk 北京大学全国优秀大学生夏令营个人陈述-智能.doc.lnk 北京大学全国优秀大学生夏令营个人陈述-软微.doc.lnk 北大.lnk 北大夏令营-信工.docx.lnk 北大夏令营-智能.docx.lnk 北大夏令营-软微.docx.lnk 北大夏令营草稿.docx.lnk 四川大学网络空间安全学院2022级向诗雨-个人陈述 .pdf.lnk 四川大学网络空间安全学院2022级向诗雨-个人陈述.docx.lnk 四川大学网络空间安全学院2022级向诗雨-个人陈述.pdf.lnk 四川大学网络空间安全学院2022级向诗雨-简历.pdf.lnk 回复.md.lnk 图片.lnk 夏令营提交.docx.lnk 大三 (H) (2).lnk 大三 (H) (3).lnk 大三 (H) (4).lnk 大三 (H).lnk 学生证.jpg.lnk 学生证1.jpg.lnk 学生证2.jpg.lnk 学院答辩2 (3).pptx.lnk 学院答辩3.pptx.lnk 安全.lnk 安恒励学金答辩-向诗雨.pptx.lnk 实训报告.doc.lnk 实训报告_参考模板_01.doc.lnk 实训报告_参考模板_02.doc.lnk 密码学科研 (2).lnk 密码学科研.lnk 导师评价.xlsx.lnk 屏幕截图 2022-12-27 125932.png.lnk 屏幕截图 2025-06-20 143718.png.lnk 屏幕截图.lnk 川大.lnk 川大答辩.pptx.lnk 平台搭建笔记 (8).pdf.lnk 平台搭建笔记 (9).pdf.lnk 微信图片_20250621021431.png.lnk 扫描文件_20250615_174524.jpg.lnk 数据集生成测试.docx.lnk 新加卷 (I).lnk 新建文件夹.lnk 日志5组--向诗雨（组员）-20250603.doc.lnk 日志5组--向诗雨（组员）-20250616.doc.lnk 日志5组--向诗雨（组员）-20250617.doc.lnk 日志5组--向诗雨（组员）-20250618.doc.lnk 日志5组--向诗雨（组员）-20250619.doc.lnk 日志5组--向诗雨（组员）-20250620.doc.lnk 日志5组--向诗雨（组员）-20250623.doc.lnk 日志5组--向诗雨（组员）-20250624.doc.lnk 时光的河流.txt.lnk 未命名的设计.png.lnk 桌面 (2).lnk 桌面 (3).lnk 桌面.lnk 浏览器下载 (2).lnk 浏览器下载.lnk 浙大.lnk 浙软.lnk 版二.pptx.lnk 申报书 (2).lnk 申报书.lnk 申请材料.docx.lnk 电子签名.jpg.lnk 答辩风.pptx.lnk 简历 (2).lnk 简历 (3).lnk 简历.lnk 简历2.docx.lnk 简历3.docx.lnk 简历4.docx.lnk 系统.lnk 终版-2.docx (2).lnk 终版-2.docx.lnk 终版-2.pdf (2).lnk 网络和共享中心.lnk 背景1.jpg.lnk 自我介绍.lnk 自我介绍版1 (1).pdf.lnk 自我介绍版1 [自动保存的].pptx.lnk 自我介绍版1.pdf.lnk 自我介绍版1.pptx.lnk 自我介绍版2.pdf.lnk 英文写作样本-Beyond Surface-Level Patterns  An Essence-Driven Defense Framework Against Jailbreak Attacks in LLMs.pdf.lnk 计算机-向诗雨-ZY202591168.pdf.lnk 计算机-向诗雨-ZY202591168.zip.lnk 证件照.jpg (2).lnk 证件照.jpg.lnk 证件照.png.lnk 证件照2.jpg (2).lnk 证件照2.jpg.lnk 证件照3.jpg.lnk 证件照3.png.lnk 证件照4.jpg.lnk 赠送保研面试ppt模板.lnk 软微.lnk 附件材料.docx.lnk 附件材料.pdf.lnk
+---
+键: Product
+值: 
+Name                                                           Version          IdentifyingNumber                     
+----                                                           -------          -----------------                     
+                                                                                {2A710662-702F-4527-A703-792D366AF625}
+                                                                                {9AC08E99-230B-47e8-9721-4577B7F124EA}
+Amazon Redshift ODBC Driver 64-bit                             1.2.7            {788C401A-726B-4CE7-8BC2-89FD7967A6ED}
+Bonjour                                                        3.1.0.1          {56DDDFB8-7F79-4480-89D5-25E1F52AB28F}
+IIS 10.0 Express                                               10.0.06614       {56070933-B0D1-493F-8C12-4F7E83CA3071}
+Java(TM) SE Development Kit 17.0.2 (64-bit)                    17.0.2.0         {65BA81E7-0238-5B54-9069-A59610247B0B}
+LINGO 15.0/x64                                                 15.0             {5E64B5AA-B262-4CD9-A6D8-23472E41ED45}
+Microsoft Office 32-bit Components 2013                        15.0.4420.1017   {90150000-00C1-0000-1000-0000000FF1CE}
+Microsoft Office OSM MUI (Chinese (Simplified)) 2013           15.0.4420.1017   {90150000-00E1-0804-1000-0000000FF1CE}
+Microsoft Office Proofing (Chinese (Simplified)) 2013          15.0.4420.1017   {90150000-002C-0804-1000-0000000FF1CE}
+Microsoft Office Proofing Tools 2013 - English                 15.0.4420.1017   {90150000-001F-0409-1000-0000000FF1CE}
+Microsoft Office Shared 32-bit MUI (Chinese (Simplified)) 2013 15.0.4420.1017   {90150000-00C1-0804-1000-0000000FF1CE}
+Microsoft Office Shared MUI (Chinese (Simplified)) 2013        15.0.4420.1017   {90150000-006E-0804-1000-0000000FF1CE}
+Microsoft Office 校对工具 2013 - 简体中文                              15.0.4420.1017   {90150000-001F-0804-1000-0000000FF1CE}
+Microsoft SQL Server 2008 R2 Native Client                     10.53.6000.34    {E534493E-80D2-4E37-8020-3ECAC55D9DB5}
+Microsoft SQL Server 2012 Native Client                        11.4.7001.0      {926B987C-C8DF-4FC8-85C0-622279D90C45}
+Microsoft SQL Server 2019 LocalDB                              15.0.4153.1      {36E492B8-CB83-4DA5-A5D2-D99A8E8228A1}
+Microsoft SQL Server 2019 RsFx Driver                          15.0.2000.5      {5825CDC4-4E99-4CF9-91FE-DB60C0E2F5EA}
+Microsoft SQL Server 2019 Setup (English)                      15.0.4013.40     {17DCED0E-5B27-453A-B2B4-E487B869B28A}
+Microsoft SQL Server 2019 T-SQL 语言服务                           15.0.2000.5      {9DC7C869-A4C6-48CA-A938-26DB1FC5FC3B}
+Microsoft Update Health Tools                                  5.72.0.0         {C6FD611E-7EFE-488C-A0E0-974C09EF6473}
+Microsoft Visio MUI (Chinese (Simplified)) 2013                15.0.4420.1017   {90150000-0054-0804-1000-0000000FF1CE}
+Microsoft Visio Professional 2013                              15.0.4420.1017   {90150000-0051-0000-1000-0000000FF1CE}
+Microsoft Visual C++ 2008 Redistributable - x86 9.0.30729.6161 9.0.30729.6161   {9BE518E6-ECC6-35A9-88E4-87755C07200F}
+Microsoft Visual C++ 2010  x64 Redistributable - 10.0.40219    10.0.40219       {1D8E6291-B0D5-35EC-8441-6616F567A0F7}
+Microsoft Visual C++ 2010  x86 Redistributable - 10.0.40219    10.0.40219       {F0C3E5D1-1ADE-321E-8167-68EF0DE699A5}
+Microsoft Visual C++ 2012 x64 Additional Runtime - 11.0.61030  11.0.61030       {37B8F9C7-03FB-3253-8781-2517C99D7C00}
+Microsoft Visual C++ 2012 x64 Minimum Runtime - 11.0.61030     11.0.61030       {CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}
+Microsoft Visual C++ 2012 x86 Additional Runtime - 11.0.61030  11.0.61030       {B175520C-86A2-35A7-8619-86DC379688B9}
+Microsoft Visual C++ 2012 x86 Minimum Runtime - 11.0.61030     11.0.61030       {BD95A8CD-1D9F-35AD-981A-3E7925026EBB}
+Microsoft Visual C++ 2013 x64 Additional Runtime - 12.0.40664  12.0.40664       {010792BA-551A-3AC0-A7EF-0FAB4156C382}
+Microsoft Visual C++ 2013 x64 Minimum Runtime - 12.0.40664     12.0.40664       {53CF6934-A98D-3D84-9146-FC4EDF3D5641}
+Microsoft Visual C++ 2013 x86 Additional Runtime - 12.0.40664  12.0.40664       {D401961D-3A20-3AC7-943B-6139D5BD490A}
+Microsoft Visual C++ 2013 x86 Minimum Runtime - 12.0.40664     12.0.40664       {8122DAB1-ED4D-3676-BB0A-CA368196543E}
+Microsoft Visual C++ 2022 X64 Additional Runtime - 14.32.31332 14.32.31332      {F4499EE3-A166-496C-81BB-51D1BCDC70A9}
+Microsoft Visual C++ 2022 X64 Minimum Runtime - 14.32.31332    14.32.31332      {3407B900-37F5-4CC2-B612-5CD5D580A163}
+Microsoft Visual C++ 2022 X86 Additional Runtime - 14.32.31332 14.32.31332      {8972AC25-452E-4FFE-945A-EB9E28C20322}
+Microsoft Visual C++ 2022 X86 Minimum Runtime - 14.32.31332    14.32.31332      {AEAA18F7-9C96-4A43-BC07-8B88A4913EEB}
+Microsoft Visual J# 2.0 Redistributable Package                2.0.50727        {68A35043-C55A-4237-88C9-37EE1C63ED71}
+Microsoft VSS Writer for SQL Server 2019                       15.0.2000.5      {353FC88B-8D34-42F4-A407-6C51ED5CD919}
+Microsoft Web Deploy 4.0                                       10.0.5923        {0C85743B-48E7-4948-96D6-C3BB90246418}
+MySQL Connector Net 6.9.9                                      6.9.9            {E09F82E9-3EB3-4725-BDC8-3C77F83E262C}
+MySQL Installer - Community                                    1.6.5.0          {349F3A9A-D3E2-4DC7-AEBE-77B55064DEAE}
+MySQL Server 8.0                                               8.0.32           {AF316C49-9FF0-401A-9EC3-3BD0AA7049FA}
+Node.js                                                        20.13.1          {C46EC983-913A-4416-B426-9F16D3473F1B}
+NVIDIA Nsight Compute 2022.2.0                                 22.2.0.0         {DEFA2925-DA95-4617-9A2F-F8573413CB02}
+NVIDIA Nsight Systems 2022.1.3                                 22.1.3.3         {9DB46C4E-91B1-47AC-8C69-BEE1995A1133}
+NVIDIA Nsight Visual Studio Edition 2022.2.0.22095             22.2.0.22095     {2ACF636A-58D1-4167-9435-DCCD36BEC76A}
+NVIDIA Tools Extension SDK (NVTX) - 64 bit                     1.00.00.00       {B56D2F88-8865-40FD-B7AC-F074EE4D201D}
+Office 16 Click-to-Run Extensibility Component                 16.0.18827.20102 {90160000-008C-0000-1000-0000000FF1CE}
+Office 16 Click-to-Run Licensing Component                     16.0.18827.20164 {90160000-007E-0000-1000-0000000FF1CE}
+Office 16 Click-to-Run Localization Component                  16.0.18827.20102 {90160000-008C-0804-1000-0000000FF1CE}
+Pandoc 3.5                                                     3.5              {FCFCCF40-091A-4F79-AA79-FE53DFEACA30}
+psqlODBC_x64                                                   09.06.0201       {3D4F4C5A-28C7-441D-81DC-2AA2C1A61B6A}
+Python 3.11.4 Add to Path (64-bit)                             3.11.4150.0      {77489A51-D174-4D9A-BD61-C4883157BA60}
+Python 3.11.4 Core Interpreter (64-bit)                        3.11.4150.0      {FEF98C01-0C8A-4A0F-88AE-F164A787286C}
+Python 3.11.4 Development Libraries (64-bit)                   3.11.4150.0      {1C6E1CE6-CA4E-4B38-BAFF-32BD94DBFFEF}
+Python 3.11.4 Documentation (64-bit)                           3.11.4150.0      {FABA3DAC-829C-4C83-BC27-F3AFFD27B465}
+Python 3.11.4 Executables (64-bit)                             3.11.4150.0      {DA4B94FB-D8BB-4DB9-85A7-FA5067A5CEDF}
+Python 3.11.4 pip Bootstrap (64-bit)                           3.11.4150.0      {D86BDA9F-D389-445E-B3E6-C35EF9FD41C7}
+Python 3.11.4 Standard Library (64-bit)                        3.11.4150.0      {7EB8F17E-4AA7-4F9E-B908-42A28799523A}
+Python 3.11.4 Tcl/Tk Support (64-bit)                          3.11.4150.0      {A32FE961-D579-4E46-B3D6-0B777F8F51E8}
+Python 3.11.4 Test Suite (64-bit)                              3.11.4150.0      {52DE4CC1-22CF-498B-B50F-E66877E4850B}
+Python 3.11.4 Utility Scripts (64-bit)                         3.11.4150.0      {90A235DF-4CF1-415D-AD85-6AC578B5DFB4}
+Python 3.9.7 Core Interpreter (64-bit symbols)                 3.9.7150.0       {19CCBF82-F32C-4F9B-A25A-C18CA0229930}
+Python 3.9.7 Core Interpreter (64-bit)                         3.9.7150.0       {88D4EF59-607D-43AD-B7C7-F5A753740FD1}
+Python 3.9.7 Development Libraries (64-bit)                    3.9.7150.0       {97496FC6-5044-4A2A-BACD-40A44F38D483}
+Python 3.9.7 Documentation (64-bit)                            3.9.7150.0       {AA408E09-EBB3-470F-8D63-5AA0C46C2DA2}
+Python 3.9.7 Executables (64-bit symbols)                      3.9.7150.0       {FA525B0C-1DC4-4733-895E-FC0BB30229C9}
+Python 3.9.7 Executables (64-bit)                              3.9.7150.0       {870EC220-FEAE-481D-8B29-B4B0DF5402FA}
+Python 3.9.7 pip Bootstrap (64-bit)                            3.9.7150.0       {F1280AA2-AAC3-41AB-9616-CCF00814E626}
+Python 3.9.7 Standard Library (64-bit symbols)                 3.9.7150.0       {AB1F1505-63F0-4E88-874D-55448A1020C4}
+Python 3.9.7 Standard Library (64-bit)                         3.9.7150.0       {05903EEF-72A2-4C1A-AD35-41AD6C7094A8}
+Python 3.9.7 Tcl/Tk Support (64-bit symbols)                   3.9.7150.0       {F9100C91-CF07-4FAE-A017-7E6A57FAF41D}
+Python 3.9.7 Tcl/Tk Support (64-bit)                           3.9.7150.0       {6E8EAD3C-6F0C-494C-9C12-E10C5B5EE7EA}
+Python 3.9.7 Test Suite (64-bit symbols)                       3.9.7150.0       {EA4833F1-B32B-4D49-81C8-E28B67E87590}
+Python 3.9.7 Test Suite (64-bit)                               3.9.7150.0       {67D79D6E-8497-4EE6-850B-834D3A27553F}
+Python 3.9.7 Utility Scripts (64-bit)                          3.9.7150.0       {4110826A-903C-410C-9785-7848A51B9CC9}
+Python Launcher                                                3.11.4150.0      {23514291-DEF3-42FD-A67C-A96E35C92F24}
+SQL Server 2019 Batch Parser                                   15.0.2000.5      {D459615B-83B0-408F-8F39-6CC07C277BA6}
+SQL Server 2019 Common Files                                   15.0.2000.5      {7DAB5BDA-D902-4EA7-B6CE-CB9F03578040}
+SQL Server 2019 Common Files                                   15.0.2000.5      {0FB552DD-543E-48E7-A6F4-2F8D82723C6A}
+SQL Server 2019 Connection Info                                15.0.2000.5      {FD730873-33D1-4D1F-9AE0-E259586F8827}
+SQL Server 2019 Connection Info                                15.0.2000.5      {9E2762BB-786A-49D1-BB82-75524B3DA1D8}
+SQL Server 2019 Database Engine Shared                         15.0.2000.5      {1B7BFC1D-9D10-437F-B446-DC87A836A2D2}
+SQL Server 2019 Database Engine Shared                         15.0.2000.5      {DE5B7937-D5B5-4157-BC30-BB87F021CFF0}
+SQL Server 2019 DMF                                            15.0.2000.5      {4F3D424C-5552-45F2-9148-45189D04F7F1}
+SQL Server 2019 DMF                                            15.0.2000.5      {814D5077-C93F-42E2-B875-717007C186B9}
+SQL Server 2019 Shared Management Objects                      15.0.2000.5      {6213D6CB-D258-47A3-B1A0-EE1E5C080DCF}
+SQL Server 2019 Shared Management Objects                      15.0.2000.5      {5D24DB68-43A1-4C75-AEFC-902D2EC0E25D}
+SQL Server 2019 Shared Management Objects Extensions           15.0.2000.5      {8DDAEBCA-4267-4E16-9FE0-D87F21D36891}
+SQL Server 2019 Shared Management Objects Extensions           15.0.2000.5      {F0E70F79-A4FB-4ED2-BD99-BB341259C768}
+SQL Server 2019 SQL Data Quality Common                        15.0.2000.5      {DE61B584-A1E5-4AB4-810B-EC2F8C106B00}
+SQL Server 2019 SQL Diagnostics                                15.0.2000.5      {28ED6838-D8E5-454C-A813-12C5EB447CAB}
+SQL Server 2019 XEvent                                         15.0.2000.5      {2129312E-5204-4F3A-9039-B6D34DBB00FB}
+SQL Server 2019 XEvent                                         15.0.2000.5      {A6C627B5-614D-412A-A9CA-94B6319BA216}
+VMware Workstation                                             17.0.0           {0E992720-1330-4AB3-8155-255F79785535}
+vs_CoreEditorFonts                                             17.3.32708       {D574B266-B723-4BF0-B701-C35212C6EE0F}
+Windows SDK AddOn                                              10.1.0.0         {E18618EC-D9DB-4BCE-B382-85ADA2CBB340}
+Windows Subsystem for Linux                                    2.5.9.0          {FE9F6D2C-A292-4552-A748-A2DFD5984F6C}
+Xftp 7                                                         7.0.0167         {359A9566-381F-4D9B-8ABE-2D922940149F}
+Xshell 7                                                       7.0.0151         {2C5F58B0-1BF6-4BD3-A665-C1B5206BDC17}
+用于 SQL Server 2019 的浏览器                                        15.0.2000.5      {1227EDA2-BF16-4EB2-B8ED-372698285C9B}
+
+
+
+---

@@ -44,5 +44,7 @@ PUBLISHER_ROUTING = {
     'auditLog_queue':'auditLog',
     'loginLog_queue':'loginLog',
     'accountChangeLog_queue':'accountChangeLog',
+    'baselineDetect_queue':'baselineDetect',
+    'baselineHardening_queue':'baselineHardening',
 }
 
