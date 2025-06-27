@@ -196,7 +196,7 @@ public class RabbitSysInfoConsumer {
             Map<String, Object> map = new HashMap<>();
             map.put("status", status);
             String ret_message = mapper.writeValueAsString(map);
-            rabbitService.sendMessage("agent_" + agentMessageParam.getMac().replaceAll(":", "") + "_exchange", agentMessageParam.getMac().replaceAll(":", ""), ret_message);
+            rabbitService.sendMessage("agent_exchange", agentMessageParam.getMac().replaceAll(":", ""), ret_message);
 
             Host host = JSON.parseObject(agentMessageParam.getMessage(), Host.class);
             // 存储到数据库
